@@ -39,6 +39,9 @@ export default {
 	},
 	
 	mounted() {
+		if (typeof this.meal.announcent != "undefined") {
+			this.withAnnouncement = true;
+		}
 		this.changed();
 	},
 }
