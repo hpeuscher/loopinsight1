@@ -39,8 +39,14 @@ export default {
 	},
 	
 	mounted() {
-		if (typeof this.meal.announcent != "undefined") {
-			this.withAnnouncement = true;
+		this.withAnnouncement = false;
+		// check if this meal is announced
+		if (typeof this.meal.announcement !== "undefined") {
+			if (typeof this.meal.announcement.carbs !== "undefined") {
+				if (this.meal.announcement.carbs > 0) {
+					this.withAnnouncement = true;
+				}
+			}
 		}
 		this.changed();
 	},
