@@ -8,23 +8,21 @@ import Controller from './Controller.js';
 
 class ControllerBasalBolus extends Controller {
 		
-	constructor(useBolus, PreBolusTime, CarbFactor) {
+	constructor() {
 		super();
-		
+		this.setParams(1, false, 0, 0); 
+	};
+	
+	setParams(basalRate, useBolus, PreBolusTime, CarbFactor) {
+		this.IIR = basalRate;
 		this.useBolus = useBolus;
 		this.PreBolusTime = PreBolusTime;	// time between meal and bolus
 		this.CarbFactor = CarbFactor;		// insulin units per 10g CHO
-	};
+	}
 	
 	// reset before new simulation
 	setup(patient) {
 		super.setup(patient);
-		if (typeof patient.IIReq !== "undefined") {
-			this.IIR = patient.IIReq;	// constant basal rate
-		}
-		else {
-			this.IIR = 0;
-		}
 	};
 	
 	// compute insulin demand

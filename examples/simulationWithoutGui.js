@@ -13,7 +13,8 @@ import VirtualPatientUvaPadova from '../src/VirtualPatientUvaPadova.js';
 // define a patient object
 let patient = new VirtualPatientUvaPadova();
 // define a controller/algorithm
-let controller = new ControllerBasalBolus(true, 30, 1.5);
+let controller = new ControllerBasalBolus();
+controller.setParams(patient.IIReq, true, 30, 1.5);
 // define a set of meals
 let meals = [
 	{

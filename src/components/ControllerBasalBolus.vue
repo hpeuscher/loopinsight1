@@ -28,20 +28,23 @@ export default {
 		}
 	},
 	mounted() {
+		this.controller = new ControllerBasalBolus();
 		this.controllerChanged();
 	},
 	methods: {
 		controllerChanged() {
-			this.$emit("controllerChanged", this);
-		},
-		// setup (called before simulation)
-		setup(patient) {
-			this.controller = new ControllerBasalBolus(
+			this.controller.setParams(
+				this.IIRb,
 				this.useBolus, 
 				this.PreBolusTime, 
 				this.CarbFactor
 			);
+			this.$emit("controllerChanged", this);
+		},
+		// setup (called before simulation)
+		setup(patient) {
 			this.controller.setup(patient);
+			this.controllerChanged();
 		},
 		// compute insulin demand (function is called every minute)
 		update(t, y, x, announcement) {
