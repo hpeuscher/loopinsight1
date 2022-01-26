@@ -266,9 +266,10 @@ class VirtualPatientUvaPadova extends VirtualPatient {
 		let m3eq = params.HEb * params.m1 / (1 - params.HEb);
 		let S = m3eq * x["Il"] + params.m4*x["Ip"]; // in pmol/kg/min
 		// hepatic extraction // [Dalla Man, IEEE TBME, 2007] (4)
-		let HE = -params.m5 * S + params.m6;
+		// HE is truncated between 0 and 0.9 to avoid singularity
+		let HE = Math.min(0.9, Math.max(0, -params.m5 * S + params.m6));
 		// rate constant of insulin degradation in the liver // [Dalla Man, IEEE TBME, 2007] (5)
-		let m3 = HE * params.m1 / (1 - HE); // in 1/min
+		let m3 = params.m1 * HE / (1 - HE); // in 1/min
 		
 		
 		
