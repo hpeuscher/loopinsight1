@@ -7,7 +7,22 @@
 import Chart from 'chart.js/auto';
 import colors from '../Colors.js';
 
+// Chart object
 var chartGlucose;
+
+// glucose color
+function glucoseColor(ctx) {
+	if (ctx.p0.parsed.y < 54 || ctx.p1.parsed.y < 54)
+		return 'rgb(140,25,22,1)';	// very low
+	if (ctx.p0.parsed.y < 70 || ctx.p1.parsed.y < 70)
+		return 'rgb(194,1,18,1)';	// low
+	if (ctx.p0.parsed.y > 250 || ctx.p1.parsed.y > 250)
+		return 'rgb(233,181,17,1)';	// very high
+	if (ctx.p0.parsed.y > 180 || ctx.p1.parsed.y > 180)
+		return 'rgb(250,234,0,1)';	// high
+	return 'rgb(120,176,89,1)';		// target
+}
+
 
 export default {
 	data() {
@@ -25,16 +40,10 @@ export default {
 					{
 						type: "line", 
 						label: this.$t("prediction"), 
-						borderColor: colors['THUGreen'], 
+						borderColor: 'rgb(0,0,0,1)', 
 						borderDash: [10, 2], 
 						borderWidth: 1, 
 						spanGaps: true
-					},
-					{
-						type: "line", 
-						label: this.$t("actual"), 
-						tension: 0.5, 
-						borderColor: colors['THUBlue']
 					},
 				],
 			},
@@ -80,8 +89,10 @@ export default {
 				type: "line", 
 				label: this.$t("actual"), 
 				tension: 0.5, 
-				borderColor: colors['THUBlue'],
 				data: [],
+				segment: {
+					borderColor: ctx => glucoseColor(ctx),
+				},
 			});
 			this.currentDatasetID = datasets.length - 1;
 		},
