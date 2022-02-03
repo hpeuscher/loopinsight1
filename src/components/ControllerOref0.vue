@@ -35,6 +35,7 @@ export default {
 	},
 	methods: {
 		controllerChanged() {
+			this.CarbFactor = Math.round(10 / this.profile.carb_ratio * 100) / 100;
 			this.$emit("controllerChanged", this);
 		},
 		// setup (called before simulation)
@@ -81,7 +82,7 @@ export default {
 					<div class="item-description">{{$t("CarbFactor")}}</div>
 					<div class="item-input">
 						<input type="number" v-model.number="CarbFactor" 
-							id="CarbFactor" min="0" step="0.1" 
+							id="CarbFactor" min="0" step="0.1" class="disabled"
 							@change="controllerChanged">
 					</div>
 					<div class="item-unit">U/(10g CHO)</div>
