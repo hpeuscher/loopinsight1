@@ -27,7 +27,7 @@ export default {
 			},
 			useBolus: true,
 			PreBolusTime: 30,
-			CarbFactor: 1.5, 
+			CarbFactor: 1.5,
 		}
 	},
 	mounted() {
@@ -66,7 +66,7 @@ export default {
 <template>
 	<div id="controlleroptions" class="parameterlist">
 		<ul>
-			<li class="item">
+			<li class="item" v-tooltip="$t('tooltips.useBolus')">
 				<label for="useBolus">
 					<div class="item-description">{{$t("useBolus")}}</div>
 					<div class="item-input">
@@ -77,7 +77,7 @@ export default {
 					<div class="item-unit"></div>
 				</label>
 			</li>
-			<li class="item">
+			<li class="item" v-tooltip="$t('tooltips.CarbFactor')">
 				<label for="CarbFactor">
 					<div class="item-description">{{$t("CarbFactor")}}</div>
 					<div class="item-input">
@@ -88,7 +88,8 @@ export default {
 					<div class="item-unit">U/(10g CHO)</div>
 				</label>
 			</li>
-			<li class="item" v-bind:class="{disabled: !useBolus}">
+			<li class="item" v-tooltip="$t('tooltips.PreBolusTime')"
+				v-bind:class="{disabled: !useBolus}">
 				<label for="PreBolusTime">
 					<div class="item-description">{{$t("PreBolusTime")}}</div>
 					<div class="item-input">
@@ -100,7 +101,7 @@ export default {
 				</label>
 			</li>
 			<li><hr></li>
-			<li class="item">
+			<li class="item" v-tooltip="$t('tooltips.ISF')">
 				<label for="ISF">
 					<div class="item-description">{{$t("ISF")}}</div>
 					<div class="item-input">
@@ -111,7 +112,7 @@ export default {
 					<div class="item-unit">(mg/dl)/U</div>
 				</label>
 			</li>
-			<li class="item">
+			<li class="item" v-tooltip="$t('tooltips.min_bg')">
 				<label for="min_bg">
 					<div class="item-description">{{$t("min_bg")}}</div>
 					<div class="item-input">
@@ -122,7 +123,7 @@ export default {
 					<div class="item-unit">mg/dl</div>
 				</label>
 			</li>
-			<li class="item">
+			<li class="item" v-tooltip="$t('tooltips.max_bg')">
 				<label for="max_bg">
 					<div class="item-description">{{$t("max_bg")}}</div>
 					<div class="item-input">
@@ -133,7 +134,7 @@ export default {
 					<div class="item-unit">mg/dl</div>
 				</label>
 			</li>
-			<li class="item">
+			<li class="item" v-tooltip="$t('tooltips.DIA')">
 				<label for="DIA">
 					<div class="item-description">{{$t("DIA")}}</div>
 					<div class="item-input">
@@ -144,7 +145,7 @@ export default {
 					<div class="item-unit">h</div>
 				</label>
 			</li>
-			<li class="item">
+			<li class="item" v-tooltip="$t('tooltips.CR')">
 				<label for="CR">
 					<div class="item-description">{{$t("CR")}}</div>
 					<div class="item-input">
@@ -155,7 +156,7 @@ export default {
 					<div class="item-unit">g/U</div>
 				</label>
 			</li>
-			<li class="item">
+			<li class="item" v-tooltip="$t('tooltips.max_iob')">
 				<label for="max_iob">
 					<div class="item-description">{{$t("max_iob")}}</div>
 					<div class="item-input">
@@ -166,7 +167,7 @@ export default {
 					<div class="item-unit">U</div>
 				</label>
 			</li>
-			<li class="item">
+			<li class="item" v-tooltip="$t('tooltips.max_basal')">
 				<label for="max_basal">
 					<div class="item-description">{{$t("max_basal")}}</div>
 					<div class="item-input">
@@ -200,6 +201,18 @@ export default {
 	"CR": "carb ratio (CR)",
 	"max_iob": "maximum IOB",
 	"max_basal": "maximum basal",
+	"tooltips" : {
+		"useBolus": "Choose if the virtual patient manually administers a meal bolus.",
+		"CarbFactor": "The carb factor defines how much insulin is required to compensate for an amount of carbs. It is coupled with carb ratio.",
+		"PreBolusTime": "This defines how much before the meal a bolus is administered.",
+		"ISF": "The ISF is used to predict the eventual blood glucose concentration after all remaining insulin on board has taken its effect.",
+		"min_bg": "The algorithm tries to keep blood glucose above this value.",
+		"max_bg": "The algorithm tries to keep blood glucose below this value.",
+		"DIA": "DIA describes how long it takes before insulin that is delivered now has completely taken effect.",
+		"CR": "CR is the quotient of carbs and the compensating amount of insulin.",
+		"max_iob": "The computed amount of insulin on board (IOB) is capped at this maximum.",
+		"max_basal": "The basal rate is capped at this maximum.",
+	},
 }
 </i18n>
 <i18n locale="de">
@@ -214,5 +227,17 @@ export default {
 	"CR": "carb ratio (CR)",
 	"max_iob": "Maximalwert IOB",
 	"max_basal": "Maximale Basalrate",
+	"tooltips" : {
+		"useBolus": "Legt fest, ob vom virtuellen Patienten ein manueller Mahlzeitenbolus abgegeben wird.",
+		"CarbFactor": "Der KE-Faktor beschreibt, wie viel Insulin benötigt wird, um eine Kohlenhydrateinheit auszugleichen. Er ist hier an die Einstellung Carb Ratio gekoppelt.",
+		"PreBolusTime": "Der Spritz-Ess-Abstand legt fest, wie lange vor der Mahlzeit ein Bolus abgegeben wird.",
+		"ISF": "Der ISF dient zur Vorhersage des finalen Glukosespiegels, sobald alles verbleibende Insulin (IOB) seine Wirkung entfaltet hat.",
+		"min_bg": "Der Algorithmus versucht den Glukosespiegel über diesem Wert zu halten.",
+		"max_bg": "Der Algorithmus versucht den Glukosespiegel unter diesem Wert zu halten.",
+		"DIA": "DIA beschreibt, wie lange es dauert, über welchen Zeitraum Insulin, das jetzt abgegeben wird, seine Wirkung entfaltet und abgebaut wird.",
+		"CR": "CR is das Verhältnis zwischen Kohlenhydraten und der ausgleichenden Insulinmenge.",
+		"max_iob": "Das berechnete im Körper befindliche Insulin (IOB) wird bei diesem Maximum abgeschnitten.",
+		"max_basal": "Die Basalrate wird bei diesem Maximum abgeschnitten.",
+	},
 }
 </i18n>
