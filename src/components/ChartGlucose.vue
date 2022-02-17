@@ -74,10 +74,13 @@ export default {
 	methods: {
 		setup(patient, controller, meals) {
 			let datasets = chartGlucose.data.datasets;
+			// remove prediction data
 			datasets[0].data = [];
 			if (this.preserveOldCurves) {
-				// make old curve thinner
-				datasets[this.currentDatasetID].borderWidth = 0.5;
+				if (datasets.length > this.currentDatasetID) {
+					// make old curve thinner
+					datasets[this.currentDatasetID].borderWidth = 0.5;
+				}
 			}
 			else {
 				// remove all but first (prediction)
