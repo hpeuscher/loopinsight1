@@ -65,7 +65,7 @@ class Simulator {
 		
 		const dt = 1;
 		let x = patient.getInitialState();
-		let u = {meal: 0, IIR: patient.IIReq, bolus: 0};
+		let u = {meal: 0, iir: patient.IIReq, ibolus: 0};
 		let y = patient.outputs(t, x, u);
 		let log = {};
 		
@@ -80,11 +80,13 @@ class Simulator {
 
 			// inputs to metabolic model
 			u = controller.getTreatment();
+			u['iir'] = Math.max(u['iir'] || 0, 0);
+			u['ibolus'] = Math.max(u['ibolus'] || 0, 0);
 			u['carbs'] = this.carb(meals, t);
 			u['meal'] = this.newMeal(meals, t);
 
 			// output current state to frontend
-			if (pushData(t, patient.stateToObject(x), u, y, log)) {
+			if (pushData(t, x, u, y, log)) {
 				// abort simulation
 				return;
 			}

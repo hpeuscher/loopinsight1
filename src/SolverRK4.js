@@ -4,24 +4,24 @@
    See https://lt1.org for further information.	*/
 
 
-// multiply vector by scalar
-function timesScalar(X,a) {
-	let z = new Array(X.length);
-	for (let i=0; i<z.length; i++) {
-		z[i] = X[i]*a;
-	}
-	return z;
+// multiply state vector by scalar
+function timesScalar(X, a) {
+	return Object.keys(X).reduce(function(result, key) {
+		result[key] = X[key] * a;
+		return result;
+	}, {});
 };
 
 // compute sum of n vectors
-function vectorSum () { 
-	let z = arguments[0].slice();
-	for (let k=1; k<arguments.length; k++) {
-		for (let i=0; i<z.length; i++) {
-			z[i] = z[i] + arguments[k][i];
-		}
-	}
-	return z;
+function vectorSum (...X) { 
+	return X.reduce((a, b) => {
+		for (let k in b) {
+			if (b.hasOwnProperty(k))
+				a[k] = (a[k] || 0) + b[k];
+			}
+			return a;
+		}, {}
+	);
 };
 
 // classical fixed-step Runge-Kutta solver

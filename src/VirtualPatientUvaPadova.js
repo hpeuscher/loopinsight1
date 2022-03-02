@@ -218,7 +218,7 @@ class VirtualPatientUvaPadova extends VirtualPatient {
 	}
 	
 	getInitialState() {
-		return this.stateToArray(this.xeq);
+		return this.xeq;
 	}
 	
 	// u["carbs"]: carbs intake in g/min
@@ -226,7 +226,6 @@ class VirtualPatientUvaPadova extends VirtualPatient {
 	// u["ibolus"]: bolus in U
 	derivatives(_t, x, u) {
 		
-		x = this.stateToObject(x);
 		let params = this.params;
 		
 		// inputs
@@ -317,13 +316,12 @@ class VirtualPatientUvaPadova extends VirtualPatient {
 		dx_dt["Isc2"] = params.kd*x["Isc1"] - params.ka2*x["Isc2"];
 		
 		
-		return this.stateToArray(dx_dt);
+		return dx_dt;
 	};
 	
 	
 	// compute outputs (returns object)
 	outputs(_, x, _u) {
-		x = this.stateToObject(x);
 		return {
 			"G": x["Gp"] / this.params.VG
 		}

@@ -19,45 +19,20 @@ class VirtualPatient {
 	constructor() {
 	};
 	
-	
+	// return initial state
+	getInitialState() {
+		return {};
+	}
 	
 	// compute derivatives (returns array)
 	derivatives(_t, _x, _u) {
-		return [];
+		return {};
 	};
 	
 	
 	// compute outputs (returns object)
 	outputs(_t, _x, _u) {
 		return {}
-	};
-	
-	
-	// output state as array
-	stateToArray(x) {
-		if (Array.isArray(x)) {
-			return x;
-		}
-		let a = [];
-		for (const id of Object.keys(this.stateList)) {
-			a.push(x[id]);
-		}
-		return a;
-	};
-	
-	
-	// output state as object
-	stateToObject(a) {
-		if (! Array.isArray(a)) {
-			return a;
-		}
-		let keys = Object.keys(this.stateList);
-		let x = {};
-		for (let i=0; i<a.length; i++) {
-			// todo
-			x[keys[i]] = a[i];
-		}
-		return x;
 	};
 	
 }
