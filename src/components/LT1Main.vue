@@ -13,6 +13,7 @@ import { ref } from 'vue';
 import ChartGlucose from './ChartGlucose.vue';
 import ChartInsulinCarbs from './ChartInsulinCarbs.vue';
 import ChartControllerOutput from './ChartControllerOutput.vue';
+import ChartAGP from './ChartAGP.vue';
 
 export default {
 	props: {
@@ -52,6 +53,7 @@ export default {
 		ChartGlucose,
 		ChartInsulinCarbs,
 		ChartControllerOutput,
+		ChartAGP,
 	},
 
 	data() {
@@ -207,6 +209,7 @@ export default {
 			<ChartGlucose ref="chartGlucose" />
 			<ChartInsulinCarbs ref="chartInsulinCarbs" @selectLog="controllerDataHover" />
 			<ChartControllerOutput ref="chartControllerOutput" />
+			<ChartAGP ref="chartAGP" />
 		</div>
 	</div>
 </template>
@@ -215,6 +218,7 @@ export default {
 <style lang="css">
 body {
 	overflow-y: scroll;
+	min-width: 440px;
 }
 
 /* for wide screen, show results next to settings. otherwise below */
