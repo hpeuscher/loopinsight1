@@ -17,6 +17,8 @@ export default {
 			import("./ControllerOref0.vue")), 
 		ControllerBasalBolus: defineAsyncComponent(() => 
 			import("./ControllerBasalBolus.vue")), 
+		ControllerPID: defineAsyncComponent(() => 
+			import("./ControllerPID.vue")), 
 	},
 
 	emits: ["controllerChanged"],
@@ -35,6 +37,11 @@ export default {
 				oref0: {
 					id: "oref0",
 					filename: "ControllerOref0",
+					version: "1.0.0"
+				},
+				pid: {
+					id: "pid",
+					filename: "ControllerPID",
 					version: "1.0.0"
 				},
 			},
@@ -92,6 +99,7 @@ export default {
 	"selectalgo": "Select algorithm / device / treatment",
 	"basalbolus": "Basal rate + bolus",
 	"oref0": "OpenAPS (oref0)",
+	"pid": "PID controller + bolus",
 }
 </i18n>
 
@@ -101,5 +109,6 @@ export default {
 	"selectalgo": "Algorithmus / Gerät wählen",
 	"basalbolus": "Basalrate + Bolus",
 	"oref0": "OpenAPS (oref0)",
+	"pid": "PID-Regler + Bolus",
 }
 </i18n>
