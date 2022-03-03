@@ -8,9 +8,12 @@ import CopyWebpackPlugin from 'copy-webpack-plugin';
 import webpack from 'webpack';
 
 export default {
-  entry: './src/LoopInsighT1.js',
+  entry: {
+	  lt1: './src/LoopInsighT1.js',
+	  game: './src/Gamification.js'
+  },
   output: {
-    filename: 'lt1.bundle.js',
+	filename: '[name].bundle.js',
     path: path.resolve(__dirname, 'dist'),
   },
   module: {
@@ -37,6 +40,14 @@ export default {
     new HtmlWebpackPlugin({
       template: './src/assets/index.htm',
       favicon: './src/assets/images/favicon.png', 
+	    filename: 'index.html',
+	    chunks: ["index"],
+    }),
+    new HtmlWebpackPlugin({
+      template: './src/assets/index.htm',
+      favicon: './src/assets/images/favicon.png',
+	    filename: 'game.html',
+	    chunks: ["game"],
     }),
 	new CopyWebpackPlugin({'patterns': [
         {from:'./src/assets/images', to:'images'}
