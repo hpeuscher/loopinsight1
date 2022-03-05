@@ -6,10 +6,10 @@
 
 import AbstractController from './AbstractController.js'
 
-import determine_basal from '../../node_modules/oref0/lib/determine-basal/determine-basal.js';
-import tempBasalFunctions from '../../node_modules/oref0/lib/basal-set-temp.js';
-import iob from '../../node_modules/oref0/lib/iob/index.js';
-import getMealData from '../../node_modules/oref0/lib/meal/total.js';
+import determine_basal from 'oref0/lib/determine-basal/determine-basal.js';
+import tempBasalFunctions from 'oref0/lib/basal-set-temp.js';
+import iob from 'oref0/lib/iob/index.js';
+import getMealData from 'oref0/lib/meal/total.js';
 
 // redirect console outputs of determine-basal and store them
 var debugLog = ""; 
