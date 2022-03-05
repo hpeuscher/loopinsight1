@@ -44,11 +44,12 @@ var log_fun = function () {
 };
 		
 		
-class controllerOref0 extends AbstractController {
+class ControllerOref0 extends AbstractController {
 	
 	constructor(profile, useBolus, PreBolusTime, CarbFactor) {
-		super();
 		
+		super()
+
 		// patient profile
 		// todo: create default profile
 		//profile = Object.assign(oref0Profile.defaults(), profile);
@@ -281,4 +282,4 @@ class controllerOref0 extends AbstractController {
 
 }
 
-export default controllerOref0;
+export default ControllerOref0;

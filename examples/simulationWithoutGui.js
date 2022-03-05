@@ -38,13 +38,13 @@ var sim = new Simulator();
 var results = [];
 
 // start the simulation
-sim.startSim(
-	patient, 
-	controller, 
-	meals, 
-	(t, _x, _u, y, _log) => { results.push({t:t, G:y.G}); },
-	{"tmax": 600}
-);
+sim.setPatient(patient)
+sim.setController(controller)
+sim.setMeals(meals)
+sim.setPushData((t, _x, _u, y, _log) => { results.push({t:t, G:y.G}); })
+sim.setOptions({"tmax": 600})
+sim.startSim();
+
 
 // display the results (or preprocess them as you need)
 console.log(results);

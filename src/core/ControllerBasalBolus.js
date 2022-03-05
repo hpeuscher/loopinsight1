@@ -9,7 +9,7 @@ import AbstractController from './AbstractController.js';
 class ControllerBasalBolus extends AbstractController {
 		
 	constructor() {
-		super();
+		super()
 		this.setParams(1, false, 0, 0); 
 	};
 	

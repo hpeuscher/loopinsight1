@@ -8,9 +8,6 @@ import NotImplementedError from '../common/NotImplementedError.js'
 // base class of controller algorithm
 class AbstractController {
 
-	constructor() {
-	};
-
 	// setPatient (called before simulation)
 	setPatient(patient) {
 		this.patient = patient;

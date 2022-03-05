@@ -6,8 +6,6 @@
 import RK4 from './SolverRK4.js';
 
 class Simulator {
-	constructor() {
-	}
 	
 	// compute momentary carb intake
 	carb(meals, t) {
@@ -50,23 +48,43 @@ class Simulator {
 		return a;
 	}
 	
+	setPatient(patient) {
+		this.patient = patient
+	}
+	
+	setController(controller) {
+		this.controller = controller;
+	}
+
+	setMeals(meals) {
+		this.meals = meals
+	}
+
+	setPushData(pushData) {
+		this.pushData = pushData
+	}
+
+	setOptions(options) {
+		this.options = options
+	}
+
 	// run simulation
-	startSim(patient, controller, meals, pushData, options) {
+	startSim() {
 		
 		// initialize controller
-		controller.setup(patient);
+		this.controller.setup(this.patient);
 		
 		// initialize simulation variables
 		let t = 0;
-		let tmax = options.tmax;
+		let tmax = this.options.tmax;
 		if (!Number.isInteger(tmax) || tmax < 0) {
 			tmax = 10;
 		}
 		
 		const dt = 1;
-		let x = patient.getInitialState();
-		let u = {meal: 0, iir: patient.IIReq, ibolus: 0};
-		let y = patient.outputs(t, x, u);
+		let x = this.patient.getInitialState();
+		let u = {meal: 0, iir: this.patient.IIReq, ibolus: 0};
+		let y = this.patient.outputs(t, x, u);
 		let log = {};
 		
 		
@@ -74,26 +92,26 @@ class Simulator {
 		while (t<tmax)
 		{
 			// compute controller output
-			log = controller.update(t, y, x, 
-				(t_) => this.announcement(meals, t_, t)
+			log = this.controller.update(t, y, x, 
+				(t_) => this.announcement(this.meals, t_, t)
 			);
 
 			// inputs to metabolic model
-			u = controller.getTreatment();
+			u = this.controller.getTreatment();
 			u['iir'] = Math.max(u['iir'] || 0, 0);
 			u['ibolus'] = Math.max(u['ibolus'] || 0, 0);
-			u['carbs'] = this.carb(meals, t);
-			u['meal'] = this.newMeal(meals, t);
+			u['carbs'] = this.carb(this.meals, t);
+			u['meal'] = this.newMeal(this.meals, t);
 
 			// output current state to frontend
-			if (pushData(t, x, u, y, log)) {
+			if (this.pushData(t, x, u, y, log)) {
 				// abort simulation
 				return;
 			}
 			
 			// proceed one time step
-			x = RK4((t_,x_) => patient.derivatives(t_, x_, u), t, x, dt);
-			y = patient.outputs(t, x, u);
+			x = RK4((t_,x_) => this.patient.derivatives(t_, x_, u), t, x, dt);
+			y = this.patient.outputs(t, x, u);
 			t += dt;
 		}
 	}

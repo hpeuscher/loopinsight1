@@ -15,10 +15,7 @@ class AbstractVirtualPatient {
 	stateList
 	signalList
 	
-	
-	constructor() {
-	};
-	
+
 	// return initial state
 	getInitialState() {
 		throw new NotImplementedError(this.constructor.name, 'getInitialState')

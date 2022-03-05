@@ -56,12 +56,13 @@ var sim = new Simulator();
 // configure callback to run simulation
 gui.runSimulation = () => {
 	console.log("start simulation");
-	sim.startSim(
-		gui.$refs.main.getPatient(), 
-		gui.$refs.main.getController(), 
-		gui.$refs.main.getMeals(), 
-		gui.$refs.main.pushData, 
-		{"tmax": Number(gui.$refs.main.tmax)}
-	);
+
+	sim.setPatient(gui.$refs.main.getPatient())
+	sim.setController(gui.$refs.main.getController())
+	sim.setMeals(gui.$refs.main.getMeals())
+	sim.setPushData(gui.$refs.main.pushData)
+	sim.setOptions({"tmax": Number(gui.$refs.main.tmax)})
+	
+	sim.startSim();
 };
 

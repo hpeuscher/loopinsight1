@@ -9,12 +9,12 @@ import AbstractController from './AbstractController.js';
 class ControllerPID extends AbstractController {
 		
 	constructor() {
-		super();
-		this.setParams(1, false, 0, 0); 
+		super()
 		this.setup()
-	};
-	
+	}
+
 	setParams(basalRate, kP, kI, kD, target, useBolus, PreBolusTime, CarbFactor) {
+
 		this.IIReq = basalRate;
 		this.kP = kP;
 		this.kI = kI;

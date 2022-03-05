@@ -5,7 +5,7 @@
 	See https://lt1.org for further information.	*/
 
 import ControllerOref0 from '../../core/ControllerOref0.js';
-var oref0;
+var oref0; // FIXME Referenz zu Controller
 
 export default {
 	props: {
@@ -31,12 +31,12 @@ export default {
 		}
 	},
 	mounted() {
-		this.controllerChanged();
+		this.valueChanged()
+		this.$emit("controllerChanged", this)
 	},
 	methods: {
-		controllerChanged() {
+		valueChanged() {
 			this.CarbFactor = Math.round(10 / this.profile.carb_ratio * 100) / 100;
-			this.$emit("controllerChanged", this);
 		},
 		// setup (called before simulation)
 		setup(patient) {
@@ -72,7 +72,7 @@ export default {
 					<div class="item-input">
 						<input type="checkbox" v-model="useBolus"
 							id="useBolus" 
-							@change="controllerChanged">
+							@change="valueChanged">
 					</div>
 					<div class="item-unit"></div>
 				</label>
@@ -83,7 +83,7 @@ export default {
 					<div class="item-input">
 						<input type="number" v-model.number="CarbFactor" 
 							id="CarbFactor" min="0" step="0.1" class="disabled"
-							@change="controllerChanged">
+							@change="valueChanged">
 					</div>
 					<div class="item-unit">U/(10g CHO)</div>
 				</label>
@@ -95,7 +95,7 @@ export default {
 					<div class="item-input">
 						<input type="number" v-model.number="PreBolusTime" 
 							id="PreBolusTime" min="0" step="5" 
-							@change="controllerChanged">
+							@change="valueChanged">
 					</div>
 					<div class="item-unit">min</div>
 				</label>
@@ -107,7 +107,7 @@ export default {
 					<div class="item-input">
 						<input type="number" v-model.number="profile.sens" 
 							id="ISF" min="20" step="5" 
-							@change="controllerChanged">
+							@change="valueChanged">
 					</div>
 					<div class="item-unit">(mg/dl)/U</div>
 				</label>
@@ -118,7 +118,7 @@ export default {
 					<div class="item-input">
 						<input type="number" v-model.number="profile.min_bg" 
 							id="min_bg" min="50" step="5" 
-							@change="controllerChanged">
+							@change="valueChanged">
 					</div>
 					<div class="item-unit">mg/dl</div>
 				</label>
@@ -129,7 +129,7 @@ export default {
 					<div class="item-input">
 						<input type="number" v-model.number="profile.max_bg" 
 							id="max_bg" min="100" step="5" 
-							change="controllerChanged">
+							change="valueChanged">
 					</div>
 					<div class="item-unit">mg/dl</div>
 				</label>
@@ -140,7 +140,7 @@ export default {
 					<div class="item-input">
 						<input type="number" v-model.number="profile.dia" 
 							id="DIA" min="1" step="0.5" 
-							@change="controllerChanged">
+							@change="valueChanged">
 					</div>
 					<div class="item-unit">h</div>
 				</label>
@@ -151,7 +151,7 @@ export default {
 					<div class="item-input">
 						<input type="number" v-model.number="profile.carb_ratio" 
 							id="CR" min="1" step="0.5" 
-							@change="controllerChanged">
+							@change="valueChanged">
 					</div>
 					<div class="item-unit">g/U</div>
 				</label>
@@ -162,7 +162,7 @@ export default {
 					<div class="item-input">
 						<input type="number" v-model.number="profile.max_iob" 
 							id="max_iob" min="1" step="0.1" 
-							@change="controllerChanged">
+							@change="valueChanged">
 					</div>
 					<div class="item-unit">U</div>
 				</label>
@@ -173,7 +173,7 @@ export default {
 					<div class="item-input">
 						<input type="number" v-model.number="profile.max_basal" 
 							id="max_basal" min="1" step="0.1" 
-							@change="controllerChanged">
+							@change="valueChanged">
 					</div>
 					<div class="item-unit">U/h</div>
 				</label>

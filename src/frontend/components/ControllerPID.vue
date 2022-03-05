@@ -33,10 +33,11 @@ export default {
 	},
 	mounted() {
 		this.controller = new ControllerPID();
-		this.controllerChanged();
+		this.valueChanged();
+		this.$emit("controllerChanged", this)
 	},
 	methods: {
-		controllerChanged() {
+		valueChanged() {
 			this.controller.setParams(
 				this.IIRb,
 				this.kP,
@@ -46,13 +47,12 @@ export default {
 				this.useBolus, 
 				this.PreBolusTime, 
 				this.CarbFactor,
-			);
-			this.$emit("controllerChanged", this);
+			)
 		},
 		// setup (called before simulation)
 		setup(patient) {
-			this.controller.setup(patient);
-			this.controllerChanged();
+			this.controller.setup(patient)
+			this.valueChanged()
 		},
 		// compute insulin demand (function is called every minute)
 		update(t, y, x, announcement) {
@@ -77,7 +77,7 @@ export default {
 					<div class="item-input">
 						<input type="number" v-model.number="IIRb" 
 							id="IIRb" min="0" step="0.05" 
-							@change="controllerChanged">
+							@change="valueChanged">
 					</div>
 					<div class="item-unit">U/h</div>
 				</label>
@@ -88,7 +88,7 @@ export default {
 					<div class="item-input">
 						<input type="number" v-model.number="kP" 
 							id="kP" min="0" step="0.002" 
-							@change="controllerChanged">
+							@change="valueChanged">
 					</div>
 					<div class="item-unit">U/h / (mg/dl)</div>
 				</label>
@@ -99,7 +99,7 @@ export default {
 					<div class="item-input">
 						<input type="number" v-model.number="kI" 
 							id="kI" min="0" step="0.001" 
-							@change="controllerChanged">
+							@change="valueChanged">
 					</div>
 					<div class="item-unit">U/h / (mg/dl) / h</div>
 				</label>
@@ -110,7 +110,7 @@ export default {
 					<div class="item-input">
 						<input type="number" v-model.number="kD" 
 							id="kD" min="0" step="0.01" 
-							@change="controllerChanged">
+							@change="valueChanged">
 					</div>
 					<div class="item-unit">U/h / (mg/dl) * h</div>
 				</label>
@@ -121,7 +121,7 @@ export default {
 					<div class="item-input">
 						<input type="number" v-model.number="target" 
 							id="target" min="0" step="0.05" 
-							@change="controllerChanged">
+							@change="valueChanged">
 					</div>
 					<div class="item-unit">mg/dl</div>
 				</label>
@@ -132,7 +132,7 @@ export default {
 					<div class="item-input">
 						<input type="checkbox" v-model="useBolus"
 							id="useBolus" 
-							@change="controllerChanged">
+							@change="valueChanged">
 					</div>
 					<div class="item-unit"></div>
 				</label>
@@ -143,7 +143,7 @@ export default {
 					<div class="item-input">
 						<input type="number" v-model.number="CarbFactor" 
 							id="CarbFactor" min="0" step="0.1" 
-							@change="controllerChanged">
+							@change="valueChanged">
 					</div>
 					<div class="item-unit">U/(10g CHO)</div>
 				</label>
@@ -154,7 +154,7 @@ export default {
 					<div class="item-input">
 						<input type="number" v-model.number="PreBolusTime" 
 							id="PreBolusTime" min="0" step="5" 
-							@change="controllerChanged">
+							@change="valueChanged">
 					</div>
 					<div class="item-unit">min</div>
 				</label>
