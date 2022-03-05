@@ -4,13 +4,14 @@
    See https://lt1.org for further information.	*/
 
 
-import Controller from './Controller.js';
+import AbstractController from './AbstractController.js';
 
-class ControllerPID extends Controller {
+class ControllerPID extends AbstractController {
 		
 	constructor() {
 		super();
 		this.setParams(1, false, 0, 0); 
+		this.setup()
 	};
 	
 	setParams(basalRate, kP, kI, kD, target, useBolus, PreBolusTime, CarbFactor) {
@@ -25,8 +26,7 @@ class ControllerPID extends Controller {
 	};
 	
 	// reset before new simulation
-	setup(patient) {
-		super.setup(patient);
+	setup() {
 		this.e_int = 0;
 		this.e_old = undefined;
 		this.IIR = this.IIReq;
@@ -34,7 +34,6 @@ class ControllerPID extends Controller {
 	
 	// compute insulin demand
 	update(t, y, _x, announcement) {
-		super.update();
 		
 		// compute bolus (IIR remains constant all the time)
 		this.bolus = this.useBolus * announcement(t+this.PreBolusTime) / 10.0 

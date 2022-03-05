@@ -5,7 +5,7 @@
 
 
 // base class of physiological model of virtual patient
-class VirtualPatient {
+class AbstractVirtualPatient {
 	xeq				// steady state vector (equilibrium)
 	IIReq			// equilibrium basal rate
 
@@ -21,21 +21,21 @@ class VirtualPatient {
 	
 	// return initial state
 	getInitialState() {
-		return {};
+		throw new NotImplementedError(this.constructor.name, 'getInitialState')
 	}
 	
 	// compute derivatives (returns array)
 	derivatives(_t, _x, _u) {
-		return {};
+		throw new NotImplementedError(this.constructor.name, 'derivatives')
 	};
 	
 	
 	// compute outputs (returns object)
 	outputs(_t, _x, _u) {
-		return {}
+		throw new NotImplementedError(this.constructor.name, 'outputs')
 	};
 	
 }
 
-export default VirtualPatient;
+export default AbstractVirtualPatient;
 

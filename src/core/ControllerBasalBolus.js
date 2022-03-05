@@ -4,9 +4,9 @@
    See https://lt1.org for further information.	*/
 
 
-import Controller from './Controller.js';
+import AbstractController from './AbstractController.js';
 
-class ControllerBasalBolus extends Controller {
+class ControllerBasalBolus extends AbstractController {
 		
 	constructor() {
 		super();
@@ -22,13 +22,11 @@ class ControllerBasalBolus extends Controller {
 	
 	// reset before new simulation
 	setup(patient) {
-		super.setup(patient);
-	};
+		this.setPatient(patient);
+	}
 	
 	// compute insulin demand
 	update(t, _y, _x, announcement) {
-		super.update();
-		
 		// compute bolus (IIR remains constant all the time)
 		this.bolus = this.useBolus * announcement(t+this.PreBolusTime) / 10.0 
 			* this.CarbFactor;

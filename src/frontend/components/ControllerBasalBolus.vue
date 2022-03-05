@@ -4,7 +4,7 @@
    	Distributed under the MIT software license.
 	See https://lt1.org for further information.	*/
 
-import ControllerPID from '../ControllerPID.js';
+import ControllerBasalBolus from '../../core/ControllerBasalBolus.js';
 
 export default {
 	props: {
@@ -18,10 +18,6 @@ export default {
 			PreBolusTime: 30,
 			CarbFactor: 1.5,
 			IIRb: 0,
-			kP: 0.01,
-			kI: 0.001,
-			kD: 0.05,
-			target: 100,
 			bolus: 0,
 		}
 	},
@@ -32,20 +28,16 @@ export default {
 		}
 	},
 	mounted() {
-		this.controller = new ControllerPID();
+		this.controller = new ControllerBasalBolus();
 		this.controllerChanged();
 	},
 	methods: {
 		controllerChanged() {
 			this.controller.setParams(
 				this.IIRb,
-				this.kP,
-				this.kI,
-				this.kD,
-				this.target,
 				this.useBolus, 
 				this.PreBolusTime, 
-				this.CarbFactor,
+				this.CarbFactor
 			);
 			this.$emit("controllerChanged", this);
 		},
@@ -80,50 +72,6 @@ export default {
 							@change="controllerChanged">
 					</div>
 					<div class="item-unit">U/h</div>
-				</label>
-			</li>
-			<li class="item">
-				<label for="kP">
-					<div class="item-description">{{$t("kP")}}</div>
-					<div class="item-input">
-						<input type="number" v-model.number="kP" 
-							id="kP" min="0" step="0.002" 
-							@change="controllerChanged">
-					</div>
-					<div class="item-unit">U/h / (mg/dl)</div>
-				</label>
-			</li>
-			<li class="item">
-				<label for="kI">
-					<div class="item-description">{{$t("kI")}}</div>
-					<div class="item-input">
-						<input type="number" v-model.number="kI" 
-							id="kI" min="0" step="0.001" 
-							@change="controllerChanged">
-					</div>
-					<div class="item-unit">U/h / (mg/dl) / h</div>
-				</label>
-			</li>
-			<li class="item">
-				<label for="kD">
-					<div class="item-description">{{$t("kD")}}</div>
-					<div class="item-input">
-						<input type="number" v-model.number="kD" 
-							id="kD" min="0" step="0.01" 
-							@change="controllerChanged">
-					</div>
-					<div class="item-unit">U/h / (mg/dl) * h</div>
-				</label>
-			</li>
-			<li class="item">
-				<label for="target">
-					<div class="item-description">{{$t("target")}}</div>
-					<div class="item-input">
-						<input type="number" v-model.number="target" 
-							id="target" min="0" step="0.05" 
-							@change="controllerChanged">
-					</div>
-					<div class="item-unit">mg/dl</div>
 				</label>
 			</li>
 			<li class="item">
@@ -175,10 +123,6 @@ export default {
 <i18n locale="en">
 {
 	"IIRb": "basal rate",
-	"kP": "proportional factor",
-	"kI": "integral factor",
-	"kD": "differential factor",
-	"target": "target glucose concentration",
 	"useBolus": "bolus with meal",
 	"CarbFactor": "carb factor",
 	"PreBolusTime": "time between bolus and meal",
@@ -187,10 +131,6 @@ export default {
 <i18n locale="de">
 {
 	"IIRb": "Basalrate",
-	"kP": "Proportional-Faktor",
-	"kI": "Integral-Faktor",
-	"kD": "Differential-Faktor",
-	"target": "Ziel-Konzentration",
 	"useBolus": "Bolus zur Mahlzeit",
 	"CarbFactor": "KE-Faktor",
 	"PreBolusTime": "Spritz-Ess-Abstand",

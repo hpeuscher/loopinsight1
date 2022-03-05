@@ -28,13 +28,13 @@ The model implemented in this file uses information from the following scientifi
 
 */
 
-import VirtualPatient from './VirtualPatient.js';
+import AbstractVirtualPatient from './AbstractVirtualPatient.js';
 
 
 const pmol_per_U = 6000;
 
 // physiological model of virtual patient
-class VirtualPatientUvaPadova extends VirtualPatient {
+class VirtualPatientUvaPadova extends AbstractVirtualPatient {
 	
 	constructor(params) {
 		super(params);

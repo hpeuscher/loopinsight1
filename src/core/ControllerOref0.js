@@ -4,14 +4,12 @@
    See https://lt1.org for further information.	*/
 
 
-import Controller from './Controller.js'
+import AbstractController from './AbstractController.js'
 
-import round_basal from '../node_modules/oref0/lib/round-basal.js';
-import determine_basal from '../node_modules/oref0/lib/determine-basal/determine-basal.js';
-import tempBasalFunctions from '../node_modules/oref0/lib/basal-set-temp.js';
-import iob from '../node_modules/oref0/lib/iob/index.js';
-import getMealData from '../node_modules/oref0/lib/meal/total.js';
-import oref0Profile from '../node_modules/oref0/lib/profile/index.js';
+import determine_basal from '../../node_modules/oref0/lib/determine-basal/determine-basal.js';
+import tempBasalFunctions from '../../node_modules/oref0/lib/basal-set-temp.js';
+import iob from '../../node_modules/oref0/lib/iob/index.js';
+import getMealData from '../../node_modules/oref0/lib/meal/total.js';
 
 // redirect console outputs of determine-basal and store them
 var debugLog = ""; 
@@ -46,7 +44,7 @@ var log_fun = function () {
 };
 		
 		
-class controllerOref0 extends Controller {
+class controllerOref0 extends AbstractController {
 	
 	constructor(profile, useBolus, PreBolusTime, CarbFactor) {
 		super();
@@ -72,8 +70,8 @@ class controllerOref0 extends Controller {
 	
 	// setup and initialization
 	setup(patient) {
-		super.setup(patient);
-		// time zero of simulation
+		this.setPatient(patient)
+
 		this.t0 = new Date().valueOf();
 		// default basal rate
 		this.currenttemp = {
@@ -98,7 +96,6 @@ class controllerOref0 extends Controller {
 	
 	// compute insulin demand
 	update(t, y, _x, announcement) {
-		super.update();
 		
 		let tNow = new Date(this.t0 + t*60*1000);
 		let G = y["G"];

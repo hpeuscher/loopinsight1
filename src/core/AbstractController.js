@@ -2,30 +2,35 @@
    simulate closed-loop glycemic control in type 1 diabetes.
    Distributed under the MIT software license.
    See https://lt1.org for further information.	*/
-
+import NotImplementedError from '../common/NotImplementedError.js'
 
 
 // base class of controller algorithm
-class Controller {
+class AbstractController {
 
 	constructor() {
 	};
 
-	// setup (called before simulation)
-	setup(patient) {
+	// setPatient (called before simulation)
+	setPatient(patient) {
 		this.patient = patient;
 	};
+
+	setup() {
+		throw new NotImplementedError(this.constructor.name, 'setup')
+	}
 	
 	// compute insulin demand (function is called every minute)
 	update(_t, _y, _x, _announcement) {
-	};
+		throw new NotImplementedError(this.constructor.name, 'update')
+	}
 	
 	// return current treatment
 	//   iir: insulin infusion rate in U/h
 	//   ibolus: insulin bolus in U
 	getTreatment() {
-		return {};
+		throw new NotImplementedError(this.constructor.name, 'getTreatment')
 	}
 }
 
-export default Controller;
+export default AbstractController;
