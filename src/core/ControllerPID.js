@@ -10,7 +10,7 @@ class ControllerPID extends AbstractController {
 		
 	constructor() {
 		super()
-		this.setup()
+		this.reset()
 	}
 
 	setParams(basalRate, kP, kI, kD, target, useBolus, PreBolusTime, CarbFactor) {

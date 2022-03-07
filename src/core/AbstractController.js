@@ -13,7 +13,7 @@ class AbstractController {
 		this.patient = patient;
 	};
 
-	setup() {
+	reset() {
 		throw new NotImplementedError(this.constructor.name, 'setup')
 	}
 	
