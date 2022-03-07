@@ -59,7 +59,7 @@ export default {
 	data() {
 		return {
 			boxactive: false,
-			controller: {},
+			controllerView: {},
 			patientData: {},	// todo
 			patientObject: {},	// todo
 			meals: {},
@@ -70,12 +70,12 @@ export default {
 	
 	methods: {
 		run() {
-			this.reset(this.getPatient(), this.getController(), this.getMeals());
+			this.reset();
 			this.runSimulation();
 			this.updateCharts();
 		},
-		getController() {
-			return this.controller;
+		getControllerView() {
+			return this.controllerView;
 		},
 		getPatient() {
 			return this.patientObject;
@@ -83,8 +83,8 @@ export default {
 		getMeals() {
 			return JSON.parse(JSON.stringify(this.meals));
 		},
-		controllerChanged(newController) {
-			this.controller = newController;
+		controllerChanged(newControllerView) {
+			this.controllerView = newControllerView;
 		},
 		patientChanged(newPatient) {
 			this.patientObject = newPatient;
@@ -93,12 +93,12 @@ export default {
 		mealsChanged(newMeals) {
 			this.meals = newMeals;
 		},
-		reset(patient, controller, meals) {
+		reset() {
 			// todo
 			for (const chart in this.$refs)
 			{
 				try {
-					this.$refs[chart].setup(patient, controller, meals);
+					this.$refs[chart].setup(this.patient, this.controllerView, this.meals);
 				}
 				catch {
 				}

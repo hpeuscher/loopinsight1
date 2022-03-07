@@ -69,11 +69,10 @@ class ControllerOref0 extends AbstractController {
 	};
 	
 	
-	// setup and initialization
-	setup(patient) {
-		this.setPatient(patient)
-
+	// reset and initialize
+	reset() {
 		this.t0 = new Date().valueOf();
+
 		// default basal rate
 		this.currenttemp = {
 			_type: "Temp Basal",
@@ -84,6 +83,7 @@ class ControllerOref0 extends AbstractController {
 			temp: "absolute"
 		};
 		this.treatmentHistory = [this.currenttemp];
+
 		// clear glucose measurement history
 		this.glucoseHistory = [];
 		this.hist = [];
@@ -91,9 +91,7 @@ class ControllerOref0 extends AbstractController {
 		// reset treatment
 		this.ibolus = 0;
 		this.IIR = this.currenttemp.rate;
-
-
-	};
+	}
 	
 	// compute insulin demand
 	update(t, y, _x, announcement) {
@@ -106,8 +104,10 @@ class ControllerOref0 extends AbstractController {
 
 		
 		// compute (simulated manual) bolus
-		this.bolus = this.useBolus * announcement(t+this.PreBolusTime) / 10.0 
-			* this.CarbFactor;
+		this.bolus = 
+				this.useBolus * 
+				announcement(t+this.PreBolusTime) / 10.0 *
+				this.CarbFactor;
 		if (this.bolus) {
 			this.treatmentHistory.push({
 				_type: "Bolus",
@@ -117,7 +117,7 @@ class ControllerOref0 extends AbstractController {
 				date: tNow,						// todo : required?
 				dateString: tNow.toISOString(),	// todo : required?
 				started_at: tNow,				// todo : required?
-			});
+			})
 		}
 		
 		

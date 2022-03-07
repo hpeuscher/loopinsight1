@@ -21,8 +21,8 @@ class ControllerBasalBolus extends AbstractController {
 	}
 	
 	// reset before new simulation
-	setup(patient) {
-		this.setPatient(patient);
+	reset() {
+		// nothing to do
 	}
 	
 	// compute insulin demand

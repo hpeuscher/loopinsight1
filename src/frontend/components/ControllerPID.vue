@@ -49,19 +49,9 @@ export default {
 				this.CarbFactor,
 			)
 		},
-		// setup (called before simulation)
-		setup(patient) {
-			this.controller.setup(patient)
-			this.valueChanged()
-		},
-		// compute insulin demand (function is called every minute)
-		update(t, y, x, announcement) {
-			// compute bolus (IIR remains constant all the time)
-			return this.controller.update(t, y, x, announcement);
-		},
-		// return current treatment
-		getTreatment() {
-			return this.controller.getTreatment();
+
+		getController() {
+			return this.controller
 		},
 	},
 }

@@ -26,7 +26,7 @@ class ControllerPID extends AbstractController {
 	};
 	
 	// reset before new simulation
-	setup() {
+	reset() {
 		this.e_int = 0;
 		this.e_old = undefined;
 		this.IIR = this.IIReq;

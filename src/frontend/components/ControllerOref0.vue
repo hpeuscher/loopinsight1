@@ -38,25 +38,14 @@ export default {
 		valueChanged() {
 			this.CarbFactor = Math.round(10 / this.profile.carb_ratio * 100) / 100;
 		},
-		// setup (called before simulation)
-		setup(patient) {
-			oref0 = new ControllerOref0(
+
+		getController() {
+			return new ControllerOref0(
 				this.profile,
 				this.useBolus,
 				this.PreBolusTime,
 				this.CarbFactor
-			);
-			return oref0.setup(patient);
-		},
-		// compute insulin demand (function is called every minute)
-		update(t, y, x, announcement) {
-			return oref0.update(t, y, x, announcement);
-		},
-		// return current treatment
-		//   iir: insulin infusion rate in U/h
-		//   ibolus: insulin bolus in U
-		getTreatment() {
-			return oref0.getTreatment();
+			)
 		},
 	},
 }

@@ -72,7 +72,8 @@ class Simulator {
 	startSim() {
 		
 		// initialize controller
-		this.controller.setup(this.patient);
+		this.controller.setPatient(this.patient)
+		this.controller.reset()
 		
 		// initialize simulation variables
 		let t = 0;

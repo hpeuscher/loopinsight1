@@ -26,7 +26,7 @@ export default {
 	data() {
 		return {
 			boxactive: false,
-			controller: {},
+			controllerView: {},
 			controllerList: {
 				// todo: detect automatically
 				basalbolus: {
@@ -50,14 +50,10 @@ export default {
 	},
 
 	methods: {
-		controllerChanged(newController) {
-			this.controller = newController;
-			this.$emit("controllerChanged", newController);
-		},
-
-		getController() {
-			return this.controller;
-		},
+		controllerChanged(newControllerView) {
+			this.controllerView = newControllerView;
+			this.$emit("controllerChanged", this.controllerView);
+		}
 	},
 
 	computed: {
