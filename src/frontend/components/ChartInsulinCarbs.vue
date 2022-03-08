@@ -105,17 +105,22 @@ export default {
 		});
 	},
 	methods: {
-		setup(patient, controller, meals) {
+		setSimulationResults(simResults) {
+			this.reset()
+			for (const result of simResults) {
+				const {t, x, u, y, logData} = result
+				this._pushRecord(t, x, u, y, logData)
+			}
+			this._update
+		},
+		reset() {
 			let datasets = chartInsulinCarbs.data.datasets;
 			for (let i=0; i<datasets.length; i++) {
 				datasets[i].data = [];
 			}
 			this.controllerOutput = [];
 		},
-		update(){
-			chartInsulinCarbs.update();
-		},
-		pushData(t, _x, u, _y, log)  {
+		_pushRecord(t, _x, u, _y, log)  {
 			let datasets = chartInsulinCarbs.data.datasets;
 			datasets[0].data.push({x: t, y: u.iir});
 			if (u.ibolus > 0) {
@@ -128,6 +133,9 @@ export default {
 
 			datasets[3].data.push({x:t, y: u.meal});
 			datasets[4].data.push({x:t, y: u.carbs});
+		},
+		_update(){
+			chartInsulinCarbs.update();
 		},
 	},
 }

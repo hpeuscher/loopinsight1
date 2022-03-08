@@ -4,17 +4,15 @@
    	Distributed under the MIT software license.
 	See https://lt1.org for further information.	*/
 
-import { defaults } from 'chart.js';
+import { defaults } from 'chart.js'
 
-import ControllerConfig from './ControllerConfig.vue';
-import VirtualPatientConfig from './VirtualPatientConfig.vue';
-import MealTable from './MealTable.vue';
-import { ref } from 'vue';
-import ChartGlucose from './ChartGlucose.vue';
-import ChartInsulinCarbs from './ChartInsulinCarbs.vue';
-import ChartControllerOutput from './ChartControllerOutput.vue';
-import ChartAGP from './ChartAGP.vue';
-import InvalidResultError from '../../common/InvalidResultError.js'
+import ControllerConfig from './ControllerConfig.vue'
+import VirtualPatientConfig from './VirtualPatientConfig.vue'
+import MealTable from './MealTable.vue'
+import ChartGlucose from './ChartGlucose.vue'
+import ChartInsulinCarbs from './ChartInsulinCarbs.vue'
+import ChartControllerOutput from './ChartControllerOutput.vue'
+import ChartAGP from './ChartAGP.vue'
 
 export default {
 	props: {
@@ -23,28 +21,28 @@ export default {
 
 	beforeMount() {
 		// set default options for Chart
-		defaults.maintainAspectRatio = false;
-		defaults.responsive = true;
-		defaults.animation = false;
-		defaults.normalized = true;
+		defaults.maintainAspectRatio = false
+		defaults.responsive = true
+		defaults.animation = false
+		defaults.normalized = true
 		
-		defaults.elements.point.pointStyle = 'line';
-		defaults.elements.point.radius = 0;
+		defaults.elements.point.pointStyle = 'line'
+		defaults.elements.point.radius = 0
 		
 		defaults.plugins.tooltip.callbacks.title = (context) => {
-			return 't = ' + context[0].label + ' min';
+			return 't = ' + context[0].label + ' min'
 		};
 
-		defaults.plugins.legend.labels.usePointStyle = true;
+		defaults.plugins.legend.labels.usePointStyle = true
 		
-		defaults.interaction.mode = 'nearest';
-		defaults.interaction.axis = 'xy';
-		defaults.interaction.intersect = false;
+		defaults.interaction.mode = 'nearest'
+		defaults.interaction.axis = 'xy'
+		defaults.interaction.intersect = false
 		
-		defaults.scale.title.display = true;
-		defaults.scale.title.text = this.$t('timeaxis');
-		defaults.scale.ticks.stepSize = 60;
-		defaults.scale.beginAtZero = true;
+		defaults.scale.title.display = true
+		defaults.scale.title.text = this.$t('timeaxis')
+		defaults.scale.ticks.stepSize = 60
+		defaults.scale.beginAtZero = true
 	},
 
 	components: {
@@ -71,7 +69,7 @@ export default {
 	
 	methods: {
 		run() {
-			this.reset();
+			this.resetCharts();
 			this.runSimulation();
 			this.updateCharts();
 		},
@@ -94,12 +92,22 @@ export default {
 		mealsChanged(newMeals) {
 			this.meals = newMeals;
 		},
-		reset() {
+		resetCharts() {
 			// todo
 			for (const chart in this.$refs)
 			{
 				try {
-					this.$refs[chart].setup(this.patient, this.controllerView, this.meals);
+					this.$refs[chart].reset();
+				}
+				catch {
+				}
+			}
+		},
+		propagateSimulationResults(simResults) {
+			for (const chart in this.$refs)
+			{
+				try {
+					this.$refs[chart].setSimulationResults(simResults);
 				}
 				catch {
 				}
@@ -110,30 +118,13 @@ export default {
 			for (const chart in this.$refs)
 			{
 				try {
-					this.$refs[chart].update();
+					this.$refs[chart]._update();
 				}
 				catch {
 				}
 			}
 		},
-		// receive and use simulation data
-		pushData(t, x, u, y, log) {
-			
-			// dispatch simulation output to charts
-			for (const chart in this.$refs)
-			{
-				try {
-					this.$refs[chart].pushData(t, x, u, y, log);
-				}
-				catch {
-				}
-			}
-			
-			// check for invalid result
-			if (isNaN(y["G"])) {
-				throw new InvalidResultError(x)
-			}
-		},
+
 		// callback when mouse hovers over treatment chart
 		controllerDataHover(t0, data) {
 			if (typeof data == "undefined") {

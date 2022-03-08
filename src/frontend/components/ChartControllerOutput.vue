@@ -13,14 +13,22 @@ export default {
 		};
 	},
 	methods: {
-		setup() {
+		setSimulationResults(simResults) {
+			this.reset()
+			for (const result of simResults) {
+				const {t, x, u, y, logData} = result
+				this._pushRecord(t, x, u, y, logData)
+			}
+			this._update
+		},	
+		reset() {
 			this.controllerOutput = {};
 			this.t0 = 0;
 		},
-		update(){
-		},
-		pushData(_t, _x, _u, _y, _log)  {
+		_pushRecord(_t, _x, _u, _y, _log)  {
 		},	
+		_update(){
+		},		
 		controllerDataHover(t0, data) {
 			this.t0 = t0;
 			this.controllerOutput = data;

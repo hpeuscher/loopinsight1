@@ -38,8 +38,15 @@ class AbstractController {
 		throw new NotImplementedError(this.constructor.name, 'setup')
 	}
 	
-	// compute insulin demand (function is called every minute)
-	update(_t, _y, _x) {
+	/**
+	 * computes insulin demand
+	 * 
+	 * @param {number} t - TODO
+	 * @param {number} y - TODO
+	 * @param {number} _x - TODO
+	 * @returns {{iir: number, ibolus: number, logData: Object}} - TODO
+	 */
+	computeTreatment(_t, _y, _x) {
 		throw new NotImplementedError(this.constructor.name, 'update')
 	}
 	

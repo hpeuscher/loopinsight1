@@ -72,7 +72,15 @@ export default {
 		});
 	},
 	methods: {
-		setup(patient, controller, meals) {
+		setSimulationResults(simResults) {
+			this.reset()
+			for (const result of simResults) {
+				const {t, x, u, y, logData} = result
+				this._pushRecord(t, x, u, y, logData)
+			}
+			this._update
+		},
+		reset() {
 			let datasets = chartGlucose.data.datasets;
 			// remove prediction data
 			datasets[0].data = [];
@@ -99,10 +107,10 @@ export default {
 			});
 			this.currentDatasetID = datasets.length - 1;
 		},
-		update(){
+		_update(){
 			chartGlucose.update();
 		},
-		pushData(t, _x, _u, y, _log)  {
+		_pushRecord(t, _x, _u, y, _log)  {
 			// glucose (most recent simulation)
 			chartGlucose.data.datasets[this.currentDatasetID].data
 				.push({x:t, y:y.G});
@@ -115,7 +123,7 @@ export default {
 					chartGlucose.data.datasets[0].data = predBG.map(p=>{
 						return {x:p.t, y:p.BG}
 					});
-					this.update();
+					this._update();
 				}
 			}
 		},

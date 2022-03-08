@@ -71,7 +71,15 @@ export default {
 		};
 	},
 	methods: {
-		setup(patient, controller, meals) {
+		setSimulationResults(simResults) {
+			this.reset()
+			for (const result of simResults) {
+				const {t, x, u, y, logData} = result
+				this._pushRecord(t, x, u, y, logData)
+			}
+			this._update
+		},			
+		reset() {
 			this.G = [];
 			this.tir_veryhigh = 0;
 			this.tir_high = 0;
@@ -80,13 +88,14 @@ export default {
 			this.tir_verylow = 0;
 			this.t_total = 0;
 		},
-		update() {
+		_update() {
 			this.averageGlucose = Math.round(mean(this.G));
 			this.GMI = Math.round((3.38 + 0.02345 * this.averageGlucose)*10) / 10;
 			this.glucoseVariability = Math.round(100*coefficientOfVariation(this.G));
 
 		},
-		pushData(_t, _x, _u, y, _log) {
+		// _pushRecord(_t, _x, _u, y, _log) {
+		_pushRecord(_t, _x, _u, y, _log) {
 			this.G.push(y.G);
 			this.t_total++;
 			let G = y.G;

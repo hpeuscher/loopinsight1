@@ -25,11 +25,20 @@ class ControllerBasalBolus extends AbstractController {
 		// nothing to do
 	}
 
-	// compute insulin demand
-	update(t, _y, _x) {
+	/**
+	 * computes insulin demand
+	 * 
+	 * @param {number} t - TODO
+	 * @param {number} y - TODO
+	 * @param {number} _x - TODO
+	 * @returns {{iir: number, ibolus: number, logData: Object}} - TODO
+	 */
+	 computeTreatment(t, _y, _x) {
 		// compute bolus (IIR remains constant all the time)
 		this.bolus = this.useBolus * this.announcedCarbs(t + this.preBolusTime) / 10.0
 			* this.carbFactor
+
+		return {iir: this.IIR, ibolus: this.bolus}
 	}
 
 	// return current treatment

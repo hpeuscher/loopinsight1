@@ -92,8 +92,16 @@ class ControllerOref0 extends AbstractController {
 		this.IIR = this.currenttemp.rate;
 	}
 
-	// compute insulin demand
-	update(t, y, _x) {
+
+	/**
+	 * computes insulin demand
+	 * 
+	 * @param {number} t - TODO
+	 * @param {number} y - TODO
+	 * @param {number} _x - TODO
+	 * @returns {{iir: number, ibolus: number, logData: Object}} - TODO
+	 */
+	 computeTreatment(t, y, _x) {
 
 		let tNow = new Date(this.t0 + t * 60 * 1000);
 		let G = y["G"];
@@ -134,7 +142,7 @@ class ControllerOref0 extends AbstractController {
 
 		// run only every 5 minutes
 		if (t % 5) {
-			return undefined;
+			return {iir: this.IIR, ibolus: this.bolus};
 		}
 
 		// add current glucose measurement to history
@@ -220,7 +228,7 @@ class ControllerOref0 extends AbstractController {
 		this.profile.current_basal = Number(this.patient.IIReq);
 
 		// call determine-basal
-		let output = determine_basal(glucose_status,
+		let basal = determine_basal(glucose_status,
 			this.currenttemp,
 			iob_data,
 			this.profile,
@@ -231,45 +239,45 @@ class ControllerOref0 extends AbstractController {
 			undefined,
 			tNow);
 
-		// store console outputs of determine-basal
-		output.debug = debugLog.split(";").map(s => s.trim()).filter(s => s.length != 0);
-		output.reason = output.reason.split(/[,;]/).map(s => s.trim());
-
 		// store bg prediction for interactive visualization
 		let predBG = [];
-		if (typeof output.predBGs !== "undefined") {
-			if (typeof output.predBGs.COB !== "undefined") {
+		if (typeof basal.predBGs !== "undefined") {
+			if (typeof basal.predBGs.COB !== "undefined") {
 				// if prediction based on COB is available, use it
-				predBG = output.predBGs.COB;
+				predBG = basal.predBGs.COB;
 			}
-			else if (typeof output.predBGs.IOB !== "undefined") {
+			else if (typeof basal.predBGs.IOB !== "undefined") {
 				// otherwise, use prediction based on IOB
-				predBG = output.predBGs.IOB;
+				predBG = basal.predBGs.IOB;
 			}
 		}
 
-		output.predictedBG = [];
+		basal.predictedBG = [];
 		for (let i = 0; i < predBG.length; i++) {
-			output.predictedBG.push({ t: t + 5 * i, BG: predBG[i] });
+			basal.predictedBG.push({ t: t + 5 * i, BG: predBG[i] });
 		}
 
 		// prepare outputs
-		if (typeof output.rate !== 'undefined') {
+		if (typeof basal.rate !== 'undefined') {
 			// remember new temp
 			this.currenttemp = {
-				duration: output.duration,
-				rate: output.rate,
+				duration: basal.duration,
+				rate: basal.rate,
 				temp: "absolute"
 			}
 
-			this.IIR = output.rate;
+			this.IIR = basal.rate;
 		} else {
 			// todo: check if current temp is still active
 			// otherwise, return to default
 		}
 
-		// TODO: Warum existiert dieser Output?
-		return output
+		// store console outputs of determine-basal
+		const logData = { ...basal }
+		logData.debug = debugLog.split(";").map(s => s.trim()).filter(s => s.length != 0);
+		logData.reason = logData.reason.split(/[,;]/).map(s => s.trim());
+
+		return {iir: this.IIR, ibolus: this.bolus, logData}
 	}
 
 	// return current treatment

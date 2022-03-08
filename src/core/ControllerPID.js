@@ -43,30 +43,31 @@ class ControllerPID extends AbstractController {
 	/**
 	 * computes insulin demand
 	 * 
-	 * @param {number} t 
-	 * @param {number} y 
-	 * @param {number} _x 
-	 * @returns 
+	 * @param {number} t - TODO
+	 * @param {number} y - TODO
+	 * @param {number} _x - TODO
+	 * @returns {{iir: number, ibolus: number, logData: Object}} - TODO
 	 */
-	update(t, y, _x) {
+	 computeTreatment(t, y, _x) {
 
 		// compute bolus (IIR remains constant all the time)
 		this.bolus = this.useBolus * this.announcedCarbs(t + this.PreBolusTime) / 10.0
-			* this.CarbFactor;
+			* this.CarbFactor
 
 		// PID law
-		let e = this.target - y.G;
-		this.e_int += e / 60;
+		let e = this.target - y.G
+		this.e_int += e / 60
 
-		let u = this.IIReq - this.kP * e - this.kI * this.e_int;
+		let u = this.IIReq - this.kP * e - this.kI * this.e_int
 		if (typeof this.e_old !== "undefined") {
-			u -= this.kD * (e - this.e_old) * 60;
+			u -= this.kD * (e - this.e_old) * 60
 		}
-		this.e_old = e;
+		this.e_old = e
 
-		this.IIR = u;
-		return {};
-	};
+		this.IIR = u
+
+		return {iir: this.IIR, ibolus: this.bolus}
+	}
 
 
 

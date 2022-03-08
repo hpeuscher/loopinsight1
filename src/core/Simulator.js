@@ -8,6 +8,14 @@ import RK4 from './SolverRK4.js'
 
 class Simulator {
 
+	constructor() {
+		this.simulationResults = []
+	}
+
+	getSimulationResults() {
+		return this.simulationResults
+	}
+
 	setPatient(patient) {
 		this.patient = patient
 	}
@@ -20,16 +28,15 @@ class Simulator {
 		this.meals = meals
 	}
 
-	setPushData(pushData) {
-		this.pushData = pushData
-	}
-
 	setOptions(options) {
 		this.options = options
 	}
 
 	// run simulation
-	startSim() {
+	runSimulation() {
+
+		// reset
+		this.simulationResults = []
 
 		// initialize controller
 		this.controller.setPatient(this.patient)
@@ -47,30 +54,20 @@ class Simulator {
 		let x = this.patient.getInitialState()
 		let u = { meal: 0, iir: this.patient.IIReq, ibolus: 0 }
 		let y = this.patient.outputs(t, x, u)
-		let log = {}
 
 		// start simulation
 		while (t < tmax) {
 			// compute controller output
-			log = this.controller.update(t, y, x)
-
-			const { iir, ibolus } = this.controller.getTreatment()
+			const { logData, iir, ibolus } = this.controller.computeTreatment(t, y, x)
 			const carbs = this._momentaryCarbIntake(this.meals, t)
 			const isMeal = this._newMealstartsAt(this.meals, t)
 			const u = { iir, ibolus, carbs, meal: isMeal }
 
-			// output current state to frontend
-			try {
-				this.pushData(t, x, u, y, log)
-			} catch (err) {
-				if (err instanceof InvalidResultError) {
-					// abort simulation
-					// FIXME Hier gehört ein sauberes Error-Handling hin.
-					// (Hab erstmal nur den bestehenden Code nachgebaut)
-					return
-				} else {
-					throw err
-				}
+			this.simulationResults.push({t, x, u, y, logData})
+
+			// validity check
+			if (isNaN(y["G"])) {
+				throw InvalidResultError(x)
 			}
 
 			// proceed one time step
@@ -78,6 +75,8 @@ class Simulator {
 			y = this.patient.outputs(t, x, u)
 			t += dt
 		}
+
+		return this.simulationResults
 	}
 
 	/**

@@ -57,13 +57,14 @@ var sim = new Simulator();
 gui.runSimulation = () => {
 	console.log("start simulation");
 
-	// FIXME Zugriffe auf die GUI entfernen
 	sim.setPatient(gui.$refs.main.getPatient())
 	sim.setController(gui.$refs.main.getControllerView().getController())
 	sim.setMeals(gui.$refs.main.getMeals())
-	sim.setPushData(gui.$refs.main.pushData)
 	sim.setOptions({"tmax": Number(gui.$refs.main.tmax)})
-	
-	sim.startSim();
-};
+	sim.runSimulation()
+
+	// propagate results to charts
+	const results = sim.getSimulationResults()
+	gui.$refs.main.propagateSimulationResults(results)
+}
 
