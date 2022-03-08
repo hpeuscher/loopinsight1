@@ -115,7 +115,7 @@ export default {
 		update(){
 			chartInsulinCarbs.update();
 		},
-		pushData(t, x, u, y, log)  {
+		pushData(t, _x, u, _y, log)  {
 			let datasets = chartInsulinCarbs.data.datasets;
 			datasets[0].data.push({x: t, y: u.iir});
 			if (u.ibolus > 0) {

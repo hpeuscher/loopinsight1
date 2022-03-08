@@ -6,15 +6,15 @@
 // this file illustrates how to use LoopInsighT1 to run simulations without the
 // browser-based graphical user interface.
 
-import Simulator from '../src/Simulator.js';
-import ControllerBasalBolus from '../src/ControllerBasalBolus.js';
-import VirtualPatientUvaPadova from '../src/VirtualPatientUvaPadova.js';
+import Simulator from '../src/Simulator.js'
+import ControllerBasalBolus from '../src/ControllerBasalBolus.js'
+import VirtualPatientUvaPadova from '../src/VirtualPatientUvaPadova.js'
 
 // define a patient object
-let patient = new VirtualPatientUvaPadova();
+let patient = new VirtualPatientUvaPadova()
 // define a controller/algorithm
-let controller = new ControllerBasalBolus();
-controller.setParams(patient.IIReq, true, 30, 1.5);
+let controller = new ControllerBasalBolus()
+controller.setParams(patient.IIReq, true, 30, 1.5)
 // define a set of meals
 let meals = [
 	{
@@ -29,10 +29,10 @@ let meals = [
 			time: 0,
 		},
 	},
-];
+]
 
 // prepare the simulator
-var sim = new Simulator();
+var sim = new Simulator()
 
 // this is where to store the results
 var results = [];
@@ -43,8 +43,8 @@ sim.setController(controller)
 sim.setMeals(meals)
 sim.setPushData((t, _x, _u, y, _log) => { results.push({t:t, G:y.G}); })
 sim.setOptions({"tmax": 600})
-sim.startSim();
+sim.startSim()
 
 
 // display the results (or preprocess them as you need)
-console.log(results);
+console.log(results)

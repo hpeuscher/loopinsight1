@@ -14,6 +14,7 @@ import ChartGlucose from './ChartGlucose.vue';
 import ChartInsulinCarbs from './ChartInsulinCarbs.vue';
 import ChartControllerOutput from './ChartControllerOutput.vue';
 import ChartAGP from './ChartAGP.vue';
+import InvalidResultError from '../../common/InvalidResultError.js'
 
 export default {
 	props: {
@@ -117,8 +118,6 @@ export default {
 		},
 		// receive and use simulation data
 		pushData(t, x, u, y, log) {
-			// console output
-//				console.log("t = " + t + ": G = " + Math.round(y["G"]) + ", IIR = " + u["iir"] + log);
 			
 			// dispatch simulation output to charts
 			for (const chart in this.$refs)
@@ -130,14 +129,10 @@ export default {
 				}
 			}
 			
-			// break if result is invalid
+			// check for invalid result
 			if (isNaN(y["G"])) {
-				console.error("invalid simulation result");
-				console.error(x);
-				return true;
+				throw new InvalidResultError(x)
 			}
-			return false;
-
 		},
 		// callback when mouse hovers over treatment chart
 		controllerDataHover(t0, data) {

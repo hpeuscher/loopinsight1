@@ -4,7 +4,10 @@
    See https://lt1.org for further information.	*/
 
 
-// base class of physiological model of virtual patient
+
+/**
+ * abstract base class of physiological model of virtual patient
+ */
 class AbstractVirtualPatient {
 	xeq				// steady state vector (equilibrium)
 	IIReq			// equilibrium basal rate
@@ -24,13 +27,13 @@ class AbstractVirtualPatient {
 	// compute derivatives (returns array)
 	derivatives(_t, _x, _u) {
 		throw new NotImplementedError(this.constructor.name, 'derivatives')
-	};
+	}
 	
 	
 	// compute outputs (returns object)
 	outputs(_t, _x, _u) {
 		throw new NotImplementedError(this.constructor.name, 'outputs')
-	};
+	}
 	
 }
 

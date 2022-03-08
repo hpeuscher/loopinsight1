@@ -19,7 +19,7 @@ export default {
 		},
 		update(){
 		},
-		pushData(t, x, u, y, log)  {
+		pushData(_t, _x, _u, _y, _log)  {
 		},	
 		controllerDataHover(t0, data) {
 			this.t0 = t0;

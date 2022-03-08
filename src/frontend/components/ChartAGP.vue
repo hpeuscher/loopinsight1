@@ -86,7 +86,7 @@ export default {
 			this.glucoseVariability = Math.round(100*coefficientOfVariation(this.G));
 
 		},
-		pushData(t, _x, _u, y, _log) {
+		pushData(_t, _x, _u, y, _log) {
 			this.G.push(y.G);
 			this.t_total++;
 			let G = y.G;

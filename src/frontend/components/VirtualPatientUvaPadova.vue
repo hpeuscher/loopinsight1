@@ -41,19 +41,7 @@ export default {
 			this.patient.computeSteadyState();
 			this.$emit("patientChanged", this.patient);
 		},
-		// compute outputs (returns object)
-		outputs(t, x, u) {
-			return this.patient.outputs(t, x, u);
-		},
-		derivatives(t, x, u) {
-			return this.patient.derivatives(t, x, u);
-		},
-		getInitialState() {
-			return this.patient.stateToArray(this.patient.xeq);
-		},
-		stateToObject(x) {
-			return this.patient.stateToObject(x);
-		},
+
 		stepDistance(key) {
 			return Math.pow(10, countDecimals(this.patient.params[key]));
 		},

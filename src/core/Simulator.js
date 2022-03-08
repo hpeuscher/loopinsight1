@@ -3,57 +3,17 @@
    Distributed under the MIT software license.
    See https://lt1.org for further information.	*/
 
-import RK4 from './SolverRK4.js';
+import InvalidResultError from '../common/InvalidResultError.js'
+import RK4 from './SolverRK4.js'
 
 class Simulator {
-	
-	// compute momentary carb intake
-	carb(meals, t) {
-		let m = 0;
-		for (let i=0; i<meals.length; i++) {
-			let meal = meals[i];
-			m += (t>=meal.actual.start) * 
-				 (t<meal.actual.start+meal.actual.duration) * 
-				 meal.actual.carbs / Math.max(1,meal.actual.duration);
-		}
-		return m;
-	}
 
-	// determine whether a new meal starts at time t
-	newMeal(meals, t) {
-		let m = 0;
-		for (let i=0; i<meals.length; i++) {
-			m = m + (meals[i].actual.start==t)*meals[i].actual.carbs; 
-		}
-		if (m) {
-			return m;	// yes -> return total meal
-		} else {
-			return NaN;	// no
-		}
-	}
-	
-	// compute meal announcement
-	//   meals: array of announced meals
-	//   treq: requested time of interest
-	//   tsim: simulation time
-	announcement(meals, treq, tsim) {
-		let a = 0;
-		for (let i=0; i<meals.length; i++) {
-			if (typeof meals[i].announcement !== "undefined") {
-				a = a + (tsim>=meals[i].announcement.time)
-						* (meals[i].announcement.start==treq)
-						* meals[i].announcement.carbs;
-			}
-		}
-		return a;
-	}
-	
 	setPatient(patient) {
 		this.patient = patient
 	}
-	
+
 	setController(controller) {
-		this.controller = controller;
+		this.controller = controller
 	}
 
 	setMeals(meals) {
@@ -70,52 +30,115 @@ class Simulator {
 
 	// run simulation
 	startSim() {
-		
+
 		// initialize controller
 		this.controller.setPatient(this.patient)
+		this.controller.setAnnouncedCarbs((t_) => this._announcedCarbs(this.meals, t_, t))
 		this.controller.reset()
-		
-		// initialize simulation variables
-		let t = 0;
-		let tmax = this.options.tmax;
-		if (!Number.isInteger(tmax) || tmax < 0) {
-			tmax = 10;
-		}
-		
-		const dt = 1;
-		let x = this.patient.getInitialState();
-		let u = {meal: 0, iir: this.patient.IIReq, ibolus: 0};
-		let y = this.patient.outputs(t, x, u);
-		let log = {};
-		
-		
-		// start simulation
-		while (t<tmax)
-		{
-			// compute controller output
-			log = this.controller.update(t, y, x, 
-				(t_) => this.announcement(this.meals, t_, t)
-			);
 
-			// inputs to metabolic model
-			u = this.controller.getTreatment();
-			u['iir'] = Math.max(u['iir'] || 0, 0);
-			u['ibolus'] = Math.max(u['ibolus'] || 0, 0);
-			u['carbs'] = this.carb(this.meals, t);
-			u['meal'] = this.newMeal(this.meals, t);
+		// initialize simulation variables
+		let t = 0
+		let tmax = this.options.tmax
+		if (!Number.isInteger(tmax) || tmax < 0) {
+			tmax = 10
+		}
+
+		const dt = 1
+		let x = this.patient.getInitialState()
+		let u = { meal: 0, iir: this.patient.IIReq, ibolus: 0 }
+		let y = this.patient.outputs(t, x, u)
+		let log = {}
+
+		// start simulation
+		while (t < tmax) {
+			// compute controller output
+			log = this.controller.update(t, y, x)
+
+			const { iir, ibolus } = this.controller.getTreatment()
+			const carbs = this._momentaryCarbIntake(this.meals, t)
+			const isMeal = this._newMealstartsAt(this.meals, t)
+			const u = { iir, ibolus, carbs, meal: isMeal }
 
 			// output current state to frontend
-			if (this.pushData(t, x, u, y, log)) {
-				// abort simulation
-				return;
+			try {
+				this.pushData(t, x, u, y, log)
+			} catch (err) {
+				if (err instanceof InvalidResultError) {
+					// abort simulation
+					// FIXME Hier gehört ein sauberes Error-Handling hin.
+					// (Hab erstmal nur den bestehenden Code nachgebaut)
+					return
+				} else {
+					throw err
+				}
 			}
-			
+
 			// proceed one time step
-			x = RK4((t_,x_) => this.patient.derivatives(t_, x_, u), t, x, dt);
-			y = this.patient.outputs(t, x, u);
-			t += dt;
+			x = RK4((t_, x_) => this.patient.derivatives(t_, x_, u), t, x, dt)
+			y = this.patient.outputs(t, x, u)
+			t += dt
 		}
 	}
+
+	/**
+	 * Computes momentary carb intake
+	 * 
+	 * @param {array} meals - An array of announced meals
+	 * @param {number} t - The current time
+	 * @returns {number} the current carb intake
+	 */
+	_momentaryCarbIntake(meals, t) {
+		let m = 0;
+		for (const meal of meals) {
+			const { start, duration, carbs } = meal.actual
+			if (t >= start && t < start + duration) {
+				if (duration < 1) {
+					duration = 1
+				}
+				m += carbs / duration
+			}
+		}
+		return m
+	}
+
+	/**
+	 * determines whether a new meal starts at time t
+	 * @param {array}  meals - an array of announced meals
+	 * @param {number} t - the time of interest
+	 * @returns {boolean}
+	 */
+	_newMealstartsAt(meals, t) {
+		let m = 0;
+		for (const meal of meals) {
+			const { start, carbs } = meal.actual
+			if (start == t && carbs > 0) {
+				return true
+			}
+		}
+		return false
+	}
+
+
+	/** 
+	 * computes announced carbs:
+	 * @param {array} meal - Array of announced meals
+	 * @param {number} treq - requested time of interest
+	 * @param {number} tsim - simulation time
+	 * @returns {number} Sum of announced carbs
+	 */
+	_announcedCarbs(meals, tReq, tSim) {
+		let a = 0;
+		for (const meal of meals) {
+			if (!meal.announcement) continue
+			const { start, carbs, time } = meal.announcement
+			if (tSim > time && start == tReq) {
+				a += carbs
+			}
+		}
+
+		return a
+	}
+
 }
 
 export default Simulator;

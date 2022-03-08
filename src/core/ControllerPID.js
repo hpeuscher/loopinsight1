@@ -7,7 +7,7 @@
 import AbstractController from './AbstractController.js';
 
 class ControllerPID extends AbstractController {
-		
+
 	constructor() {
 		super()
 		this.reset()
@@ -23,36 +23,15 @@ class ControllerPID extends AbstractController {
 		this.useBolus = useBolus;
 		this.PreBolusTime = PreBolusTime;	// time between meal and bolus
 		this.CarbFactor = CarbFactor;		// insulin units per 10g CHO
-	};
-	
+	}
+
 	// reset before new simulation
 	reset() {
 		this.e_int = 0;
 		this.e_old = undefined;
 		this.IIR = this.IIReq;
-	};
-	
-	// compute insulin demand
-	update(t, y, _x, announcement) {
-		
-		// compute bolus (IIR remains constant all the time)
-		this.bolus = this.useBolus * announcement(t+this.PreBolusTime) / 10.0 
-			* this.CarbFactor;
-		
-		// PID law
-		let e = this.target - y.G;
-		this.e_int += e / 60;
-		
-		let u = this.IIReq - this.kP * e - this.kI * this.e_int;
-		if (typeof this.e_old !== "undefined") {
-			u -= this.kD * (e - this.e_old) * 60;
-		}
-		this.e_old = e;
-		
-		this.IIR = u;		
-		return {};
-	};
-	
+	}
+
 	// return current treatment
 	getTreatment() {
 		return {
@@ -60,7 +39,37 @@ class ControllerPID extends AbstractController {
 			ibolus: this.bolus,
 		};
 	};
-	
+
+	/**
+	 * computes insulin demand
+	 * 
+	 * @param {number} t 
+	 * @param {number} y 
+	 * @param {number} _x 
+	 * @returns 
+	 */
+	update(t, y, _x) {
+
+		// compute bolus (IIR remains constant all the time)
+		this.bolus = this.useBolus * this.announcedCarbs(t + this.PreBolusTime) / 10.0
+			* this.CarbFactor;
+
+		// PID law
+		let e = this.target - y.G;
+		this.e_int += e / 60;
+
+		let u = this.IIReq - this.kP * e - this.kI * this.e_int;
+		if (typeof this.e_old !== "undefined") {
+			u -= this.kD * (e - this.e_old) * 60;
+		}
+		this.e_old = e;
+
+		this.IIR = u;
+		return {};
+	};
+
+
+
 }
 
 export default ControllerPID;

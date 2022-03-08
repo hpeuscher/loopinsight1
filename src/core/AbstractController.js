@@ -8,17 +8,38 @@ import NotImplementedError from '../common/NotImplementedError.js'
 // base class of controller algorithm
 class AbstractController {
 
-	// setPatient (called before simulation)
+	/**
+	 * sets the virtual patient
+	 * @param {Object} patient 
+	 */
 	setPatient(patient) {
-		this.patient = patient;
-	};
+		this.patient = patient
+	}
+
+	/**
+	 * Callback for computing the amount of announced
+	 * carbs at a specific point in time.
+	 * 
+	 * @callback announcedCarbs 
+	 * @param {number} t - the time of interest
+	 * @returns {number}
+	 */
+	/**
+	 * Set a callback that determines the amount of announced
+	 * carbs at a specific point in time.
+	 * 
+	 * @param {announcedCarbs} announcedCarbs 
+	 */
+	setAnnouncedCarbs(announcedCarbs) {
+		this.announcedCarbs = announcedCarbs
+	}
 
 	reset() {
 		throw new NotImplementedError(this.constructor.name, 'setup')
 	}
 	
 	// compute insulin demand (function is called every minute)
-	update(_t, _y, _x, _announcement) {
+	update(_t, _y, _x) {
 		throw new NotImplementedError(this.constructor.name, 'update')
 	}
 	
