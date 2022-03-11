@@ -35,7 +35,7 @@ class AbstractController {
 	}
 
 	reset() {
-		throw new NotImplementedError(this.constructor.name, 'setup')
+		throw new NotImplementedError(this.constructor.name, 'reset')
 	}
 	
 	/**
@@ -48,13 +48,6 @@ class AbstractController {
 	 */
 	computeTreatment(_t, _y, _x) {
 		throw new NotImplementedError(this.constructor.name, 'update')
-	}
-	
-	// return current treatment
-	//   iir: insulin infusion rate in U/h
-	//   ibolus: insulin bolus in U
-	getTreatment() {
-		throw new NotImplementedError(this.constructor.name, 'getTreatment')
 	}
 }
 

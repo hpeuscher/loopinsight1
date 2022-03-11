@@ -29,7 +29,6 @@ class AbstractVirtualPatient {
 		throw new NotImplementedError(this.constructor.name, 'derivatives')
 	}
 	
-	
 	// compute outputs (returns object)
 	outputs(_t, _x, _u) {
 		throw new NotImplementedError(this.constructor.name, 'outputs')

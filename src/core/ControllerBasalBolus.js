@@ -41,13 +41,6 @@ class ControllerBasalBolus extends AbstractController {
 		return {iir: this.IIR, ibolus: this.bolus}
 	}
 
-	// return current treatment
-	getTreatment() {
-		return {
-			iir: this.IIR,
-			ibolus: this.bolus,
-		}
-	}
 
 }
 

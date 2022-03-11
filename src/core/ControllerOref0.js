@@ -280,14 +280,6 @@ class ControllerOref0 extends AbstractController {
 		return {iir: this.IIR, ibolus: this.bolus, logData}
 	}
 
-	// return current treatment
-	getTreatment() {
-		return {
-			iir: this.IIR,
-			ibolus: this.bolus,
-		};
-	};
-
 }
 
 export default ControllerOref0;

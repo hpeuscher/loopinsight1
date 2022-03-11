@@ -32,14 +32,6 @@ class ControllerPID extends AbstractController {
 		this.IIR = this.IIReq;
 	}
 
-	// return current treatment
-	getTreatment() {
-		return {
-			iir: this.IIR,
-			ibolus: this.bolus,
-		};
-	};
-
 	/**
 	 * computes insulin demand
 	 * 

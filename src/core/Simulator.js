@@ -32,10 +32,10 @@ class Simulator {
 		this.options = options
 	}
 
-	// run simulation
+
 	runSimulation() {
 
-		// reset
+		// reset simulationResults
 		this.simulationResults = []
 
 		// initialize controller
@@ -45,7 +45,7 @@ class Simulator {
 
 		// initialize simulation variables
 		let t = 0
-		let tmax = this.options.tmax
+		const tmax = this.options.tmax
 		if (!Number.isInteger(tmax) || tmax < 0) {
 			tmax = 10
 		}
@@ -122,7 +122,7 @@ class Simulator {
 	 * computes announced carbs:
 	 * @param {array} meal - Array of announced meals
 	 * @param {number} treq - requested time of interest
-	 * @param {number} tsim - simulation time
+	 * @param {number} tsim - current simulation time
 	 * @returns {number} Sum of announced carbs
 	 */
 	_announcedCarbs(meals, tReq, tSim) {
