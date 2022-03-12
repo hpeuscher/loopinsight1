@@ -8,7 +8,7 @@ import CopyWebpackPlugin from 'copy-webpack-plugin';
 import webpack from 'webpack';
 
 export default {
-  entry: './src/LoopInsighT1.js',
+  entry: './src/frontend/LoopInsighT1.js',
   output: {
     filename: 'lt1.bundle.js',
     path: path.resolve(__dirname, 'dist'),
@@ -35,11 +35,11 @@ export default {
     }),
     new VueLoaderPlugin(),
     new HtmlWebpackPlugin({
-      template: './src/assets/index.htm',
-      favicon: './src/assets/images/favicon.png', 
+      template: './src/frontend/assets/index.htm',
+      favicon: './src/frontend/assets/images/favicon.png', 
     }),
 	new CopyWebpackPlugin({'patterns': [
-        {from:'./src/assets/images', to:'images'}
+        {from:'./src/frontend/assets/images', to:'images'}
     ]}),
 	new webpack.optimize.LimitChunkCountPlugin({
 	    maxChunks: 1
