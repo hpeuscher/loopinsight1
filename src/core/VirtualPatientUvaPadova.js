@@ -229,7 +229,7 @@ class VirtualPatientUvaPadova extends AbstractVirtualPatient {
 		let params = this.params;
 		
 		// inputs
-		let M = u["carbs"]*1000;				// meal ingestion in g/min
+		let M = u["carbs"]*1000;				// meal ingestion in mg/min
 		let IIR = u["iir"] * pmol_per_U / 60;	// insulin infusion rate in pmol/min
 		let bolus = u["ibolus"] * pmol_per_U;	// insulin bolus in pmol
 		

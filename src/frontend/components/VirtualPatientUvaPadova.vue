@@ -153,7 +153,7 @@ export default {
 		"ka2"	: "1/min",
 		"kd" 	: "1/min",
 	},
-	inputs: {
+	signals: {
 		"RaI"	: "pmol/kg/min",	
 		"E"		: "mg/kg/min",
 		"EGP"	: "mg/kg/min",

@@ -60,14 +60,14 @@ class Simulator {
 			// compute controller output
 			const { logData, iir, ibolus } = this.controller.computeTreatment(t, y, x)
 			const carbs = this._momentaryCarbIntake(this.meals, t)
-			const isMeal = this._newMealstartsAt(this.meals, t)
+			const isMeal = this._newMealStartingAt(this.meals, t)
 			const u = { iir, ibolus, carbs, meal: isMeal }
 
 			this.simulationResults.push({t, x, u, y, logData})
 
 			// validity check
 			if (isNaN(y["G"])) {
-				throw InvalidResultError(x)
+				throw new InvalidResultError(x)
 			}
 
 			// proceed one time step
@@ -104,17 +104,17 @@ class Simulator {
 	 * determines whether a new meal starts at time t
 	 * @param {array}  meals - an array of announced meals
 	 * @param {number} t - the time of interest
-	 * @returns {boolean}
+	 * @returns {number}
 	 */
-	_newMealstartsAt(meals, t) {
+	_newMealStartingAt(meals, t) {
 		let m = 0;
 		for (const meal of meals) {
 			const { start, carbs } = meal.actual
 			if (start == t && carbs > 0) {
-				return true
+				return carbs
 			}
 		}
-		return false
+		return NaN;
 	}
 
 

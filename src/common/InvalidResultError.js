@@ -1,8 +1,6 @@
 class InvalidResultError extends Error {
     constructor(result) {
-        message = util.format(
-            "Error: Invalid simulation result: '%s'.",
-            )
+        message = "Error: Invalid simulation result: '%{result}'.";
         super(this.message)
         this.name = this.constructor.name
     }
