@@ -53,26 +53,31 @@ class Simulator {
 		const dt = 1
 		let x = this.patient.getInitialState()
 		let u = { meal: 0, iir: this.patient.IIReq, ibolus: 0 }
-		let y = this.patient.outputs(t, x, u)
+		let y = this.patient.getOutputs(t, x, u)
 
 		// start simulation
 		while (t < tmax) {
+			// todo: sensor dynamics
+			y["G"] = y["Gp"];
+
+			// validity check
+			if (isNaN(y["G"])) {
+				throw new InvalidResultError(t, y, x)
+			}
+
 			// compute controller output
-			const { logData, iir, ibolus } = this.controller.computeTreatment(t, y, x)
+			let { logData, iir, ibolus } = this.controller.computeTreatment(t, y, x)
+			if (iir<0) iir = 0
+			if (ibolus<0) ibolus = 0
 			const carbs = this._momentaryCarbIntake(this.meals, t)
 			const isMeal = this._newMealStartingAt(this.meals, t)
 			const u = { iir, ibolus, carbs, meal: isMeal }
 
 			this.simulationResults.push({t, x, u, y, logData})
 
-			// validity check
-			if (isNaN(y["G"])) {
-				throw new InvalidResultError(x)
-			}
-
 			// proceed one time step
-			x = RK4((t_, x_) => this.patient.derivatives(t_, x_, u), t, x, dt)
-			y = this.patient.outputs(t, x, u)
+			x = RK4((t_, x_) => this.patient.getDerivatives(t_, x_, u), t, x, dt)
+			y = this.patient.getOutputs(t, x, u)
 			t += dt
 		}
 

@@ -47,7 +47,7 @@ class AbstractController {
 	 * @returns {{iir: number, ibolus: number, logData: Object}} - TODO
 	 */
 	computeTreatment(_t, _y, _x) {
-		throw new NotImplementedError(this.constructor.name, 'update')
+		throw new NotImplementedError(this.constructor.name, 'computeTreatment')
 	}
 }
 

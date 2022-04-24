@@ -6,61 +6,65 @@
 
 import {defineAsyncComponent} from "vue";
 
+// find all controller components in folder and load them dynamically
+const controllerList = require.context('./controllers/', false, /$/).keys().map(x => { return x.match(/\w+/)[0]})
+let controllerComponents = {};
+for (let i=controllerList.length-1; i>=0; i--) {
+	let key = controllerList[i];
+	controllerComponents[key] = defineAsyncComponent(() => import("./controllers/"+key+".vue"))
+}
+
 export default {
 	props: {
 		patient: Object
 	},
 
-	components: {
-		// todo: lazy loading
-		ControllerOref0: defineAsyncComponent(() => 
-			import("./ControllerOref0.vue")), 
-		ControllerBasalBolus: defineAsyncComponent(() => 
-			import("./ControllerBasalBolus.vue")), 
-		ControllerPID: defineAsyncComponent(() => 
-			import("./ControllerPID.vue")), 
-	},
+	components: controllerComponents,
 
 	emits: ["controllerChanged"],
 
 	data() {
 		return {
-			boxactive: false,
-			controllerView: {},
-			controllerList: {
-				// todo: detect automatically
-				basalbolus: {
-					id: "basalbolus",
-					filename: "ControllerBasalBolus",
-					version: "1.0.0"
-				},
-				oref0: {
-					id: "oref0",
-					filename: "ControllerOref0",
-					version: "1.0.0"
-				},
-				pid: {
-					id: "pid",
-					filename: "ControllerPID",
-					version: "1.0.0"
-				},
-			},
-			controllerId: "oref0",
+			boxactive: false,	// open accordion box
+			controllerInfo: {},
+			controllerList: controllerList,
+			selectedController: controllerList[0],
 		}
+	},
+
+	updated() {
+		this.selectionChanged()
 	},
 
 	methods: {
-		controllerChanged(newControllerView) {
-			this.controllerView = newControllerView;
-			this.$emit("controllerChanged", this.controllerView);
-		}
-	},
-
-	computed: {
-		activeController() {
-			return this.controllerList[this.controllerId].filename;
+		getController() {
+			return this.controllerInfo[this.selectedController].ref.controller
 		},
-	}
+
+		selectionChanged() {
+			this.controllerChanged(this.getController())
+		},
+
+		controllerChanged(newController) {
+			this.$emit("controllerChanged", newController)
+		},
+
+		// during rendering of controller components, store information
+		// about them (including translated name)
+		setControllerRef(el) {
+			if (el) {
+				const id = el.$["vnode"].key
+				if (!this.controllerInfo.hasOwnProperty(id)) {
+					this.controllerInfo[id] = {
+						id: id,
+						name: el.name, 
+						version: el.version,
+						ref: el,
+					}
+				}
+			}
+    	},
+	},
 }
 </script>
 
@@ -72,19 +76,22 @@ export default {
 			<label for="algorithm" class="labelpre">{{$t("selectalgo")}}</label>
 		</p>
 		<p style="text-align:center;">
-			<select id="algorithm" v-model="controllerId">
-				<option v-for="controller in controllerList"
+			<select id="algorithm" v-model="selectedController" @change="selectionChanged">
+				<option v-for="controller in controllerInfo" 
 					:key="controller.id"
-					:value="controller.id"
-					:innerText="$t(controller.id)"
-				></option>
+					:value="controller.id">{{controller.name}}
+				</option>
 			</select>
 		</p>
-		<component :is="activeController" 
-			v-bind:patient="patient" 
-			@controllerChanged="controllerChanged">
-		</component>
-		<div id="controlleroptions"></div>
+		<Suspense>
+			<component v-for="controller in controllerList"
+				:key="controller"
+				:patient="patient" 
+				@controllerChanged="controllerChanged"
+				:ref="setControllerRef"
+				:is="controller"
+				v-show="selectedController === controller"/>
+		</Suspense>
 	</div>
 </template>
 
@@ -93,9 +100,6 @@ export default {
 {
 	"controllersettings": "Algorithm",
 	"selectalgo": "Select algorithm / device / treatment",
-	"basalbolus": "Basal rate + bolus",
-	"oref0": "OpenAPS (oref0)",
-	"pid": "PID controller + bolus",
 }
 </i18n>
 
@@ -103,8 +107,5 @@ export default {
 {
 	"controllersettings": "Algorithmus",
 	"selectalgo": "Algorithmus / Gerät wählen",
-	"basalbolus": "Basalrate + Bolus",
-	"oref0": "OpenAPS (oref0)",
-	"pid": "PID-Regler + Bolus",
 }
 </i18n>

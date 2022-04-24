@@ -4,56 +4,41 @@
    	Distributed under the MIT software license.
 	See https://lt1.org for further information.	*/
 
-import VirtualPatientUvaPadova from '../../core/VirtualPatientUvaPadova.js';
+import VirtualPatientUvaPadova from '../../../core/models/UvaPadova.js';
 
-
-// utility function to find significant digit 
-// (used for comfortable choice of step size in numeric inputs)
-// cf. https://stackoverflow.com/a/27082406
-var countDecimals = function(value) {
-	let text = Number(value).toExponential();
-	let [head, trail] = text.split('e');
-	let deg = parseInt(trail, 10);
-	if (head.indexOf('.') > -1) {
-		let [, trail2] = head.split('.');
-		deg = deg - trail2.length;
-	}
-	return deg;
-};
+import countDecimals from "../../../common/CountDecimals.js"
 
 export default {
 	emits: ["patientChanged"],
 	data() {
 		return {
+			id: "UvaPadova",
+			version: "1.0.0",
+			name: "",
+			hyperlink: "",
 			patient: new VirtualPatientUvaPadova(),
 		}
+	},
+	beforeMount() {
+		this.name = this.$t("name");
 	},
 	mounted() {
 		this.computeSteadyState();
 	},
 	methods: {
-
-		// compute derivatives (returns array)
-		derivatives(_t, _x, _u) {
-			return [];
-		},
 		computeSteadyState() {
 			this.patient.computeSteadyState();
 			this.$emit("patientChanged", this.patient);
 		},
-
 		stepDistance(key) {
-			return Math.pow(10, countDecimals(this.patient.params[key]));
+			return Math.pow(10, countDecimals(this.patient.parameters[key]));
 		},
 		loaddefaultpatient() {
 			this.patient.setParameters(this.patient.defaults);
 		},
-		setParams(params) {
-			console.log(params);
-			this.patient.params = Object.assign(this.patient.params, params);
-		},
-		getData() {
-			return this.patient.params;
+		setParameters(parameters) {
+			this.patient.parameters = Object.assign(this.patient.parameters, 
+				JSON.parse(JSON.stringify(parameters)));
 		},
 	},
 }
@@ -61,6 +46,7 @@ export default {
 
 
 <template>
+	<div>
 	<p style="text-align:center;">
 		<input type="button" 
 			:value="$t('loaddefaultpatient')" 
@@ -68,23 +54,24 @@ export default {
 	</p>
 	<div id="patientoptions" class="parameterlist">
 		<ul>
-			<li v-for="(param,id) in patient.paramList" class="item" :key="id">
+			<li v-for="(id) in patient.parameterList" class="item" :key="id">
 				<label :for="'param'+id" >
 					<div class="item-description"
-						v-tooltip="{content: $t('params.'+id)}">
-						<span v-html="$t('params.'+id,'html')"></span>
+						v-tooltip="{content: $t('parameters.'+id)}">
+						<span v-html="$t('parameters.'+id,'html')"></span>
 					</div>
 					<div class="item-input">
-						<input v-model.number=patient.params[id] 
+						<input v-model.number=patient.parameters[id] 
 							:id="'param'+id"
 							type="number" :min=0
 							@change="computeSteadyState()"
 							:step="stepDistance(id)">
 					</div>
-					<div class="item-unit">{{param.unit}}</div>
+					<div class="item-unit">{{$t('parameters.'+id,'units')}}</div>
 				</label>
 			</li>	
 		</ul>
+	</div>
 	</div>
 </template>
 
@@ -106,23 +93,16 @@ export default {
 		"Qsto1"	: "mg",
 		"Qsto2"	: "mg",
 		"Qgut"	: "mg",
-		"XL"	: "pmol/l",
-		"I_"	: "pmol/l",
-		"X"		: "pmol/l",
+		"XL"	: "pmol/L",
+		"I_"	: "pmol/L",
+		"X"		: "pmol/L",
 		"Isc1"	: "pmol/kg",
 		"Isc2"	: "pmol/kg",
 	},
-	inputs: {
-		"meal"	: "g/min",
-		"IIR"	: "U/h",
-		"bolus"	: "U",
-	},
-	outputs: {
-		"G"		: "mg/dl",
-	},
-	params: {
+	parameters: {
 		"BW"	: "kg",
-		"VG" 	: "dl/kg",
+		"Gpeq"	: "mg/kg",
+		"VG" 	: "dL/kg",
 		"k1" 	: "1/min",
 		"k2" 	: "1/min",
 		"VI" 	: "l/kg",
@@ -131,7 +111,7 @@ export default {
 		"m4" 	: "1/min",
 		"m5" 	: "min*kg/pmol",
 		"m6" 	: "1",
-		"HEb" 	: "1",
+		"HEeq" 	: "1",
 		"kmax" 	: "1/min",
 		"kmin" 	: "1/min",
 		"kabs" 	: "1/min",
@@ -139,12 +119,12 @@ export default {
 		"f" 	: "1",
 		"kp1" 	: "mg/kg/min",
 		"kp2" 	: "1/min",
-		"kp3"	: "mg/kg per pmol/l",
+		"kp3"	: "mg/kg per pmol/L",
 		"kp4"	: "mg/kg/min per pmol/kg",
 		"ki"	: "1/min",
 		"Fcns"	: "mg/kg/min",
 		"Vm0"	: "mg/kg/min",
-		"Vmx"	: "mg/kg/min per pmol/l",
+		"Vmx"	: "mg/kg/min per pmol/L",
 		"Km0"	: "mg/kg",
 		"p2u"	: "1/min",
 		"ke1"	: "1/min",
@@ -159,7 +139,7 @@ export default {
 		"EGP"	: "mg/kg/min",
 		"Uid"	: "mg/kg/min",
 		"Uii"	: "mg/kg/min",
-		"I"		: "pmol/l",
+		"I"		: "pmol/L",
 		"Qsto"	: "mg",
 		"Ra"	: "mg/kg/min",
 		"S"		: "pmol/kg/min",
@@ -185,8 +165,9 @@ export default {
 		"Isc1"	: "I<sub>sc1</sub>",
 		"Isc2"	: "I<sub>sc1</sub>",
 	},
-	params: {
+	parameters: {
 		"BW"	: "BW",
+		"Gpeq"	: "G<sub>p,eq</sub>",
 		"VG" 	: "V<sub>G</sub>",
 		"k1" 	: "k<sub>1</sub>",
 		"k2" 	: "k<sub>2</sub>",
@@ -196,7 +177,7 @@ export default {
 		"m4" 	: "m<sub>4</sub>",
 		"m5" 	: "m<sub>4</sub>",
 		"m6" 	: "m<sub>6</sub>",
-		"HEb" 	: "HE<sub>b</sub>",
+		"HEeq" 	: "HE<sub>eq</sub>",
 		"kmax" 	: "k<sub>max</sub>",
 		"kmin" 	: "k<sub>min</sub>",
 		"kabs" 	: "k<sub>abs</sub>",
@@ -235,6 +216,7 @@ export default {
 </i18n>
 <i18n locale="en">
 {
+	"name"			: "UVA/Padova mockup",
 	loaddefaultpatient: "restore default values",
 	states: {
 		"Gp"		: "glucose in plasma",
@@ -250,16 +232,9 @@ export default {
 		"Isc1"		: "subcutaneous insulin in compartment 1",
 		"Isc2"		: "subcutaneous insulin in compartment 2",
 	},
-	inputs: {
-		"meal"		: "carbs intake",
-		"IIR"		: "rate of subcutaneous insulin infusion",
-		"bolus"		: "insulin bolus",
-	},
-	outputs: {
-		"G"			: "glucose concentration",
-	},
-	params: {
+	parameters: {
 		"BW"		: "body weight",
+		"Gpeq"		: "steady-state of glucose in plasma",
 		"VG" 		: "distribution volume of glucose",
 		"k1" 		: "rate parameter from Gp to Gt",
 		"k2" 		: "rate parameter from Gt to Gp",
@@ -269,7 +244,7 @@ export default {
 		"m4" 		: "rate parameter from Ip to periphery",
 		"m5" 		: "rate parameter of hepatic extraction (slope)",
 		"m6" 		: "rate parameter of hepatic extraction (offset)",
-		"HEb" 		: "steady-state hepatic extraction of insulin",
+		"HEeq" 		: "steady-state hepatic extraction of insulin",
 		"kmax" 		: "maximal emptying rate of stomach",
 		"kmin" 		: "minimal emptying rate of stomach",
 		"kabs" 		: "rate constant of intestinal absorption",
@@ -308,6 +283,7 @@ export default {
 </i18n>
 <i18n locale="de">
 {
+	"name"			: "UVA/Padova-Modell",
 	"loaddefaultpatient": "Standardwerte wiederherstellen",
 	states: {
 		"Gp"		: "Glukose im Plasma",
@@ -323,16 +299,9 @@ export default {
 		"Isc1"		: "Subkutanes Insulin im Kompartiment 1",
 		"Isc2"		: "Subkutanes Insulin im Kompartiment 2",
 	},
-	inputs: {
-		"meal"		: "Einnahme von Kohlenhydraten",
-		"IIR"		: "Subkutane Insulin-Zufuhrrate",
-		"bolus"		: "Insulin-Bolus",
-	},
-	outputs: {
-		"G"			: "Glukose-Konzentration",
-	},
-	params: {
+	parameters: {
 		"BW"		: "Körpergewicht",
+		"Gpeq"		: "Glukose im Plasma im Gleichgewicht",
 		"VG" 		: "Verteilungsvolumen der Glukose",
 		"k1" 		: "Übergangsgeschwindigkeit von Gp nach Gt",
 		"k2" 		: "Übergangsgeschwindigkeit von Gt nach Gp",
@@ -342,7 +311,7 @@ export default {
 		"m4" 		: "Übergangsgeschwindigkeit von Ip in die Peripherie",
 		"m5" 		: "Geschwindigkeit der hepatischen Extraction (Steigung)",
 		"m6" 		: "Geschwindigkeit der hepatischen Extraction (Offset)",
-		"HEb" 		: "Hepatische Insulin-Extraktion im Gleichgewicht",
+		"HEeq" 		: "Hepatische Insulin-Extraktion im Gleichgewicht",
 		"kmax" 		: "Maximale Entleerungsrate des Magens",
 		"kmin" 		: "Minimale Entleerungsrate des Magens",
 		"kabs" 		: "Geschwindigkeit der Absorption im Darm",

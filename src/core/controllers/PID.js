@@ -4,16 +4,17 @@
    See https://lt1.org for further information.	*/
 
 
-import AbstractController from './AbstractController.js';
+import AbstractController from '../AbstractController.js';
 
 class ControllerPID extends AbstractController {
 
 	constructor() {
 		super()
+		this.setParameters(1, 0.01, 0, 0, 100, false, 0, 0) 
 		this.reset()
 	}
 
-	setParams(basalRate, kP, kI, kD, target, useBolus, PreBolusTime, CarbFactor) {
+	setParameters(basalRate, kP, kI, kD, target, useBolus, PreBolusTime, CarbFactor) {
 
 		this.IIReq = basalRate;
 		this.kP = kP;

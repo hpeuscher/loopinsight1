@@ -1,5 +1,5 @@
 /**
- * computes the coefficien of variation of an array of numbers
+ * computes the coefficient of variation of an array of numbers
  * @param {Array} arr 
  * @returns {number} the coefficien of variation
  */

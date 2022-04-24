@@ -3,20 +3,19 @@
    Distributed under the MIT software license.
    See https://lt1.org for further information.	*/
 
-
+import NotImplementedError from "../common/NotImplementedError.js"
 
 /**
  * abstract base class of physiological model of virtual patient
  */
 class AbstractVirtualPatient {
-	xeq				// steady state vector (equilibrium)
 	IIReq			// equilibrium basal rate
 
-	inputList
-	outputList
-	paramList
-	stateList
-	signalList
+	inputList		// list of inputs used by this model
+	outputList		// list of outputs provided by this model
+	parameterList	// list of model parameters
+	stateList		// list of state variables
+	signalList		// list of intermediate signals
 	
 
 	// return initial state
@@ -25,13 +24,16 @@ class AbstractVirtualPatient {
 	}
 	
 	// compute derivatives (returns array)
-	derivatives(_t, _x, _u) {
-		throw new NotImplementedError(this.constructor.name, 'derivatives')
+	// u["carbs"]: carbs intake in g/min
+	// u["iir"]: subcutaneous insulin injection in U/h
+	// u["ibolus"]: bolus in U administered in this minute
+	getDerivatives(_t, _x, _u) {
+		throw new NotImplementedError(this.constructor.name, 'getDerivatives')
 	}
 	
 	// compute outputs (returns object)
-	outputs(_t, _x, _u) {
-		throw new NotImplementedError(this.constructor.name, 'outputs')
+	getOutputs(_t, _x, _u) {
+		throw new NotImplementedError(this.constructor.name, 'getOutputs')
 	}
 	
 }

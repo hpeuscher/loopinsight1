@@ -58,7 +58,7 @@ gui.runSimulation = () => {
 	console.log("start simulation");
 
 	sim.setPatient(gui.$refs.main.getPatient())
-	sim.setController(gui.$refs.main.getControllerView().getController())
+	sim.setController(gui.$refs.main.getController())
 	sim.setMeals(gui.$refs.main.getMeals())
 	sim.setOptions({"tmax": Number(gui.$refs.main.tmax)})
 	sim.runSimulation()

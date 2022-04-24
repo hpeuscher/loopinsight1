@@ -4,16 +4,21 @@
    	Distributed under the MIT software license.
 	See https://lt1.org for further information.	*/
 
-import ControllerOref0 from '../../core/ControllerOref0.js';
+import ControllerOref0 from '../../../core/controllers/Oref0.js';
 var oref0; // FIXME Referenz zu Controller
 
 export default {
 	props: {
 		patient: Object,
 	},
+
 	emits: ["controllerChanged"],
+
 	data() {
 		return {
+			version: "1.0.0",
+			name: "",
+			controller: new ControllerOref0(),
 			profile: {
 				max_iob: 3.5,
 				dia: 6,
@@ -30,22 +35,23 @@ export default {
 			CarbFactor: 1.5,
 		}
 	},
+
+	beforeMount() {
+		this.name = this.$t("name");
+	},
+
 	mounted() {
 		this.valueChanged()
-		this.$emit("controllerChanged", this)
 	},
+
 	methods: {
 		valueChanged() {
 			this.CarbFactor = Math.round(10 / this.profile.carb_ratio * 100) / 100;
-		},
-
-		getController() {
-			return new ControllerOref0(
-				this.profile,
+			this.controller.setParameters(this.profile,
 				this.useBolus,
 				this.PreBolusTime,
-				this.CarbFactor
-			)
+				this.CarbFactor)
+			this.$emit("controllerChanged", this.controller)
 		},
 	},
 }
@@ -180,6 +186,7 @@ export default {
 
 <i18n locale="en">
 {
+	"name": "OpenAPS (oref0)",
 	"useBolus": "Patient administers meal bolus",
 	"CarbFactor": "carb factor",
 	"PreBolusTime": "time between bolus and meal",
@@ -206,6 +213,7 @@ export default {
 </i18n>
 <i18n locale="de">
 {
+	"name": "OpenAPS (oref0)",
 	"useBolus": "Bolus zur Mahlzeit",
 	"CarbFactor": "KE-Faktor",
 	"PreBolusTime": "Spritz-Ess-Abstand",

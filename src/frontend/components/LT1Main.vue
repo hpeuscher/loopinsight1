@@ -58,7 +58,7 @@ export default {
 	data() {
 		return {
 			boxactive: false,
-			controllerView: {},
+			controller: {},
 			patientData: {},	// todo
 			patientObject: {},	// todo
 			meals: {},
@@ -73,8 +73,8 @@ export default {
 			this.runSimulation();
 			this.updateCharts();
 		},
-		getControllerView() {
-			return this.controllerView;
+		getController() {
+			return this.controller;
 		},
 		getPatient() {
 			return this.patientObject;
@@ -82,8 +82,8 @@ export default {
 		getMeals() {
 			return JSON.parse(JSON.stringify(this.meals));
 		},
-		controllerChanged(newControllerView) {
-			this.controllerView = newControllerView;
+		controllerChanged(newController) {
+			this.controller = newController;
 		},
 		patientChanged(newPatient) {
 			this.patientObject = newPatient;
