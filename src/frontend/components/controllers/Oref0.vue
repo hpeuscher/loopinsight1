@@ -5,7 +5,6 @@
 	See https://lt1.org for further information.	*/
 
 import ControllerOref0 from '../../../core/controllers/Oref0.js';
-var oref0; // FIXME Referenz zu Controller
 
 export default {
 	props: {
@@ -18,7 +17,6 @@ export default {
 		return {
 			version: "1.0.0",
 			name: "",
-			controller: new ControllerOref0(),
 			profile: {
 				max_iob: 3.5,
 				dia: 6,
@@ -46,12 +44,18 @@ export default {
 
 	methods: {
 		valueChanged() {
+			this.$emit("controllerChanged", this.getController())
+		},
+
+		getController() {
 			this.CarbFactor = Math.round(10 / this.profile.carb_ratio * 100) / 100;
-			this.controller.setParameters(this.profile,
+			let controller = new ControllerOref0()
+			controller.setParameters(
+				JSON.parse(JSON.stringify(this.profile)),
 				this.useBolus,
 				this.PreBolusTime,
 				this.CarbFactor)
-			this.$emit("controllerChanged", this.controller)
+			return controller
 		},
 	},
 }

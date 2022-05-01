@@ -14,6 +14,8 @@ import ChartInsulinCarbs from './ChartInsulinCarbs.vue'
 import ChartControllerOutput from './ChartControllerOutput.vue'
 import ChartAGP from './ChartAGP.vue'
 
+let controller = {}
+
 export default {
 	props: {
 		runSimulation: Function
@@ -43,6 +45,8 @@ export default {
 		defaults.scale.title.text = this.$t('timeaxis')
 		defaults.scale.ticks.stepSize = 60
 		defaults.scale.beginAtZero = true
+
+		defaults.parsing = false
 	},
 
 	components: {
@@ -58,7 +62,6 @@ export default {
 	data() {
 		return {
 			boxactive: false,
-			controller: {},
 			patientData: {},	// todo
 			patientObject: {},	// todo
 			meals: {},
@@ -74,7 +77,7 @@ export default {
 			this.updateCharts();
 		},
 		getController() {
-			return this.controller;
+			return controller;
 		},
 		getPatient() {
 			return this.patientObject;
@@ -83,7 +86,9 @@ export default {
 			return JSON.parse(JSON.stringify(this.meals));
 		},
 		controllerChanged(newController) {
-			this.controller = newController;
+			if (typeof newController !== "undefined") {
+				controller = newController
+			}
 		},
 		patientChanged(newPatient) {
 			this.patientObject = newPatient;

@@ -21,7 +21,7 @@ var log_fun = function () {
 	else if (typeof arguments === "string") {
 		args = [arguments];
 	}
-	else if (typeof argumnets === "array") {
+	else if (typeof arguments === "array") {
 		args = arguments;
 	}
 	else {

@@ -17,7 +17,6 @@ export default {
 		return {
 			version: "1.0.0",
 			name: "",
-			controller: new ControllerBasalBolus(),
 			useBolus: true,
 			PreBolusTime: 30,
 			CarbFactor: 1.5,
@@ -46,14 +45,20 @@ export default {
 
 	methods: {
 		valueChanged() {
-			this.controller.setParameters(
+			this.$emit("controllerChanged", this.getController())
+		},
+		
+		getController() {
+			let controller = new ControllerBasalBolus()
+			controller.setParameters(
 				this.IIRb,
 				this.useBolus, 
 				this.PreBolusTime, 
 				this.CarbFactor
 			)
-			this.$emit("controllerChanged", this.controller)
+			return controller
 		},
+
 	},
 }
 </script>

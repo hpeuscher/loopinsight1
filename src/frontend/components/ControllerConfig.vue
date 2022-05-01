@@ -28,7 +28,7 @@ export default {
 			boxactive: false,	// open accordion box
 			controllerInfo: {},
 			controllerList: controllerList,
-			selectedController: controllerList[0],
+			selectedController: "Oref0",
 		}
 	},
 
@@ -38,7 +38,7 @@ export default {
 
 	methods: {
 		getController() {
-			return this.controllerInfo[this.selectedController].ref.controller
+			return this.controllerInfo[this.selectedController].ref.getController()
 		},
 
 		selectionChanged() {
