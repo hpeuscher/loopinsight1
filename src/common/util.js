@@ -1,10 +1,10 @@
 /**
  * computes the coefficient of variation of an array of numbers
  * @param {Array} arr 
- * @returns {number} the coefficien of variation
+ * @returns {number} the coefficient of variation
  */
- function coefficientOfVariation(arr) {
-    return std(arr) / mean(arr);
+function coefficientOfVariation(arr) {
+    return std(arr) / mean(arr)
 }
 
 /**
@@ -13,7 +13,7 @@
  * @returns {number} the standard deviation
  */
  function std(arr) {
-    return Math.sqrt(variance(arr));
+    return Math.sqrt(variance(arr))
 }
 
 /**
@@ -22,13 +22,8 @@
  * @returns {number} the variance
  */
 function variance(arr) {
-    let sum = 0
-    let n = arr.length
-    let m = mean(arr)
-    for (elem of arr) {
-        sum += elem ** 2;
-    }
-    return sum / n - m * m
+    const m = mean(arr)  
+    return mean(arr.map(el => (el - m) ** 2))
 }
 
 /**
@@ -38,8 +33,7 @@ function variance(arr) {
  */
  function mean(arr) {
     let sum = 0
-    let n = arr.length
-    for (elem of arr) {
+    for (const elem of arr) {
         sum += elem
     }
     return sum / arr.length
