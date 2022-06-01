@@ -5,6 +5,7 @@
 	See https://lt1.org for further information.	*/
 	
 import Chart from 'chart.js/auto';
+import 'chartjs-adapter-moment';
 import colors from '../Colors.js';
 
 // Chart object
@@ -53,9 +54,9 @@ export default {
 		        },
 				scales: {
 					x: {
-						type: "linear",
-						ticks: {stepSize: 60},
-						suggestedMax: 300,
+						type: "time",
+						offset: false,
+						time: {unit: 'hour'},
 					},
 					y: {
 						type: "linear",

@@ -37,6 +37,10 @@ export default {
 			expertMode: false,
 		}
 	},
+	
+	props: {
+		t0: Date,
+	},
 
 	methods: {
 		mealsChanged() {
@@ -51,6 +55,12 @@ export default {
 			uniqueId = uniqueId + 1;
 			let newMeal = Object.assign({id: uniqueId}, 
 					JSON.parse(JSON.stringify(defaultMeal)));
+			let mealStarts = this.meals.map( (m) => {return m.actual.start.getTime()})
+			mealStarts.push(this.t0.getTime())
+			const lastMeal = Math.max(...mealStarts)
+			newMeal.actual.start = new Date(lastMeal + 2 * 60 * 60e3)
+			newMeal.announcement.start = newMeal.actual.start
+			newMeal.announcement.time = this.t0
 			this.meals.push(newMeal);
 			this.mealsChanged();
 		},
@@ -94,7 +104,7 @@ export default {
 		<hr>
 		<ul class="meallist">
 			<li v-for="(meal, index) in meals" :key="'meal'+index">
-				<component v-bind:is="activeMode" 
+				<component v-bind:is="activeMode" :t0="t0"
 				:meal="meals[index]" :id="index+1"
 					@mealChanged="mealChanged"
 					@mealDelete="deleteMeal" />

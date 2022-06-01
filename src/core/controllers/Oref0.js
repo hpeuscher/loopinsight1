@@ -71,26 +71,17 @@ class ControllerOref0 extends AbstractController {
 
 	// reset and initialize
 	reset() {
-		this.t0 = new Date().valueOf();
-
 		// default basal rate
-		this.currenttemp = {
-			_type: "Temp Basal",
-			timestamp: new Date(this.t0),
-			duration: 5,
-			'duration (min)': 5,
-			rate: 0,
-			temp: "absolute"
-		};
-		this.treatmentHistory = [this.currenttemp];
+		this.currenttemp = {}
+		this.treatmentHistory = []
 
 		// clear glucose measurement history
-		this.glucoseHistory = [];
-		this.hist = [];
+		this.glucoseHistory = []
+		this.hist = []
 
 		// reset treatment
-		this.ibolus = 0;
-		this.IIR = this.currenttemp.rate;
+		this.ibolus = 0
+		this.IIR = 0
 	}
 
 
@@ -104,17 +95,15 @@ class ControllerOref0 extends AbstractController {
 	 */
 	 computeTreatment(t, y, _x) {
 
-		let tNow = new Date(this.t0 + t * 60 * 1000);
+		let tNow = new Date(t);
 		let G = y["G"];
 
-		// add current glucose measurement to history
-		this.hist[t] = G;
 
 
 		// compute (simulated manual) bolus
 		this.bolus =
 			this.useBolus *
-			this.announcedCarbs(t + this.PreBolusTime) / 10.0 *
+			this.announcedCarbs(t + this.PreBolusTime * 60e3) / 10.0 *
 			this.CarbFactor;
 		if (this.bolus) {
 			this.treatmentHistory.push({
@@ -142,7 +131,7 @@ class ControllerOref0 extends AbstractController {
 
 
 		// run only every 5 minutes
-		if (t % 5) {
+		if (tNow.getMinutes() % 5) {
 			return {iir: this.IIR, ibolus: this.bolus};
 		}
 
@@ -152,6 +141,9 @@ class ControllerOref0 extends AbstractController {
 			dateString: tNow.toISOString(),
 			glucose: G
 		});
+
+		// add current glucose measurement to history
+		this.hist.push(G);
 
 
 		// add effect of current temp (5min) to treatment history (->IOB)
@@ -168,20 +160,20 @@ class ControllerOref0 extends AbstractController {
 		// compute glucose trends
 		// todo: check if these formulas are correct
 		let glucose_status = { "glucose": G, "date": tNow };
-		if (t >= 5) {
-			glucose_status["delta"] = G - this.hist[t - 5];
+		if (this.hist.length >= 5) {
+			glucose_status["delta"] = G - this.hist.at(-5);
 		}
 		else {
 			glucose_status["delta"] = 0;
 		}
-		if (t >= 15) {
-			glucose_status["short_avgdelta"] = (G - this.hist[t - 15]) / 3.0;
+		if (this.hist.length >= 15) {
+			glucose_status["short_avgdelta"] = (G - this.hist.at(-15)) / 3.0;
 		}
 		else {
 			glucose_status["short_avgdelta"] = 0;
 		}
-		if (t >= 45) {
-			glucose_status["long_avgdelta"] = (G - this.hist[t - 45]) / 9.0;
+		if (this.hist.length >= 45) {
+			glucose_status["long_avgdelta"] = (G - this.hist.at(-45)) / 9.0;
 		}
 		else {
 			glucose_status["long_avgdelta"] = 0;
@@ -255,7 +247,7 @@ class ControllerOref0 extends AbstractController {
 
 		basal.predictedBG = [];
 		for (let i = 0; i < predBG.length; i++) {
-			basal.predictedBG.push({ t: t + 5 * i, BG: predBG[i] });
+			basal.predictedBG.push({ t: t + 5 * 60000 * i, BG: predBG[i] });
 		}
 
 		// prepare outputs

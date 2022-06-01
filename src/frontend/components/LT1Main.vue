@@ -31,10 +31,6 @@ export default {
 		defaults.elements.point.pointStyle = 'line'
 		defaults.elements.point.radius = 0
 		
-		defaults.plugins.tooltip.callbacks.title = (context) => {
-			return 't = ' + context[0].label + ' min'
-		};
-
 		defaults.plugins.legend.labels.usePointStyle = true
 		
 		defaults.interaction.mode = 'nearest'
@@ -43,8 +39,6 @@ export default {
 		
 		defaults.scale.title.display = true
 		defaults.scale.title.text = this.$t('timeaxis')
-		defaults.scale.ticks.stepSize = 60
-		defaults.scale.beginAtZero = true
 
 		defaults.parsing = false
 	},
@@ -66,8 +60,15 @@ export default {
 			patientObject: {},	// todo
 			meals: {},
 			myCharts: [],
-			tmax: 600, 
+			t0String: new Date(Date.now()).toISOString().substr(0,11)+"06:00:00",
+			tspan: 8, 
 		}
+	},
+
+	computed: {
+		t0() {
+			return new Date(this.t0String.valueOf())
+		},
 	},
 	
 	methods: {
@@ -83,7 +84,14 @@ export default {
 			return this.patientObject;
 		},
 		getMeals() {
-			return JSON.parse(JSON.stringify(this.meals));
+			return JSON.parse(JSON.stringify(this.meals))
+		},
+		getOptions() {
+			//const t0 = new Date((new Date(Date.now())).toDateString() + 
+			//	" " + JSON.parse(JSON.stringify(this.t0)) + ":00")
+			const t0 = new Date(this.t0.valueOf());
+			const tmax = new Date(t0.valueOf() + this.tspan * 3600000)
+			return {t0, tmax}
 		},
 		controllerChanged(newController) {
 			if (typeof newController !== "undefined") {
@@ -161,7 +169,7 @@ export default {
 			<VirtualPatientConfig 
 				@patientChanged="patientChanged">
 			</VirtualPatientConfig>
-			<MealTable 
+			<MealTable :t0="t0"
 				@mealsChanged="mealsChanged">
 			</MealTable>
 			<div id="generalcontrols" 
@@ -171,12 +179,22 @@ export default {
 				<div id="generaloptions" class="parameterlist">
 					<ul>
 						<li class="item">
-							<label for="tmax">
-								<div class="item-description">{{$t("tmax")}}</div>
-								<div class="item-input">
-									<input v-model.number="tmax" type="number" min="0" step="30">
+							<label for="t0">
+								<div class="item-description">{{$t("t0")}}</div>
+								<div >
+									<input v-model="t0String" type="datetime-local">
 								</div>
-								<div class="item-unit">min</div>
+								<div class="item-unit"></div>
+							</label>
+						</li>
+						<li class="item">
+							<label for="t0">
+								<div class="item-description">{{$t("tspan")}}</div>
+								<div class="item-input">
+									<input v-model.number="tspan"
+										type="number" min="0" step="1">
+								</div>
+								<div class="item-unit">h</div>
 							</label>
 						</li>
 					</ul>
@@ -244,7 +262,9 @@ div#results {
 
 #container input,select {
 	padding: 0.25rem;
+	font-size: 0.8rem;
 	box-sizing: border-box;
+	font-family: inherit;
 }
 
 
@@ -394,9 +414,10 @@ input#startbutton {
 	"settings": 	"Settings",
 	"run": 			"run simulation",
 	"general": 		"General options",
-	"tmax": 		"Simulation timespan",
+	"t0": 			"Simulation start",
+	"tspan": 		"Simulation timespan",
 	"results":		"Results",
-	"timeaxis":		"time in min",
+	"timeaxis":		"time",
 }
 </i18n>
 <i18n locale="de">
@@ -404,8 +425,9 @@ input#startbutton {
 	"settings": 	"Einstellungen",
 	"run": 			"Simulation starten",
 	"general":		"Allgemein",
-	"tmax":			"Simulationszeitraum",
+	"t0": 			"Simulationsbeginn",
+	"tspan":		"Simulationszeitraum",
 	"results":		"Ergebnisse",
-	"timeaxis":		"Zeit in min",
+	"timeaxis":		"Zeit",
 }
 </i18n>

@@ -31,10 +31,6 @@ const app = Vue.createApp(LT1VueApp);
 
 
 // add multi-language support
-
-
-//const VueI18n = require("vue-i18n");
-//const i18n = VueI18n.createI18n({
 const i18n = createI18n({
 	locale: document.getElementsByTagName("html")[0].lang || navigator.language.split('-')[0],
 	fallbackLocale: 'en',
@@ -60,7 +56,7 @@ gui.runSimulation = () => {
 	sim.setPatient(gui.$refs.main.getPatient())
 	sim.setController(gui.$refs.main.getController())
 	sim.setMeals(gui.$refs.main.getMeals())
-	sim.setOptions({"tmax": Number(gui.$refs.main.tmax)})
+	sim.setOptions(gui.$refs.main.getOptions())
 	sim.runSimulation()
 
 	// propagate results to charts

@@ -4,12 +4,14 @@
    	Distributed under the MIT software license.
    	See https://lt1.org for further information.	*/
 
+import moment from "../../../node_modules/moment/moment.js"
+
 export default {
 	data() {
 		return {
 			boxactive: true,
 			controllerOutput: {},
-			t0: 0,
+			t0: "",
 		};
 	},
 	methods: {
@@ -23,14 +25,14 @@ export default {
 		},	
 		reset() {
 			this.controllerOutput = {};
-			this.t0 = 0;
+			this.t0 = "";
 		},
 		_pushRecord(_t, _x, _u, _y, _log)  {
 		},	
 		_update(){
 		},		
 		controllerDataHover(t0, data) {
-			this.t0 = t0;
+			this.t0 = moment(t0).format(this.$t("dateformat"));
 			this.controllerOutput = data;
 		},
 	},
@@ -93,11 +95,13 @@ p {
 {
 	"title":	"Algorithm outputs and logs",
 	"time":		"time",
+	"dateformat":	"Do MMMM YYYY hh:mm:ss",
 }
 </i18n>
 <i18n locale="de">
 {
 	"title": 	"Algorithmus-Ausgaben und -Logs",
 	"time":		"Zeitpunkt",
+	"dateformat":	"DD.MM.YYYY hh:mm:ss",
 }
 </i18n>

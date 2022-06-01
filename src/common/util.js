@@ -39,4 +39,15 @@ function variance(arr) {
     return sum / arr.length
 }
 
-export { mean, variance, std, coefficientOfVariation }
+/**
+ * transforms Date to browser locale String
+ * @param {Date} date 
+ * @returns {String} formatted date
+ */
+function dateToBrowserLocale(date) {
+	let t = new Date(date)
+	t = t.valueOf() - t.getTimezoneOffset() * 60000
+	return new Date(t).toISOString().substr(0,19)
+}
+
+export { mean, variance, std, coefficientOfVariation, dateToBrowserLocale }

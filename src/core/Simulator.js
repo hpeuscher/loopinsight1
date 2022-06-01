@@ -6,6 +6,8 @@
 import InvalidResultError from '../common/InvalidResultError.js'
 import RK4 from './SolverRK4.js'
 
+const Min2Milli = 6e4
+
 class Simulator {
 
 	constructor() {
@@ -25,7 +27,23 @@ class Simulator {
 	}
 
 	setMeals(meals) {
-		this.meals = meals
+		this.meals = []
+		for (let meal of meals) {
+			if (typeof meal.actual !== "undefined") {
+				if (typeof meal.actual.start !== "undefined") {
+					meal.actual.start = new Date(meal.actual.start)
+				}
+			}
+			if (typeof meal.announcement !== "undefined") {
+				if (typeof meal.announcement.start !== "undefined") {
+					meal.announcement.start = new Date(meal.announcement.start)
+				}
+				if (typeof meal.announcement.time !== "undefined") {
+					meal.announcement.time = new Date(meal.announcement.time)
+				}
+			}
+			this.meals.push(meal)
+		}
 	}
 
 	setOptions(options) {
@@ -35,6 +53,9 @@ class Simulator {
 
 	runSimulation() {
 
+		// fixed time step
+		const dt = 1
+
 		// reset simulationResults
 		this.simulationResults = []
 
@@ -43,20 +64,26 @@ class Simulator {
 		this.controller.setAnnouncedCarbs((t_) => this._announcedCarbs(this.meals, t_, t))
 		this.controller.reset()
 
-		// initialize simulation variables
-		let t = 0
-		const tmax = this.options.tmax
-		if (!Number.isInteger(tmax) || tmax < 0) {
-			tmax = 10
+		// initial time of simulation
+		let t = this.options.t0
+		if (Object.prototype.toString.call(t) !== '[object Date]') {
+			t = new Date()
+		}
+		t = t.valueOf()
+		
+		// stop time of simulation
+		let tmax = this.options.tmax
+		if (Object.prototype.toString.call(tmax) !== '[object Date]') {
+			tmax = t + 60*Min2Milli
 		}
 
-		const dt = 1
+		// initialize simulation variables
 		let x = this.patient.getInitialState()
-		let u = { meal: 0, iir: this.patient.IIReq, ibolus: 0 }
+		let u = { meal: 0, iir: this.patient.IIReq, ibolus: 0 }	// todo: complete list
 		let y = this.patient.getOutputs(t, x, u)
 
 		// start simulation
-		while (t < tmax) {
+		while (t <= tmax) {
 			// todo: sensor dynamics
 			y["G"] = y["Gp"];
 
@@ -69,16 +96,17 @@ class Simulator {
 			let { logData, iir, ibolus } = this.controller.computeTreatment(t, y, x)
 			if (iir<0) iir = 0
 			if (ibolus<0) ibolus = 0
-			const carbs = this._momentaryCarbIntake(this.meals, t)
-			const isMeal = this._newMealStartingAt(this.meals, t)
-			const u = { iir, ibolus, carbs, meal: isMeal }
 
-			this.simulationResults.push({t, x, u, y, logData})
+			// store results
+			const carbs = this._momentaryCarbIntake(this.meals, new Date(t))
+			const isMeal = this._newMealStartingAt(this.meals, new Date(t))
+			u = { iir, ibolus, carbs, meal: isMeal }
+			this.simulationResults.push({t: new Date(t), x, u, y, logData})
 
 			// proceed one time step
 			x = RK4((t_, x_) => this.patient.getDerivatives(t_, x_, u), t, x, dt)
 			y = this.patient.getOutputs(t, x, u)
-			t += dt
+			t += dt*Min2Milli
 		}
 
 		return this.simulationResults
@@ -95,7 +123,8 @@ class Simulator {
 		let m = 0;
 		for (const meal of meals) {
 			const { start, duration, carbs } = meal.actual
-			if (t >= start && t < start + duration) {
+			const tend = new Date(start.valueOf() + duration*60000)
+			if (t >= start && t < tend) {
 				if (duration < 1) {
 					duration = 1
 				}
@@ -115,7 +144,7 @@ class Simulator {
 		let m = 0;
 		for (const meal of meals) {
 			const { start, carbs } = meal.actual
-			if (start == t && carbs > 0) {
+			if (start.getTime() === t.getTime() && carbs > 0) {
 				return carbs
 			}
 		}
@@ -135,7 +164,7 @@ class Simulator {
 		for (const meal of meals) {
 			if (!meal.announcement) continue
 			const { start, carbs, time } = meal.announcement
-			if (tSim > time && start == tReq) {
+			if (tSim >= time.getTime() && start.getTime() === tReq) {
 				a += carbs
 			}
 		}

@@ -44,7 +44,7 @@ class ControllerPID extends AbstractController {
 	 computeTreatment(t, y, _x) {
 
 		// compute bolus (IIR remains constant all the time)
-		this.bolus = this.useBolus * this.announcedCarbs(t + this.PreBolusTime) / 10.0
+		this.bolus = this.useBolus * this.announcedCarbs(t + this.PreBolusTime * 60e3) / 10.0
 			* this.CarbFactor
 
 		// PID law

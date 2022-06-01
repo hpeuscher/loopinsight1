@@ -46,7 +46,7 @@ export default {
       this.averageGlucose = Math.round(util.mean(this.G));
       this.GMI = Math.round((3.38 + 0.02345 * this.averageGlucose) * 10) / 10;
       this.glucoseVariability = Math.round(
-        100 * coefficientOfVariation(this.G)
+        100 * util.coefficientOfVariation(this.G)
       );
     },
     _pushRecord(_t, _x, _u, y, _log) {
@@ -207,8 +207,7 @@ td {
   border: none;
 }
 
-table#tirtable > div {
-}
+
 /* span between TIRs */
 table#tirtable td {
   padding: 0;

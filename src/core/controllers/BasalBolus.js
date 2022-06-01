@@ -35,7 +35,7 @@ class ControllerBasalBolus extends AbstractController {
 	 */
 	 computeTreatment(t, _y, _x) {
 		// compute bolus (IIR remains constant all the time)
-		this.bolus = this.useBolus * this.announcedCarbs(t + this.preBolusTime) / 10.0
+		this.bolus = this.useBolus * this.announcedCarbs(t + this.preBolusTime * 60e3) / 10.0
 			* this.carbFactor
 
 		return {iir: this.IIR, ibolus: this.bolus}
