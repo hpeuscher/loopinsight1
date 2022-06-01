@@ -6,45 +6,45 @@
 // this file illustrates how to use LoopInsighT1 to run simulations without the
 // browser-based graphical user interface.
 
-import Simulator from '../src/Simulator.js';
-import ControllerBasalBolus from '../src/ControllerBasalBolus.js';
-import VirtualPatientUvaPadova from '../src/VirtualPatientUvaPadova.js';
+import Simulator from '../src/core/Simulator.js'
+import ControllerBasalBolus from '../src/core/controllers/BasalBolus.js'
+import VirtualPatientUvaPadova from '../src/core/models/UvaPadova.js'
 
 // define a patient object
-let patient = new VirtualPatientUvaPadova();
+let patient = new VirtualPatientUvaPadova()
 // define a controller/algorithm
-let controller = new ControllerBasalBolus();
-controller.setParams(patient.IIReq, true, 30, 1.5);
+let controller = new ControllerBasalBolus()
+controller.setParameters(patient.IIReq, true, 30, 1.5)
 // define a set of meals
 let meals = [
 	{
 		actual: {
-			start: 60, 
+			start: new Date(2022,5,1,8,0,0), 
 			duration: 15, 
 			carbs: 20, 
 		},
 		announcement: {
-			start: 60, 
+			start: new Date(2022,5,1,8,0,0), 
 			carbs: 20, 
-			time: 0,
+			time: new Date(2022,5,1,7,0,0),
 		},
 	},
-];
+]
 
 // prepare the simulator
-var sim = new Simulator();
-
-// this is where to store the results
-var results = [];
+var sim = new Simulator()
 
 // start the simulation
-sim.startSim(
-	patient, 
-	controller, 
-	meals, 
-	(t, _x, _u, y, _log) => { results.push({t:t, G:y.G}); },
-	{"tmax": 600}
-);
+sim.setPatient(patient)
+sim.setController(controller)
+sim.setMeals(meals)
+sim.setOptions({
+	"t0": new Date(2022,5,1,6,0,0),
+	"tmax": new Date(2022,5,1,18,0,0),
+})
+
+sim.runSimulation()
+const results = sim.getSimulationResults()
 
 // display the results (or preprocess them as you need)
-console.log(results);
+console.log(results)

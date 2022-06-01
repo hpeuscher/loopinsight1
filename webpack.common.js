@@ -9,11 +9,11 @@ import webpack from 'webpack';
 
 export default {
   entry: {
-	  lt1: './src/LoopInsighT1.js',
-	  game: './src/Gamification.js'
+	  lt1: './src/frontend/LoopInsighT1.js',
+	  game: './src/frontend/Gamification.js'
   },
   output: {
-	filename: '[name].bundle.js',
+    filename: '[name].bundle.js',
     path: path.resolve(__dirname, 'dist'),
   },
   module: {
@@ -38,19 +38,19 @@ export default {
     }),
     new VueLoaderPlugin(),
     new HtmlWebpackPlugin({
-      template: './src/assets/index.htm',
-      favicon: './src/assets/images/favicon.png', 
+      template: './src/frontend/assets/index.htm',
+      favicon: './src/frontend/assets/images/favicon.png', 
 	    filename: 'index.html',
 	    chunks: ["index"],
     }),
     new HtmlWebpackPlugin({
-      template: './src/assets/index.htm',
-      favicon: './src/assets/images/favicon.png',
+      template: './src/frontend/assets/index.htm',
+      favicon: './src/frontend/assets/images/favicon.png',
 	    filename: 'game.html',
 	    chunks: ["game"],
     }),
 	new CopyWebpackPlugin({'patterns': [
-        {from:'./src/assets/images', to:'images'}
+        {from:'./src/frontend/assets/images', to:'images'}
     ]}),
 	new webpack.optimize.LimitChunkCountPlugin({
 	    maxChunks: 1
