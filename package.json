@@ -12,7 +12,9 @@
   "license": "MIT",
   "dependencies": {
     "chart.js": "^3.5.1",
-    "oref0": "^0.7.0"
+    "oref0": "^0.7.0",
+    "chartjs-adapter-moment": "^1.0.0",
+    "moment": "^2.29.3"
   },
   "devDependencies": {
     "@intlify/vue-i18n-loader": "^4.0.1",
