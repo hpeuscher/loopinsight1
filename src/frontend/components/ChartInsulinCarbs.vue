@@ -109,7 +109,7 @@ export default {
 			this.reset()
 			for (const result of simResults) {
 				const {t, x, u, y, logData} = result
-				this._pushRecord(t, x, u, y, logData)
+				this._pushRecord(t.valueOf(), x, u, y, logData)
 			}
 			this._update
 		},

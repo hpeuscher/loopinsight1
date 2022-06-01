@@ -114,7 +114,7 @@ export default {
 		_pushRecord(t, _x, _u, y, _log)  {
 			// glucose (most recent simulation)
 			chartGlucose.data.datasets[this.currentDatasetID].data
-				.push({x:t, y:y.G});
+				.push({x:t.valueOf(), y:y.G});
 		},
 		controllerDataHover(t0, data) {
 			// draw oref0 glucose prediction, if available
