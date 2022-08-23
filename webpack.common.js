@@ -6,12 +6,15 @@ import { VueLoaderPlugin } from 'vue-loader';
 import HtmlWebpackPlugin from'html-webpack-plugin';
 import CopyWebpackPlugin from 'copy-webpack-plugin';
 import webpack from 'webpack';
+import MomentTimezoneDataPlugin from 'moment-timezone-data-webpack-plugin';
+import MomentLocalesPlugin from 'moment-locales-webpack-plugin';
 
 export default {
   entry: './src/frontend/LoopInsighT1.js',
   output: {
-    filename: 'lt1.bundle.js',
+    filename: '[name].bundle.js',
     path: path.resolve(__dirname, 'dist'),
+    chunkFilename: '[id].[chunkhash].js'
   },
   module: {
     rules: [
@@ -24,6 +27,12 @@ export default {
         loader: '@intlify/vue-i18n-loader'
       },
     ],
+  },
+  optimization: {
+    splitChunks: {
+      name: false,
+      chunks: 'all',
+    },
   },
   plugins: [
     new webpack.DefinePlugin({
@@ -41,8 +50,9 @@ export default {
 	new CopyWebpackPlugin({'patterns': [
         {from:'./src/frontend/assets/images', to:'images'}
     ]}),
-	new webpack.optimize.LimitChunkCountPlugin({
-	    maxChunks: 1
-	  }),
+    new MomentTimezoneDataPlugin({
+      matchZones: ['Etc/UTC'],
+    }),
+    new MomentLocalesPlugin(),
   ],
 };
