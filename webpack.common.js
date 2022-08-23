@@ -11,7 +11,7 @@ import MomentLocalesPlugin from 'moment-locales-webpack-plugin';
 
 export default {
   entry: {
-	  lt1: './src/frontend/LoopInsighT1.js',
+	  index: './src/frontend/LoopInsighT1.js',
 	  game: './src/frontend/Gamification.js'
   },
   output: {
@@ -57,8 +57,8 @@ export default {
       favicon: './src/frontend/assets/images/favicon.png',
 	    filename: 'game.html',
 	    chunks: ["game"],
-    }),
-	new CopyWebpackPlugin({'patterns': [
+    }), 
+  	new CopyWebpackPlugin({'patterns': [
         {from:'./src/frontend/assets/images', to:'images'}
     ]}),
     new MomentTimezoneDataPlugin({

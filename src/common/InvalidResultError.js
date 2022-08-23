@@ -9,7 +9,7 @@ class InvalidResultError extends Error {
         const message = "Invalid simulation result" +
             " at time t="+ t.toString() + 
             ": " + 
-            JSON.stringify(result, function (key, value) {
+            JSON.stringify({y,x}, function (key, value) {
                 if (value !== value) {
                     return 'NaN'
                 } 

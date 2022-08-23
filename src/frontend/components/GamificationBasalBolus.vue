@@ -5,7 +5,6 @@
 	See https://lt1.org for further information.	*/
 
 import ControllerBasalBolus from '../../core/controllers/BasalBolus.js';
-//import KnobControl from '../../node_modules/vue-knob-control/dist/vue-knob-control.umd.js';
 
 export default {
 	props: {
@@ -14,7 +13,6 @@ export default {
 	emits: ["controllerChanged"],
 	data() {
 		return {
-			controller: new ControllerBasalBolus(),
 			useBolus: true,
 			PreBolusTime: 30,
 			CarbFactor: 1.5,
@@ -24,22 +22,31 @@ export default {
 	},
 	watch: {
 		"patient.IIReq": {
-			handler: function(val) { this.IIRb = Math.round(val*20)/20; },
+			handler: function(val) { 
+				this.IIRb = Math.round(val*20)/20
+				this.valueChanged()
+			},
 			immediate: true,
 		}
 	},
 	mounted() {
 	},
 	methods: {
-		controllerChanged() {
-			this.controller.setParams(
+		valueChanged() {
+			this.$emit("controllerChanged", this.getController())
+		},
+		
+		getController() {
+			let controller = new ControllerBasalBolus()
+			controller.setParameters(
 				this.IIRb,
 				this.useBolus, 
 				this.PreBolusTime, 
 				this.CarbFactor
-			);
-			this.$emit("controllerChanged", this);
+			)
+			return controller
 		},
+
 		// setup (called before simulation)
 		setup(patient) {
 			this.controller.setParams(
@@ -71,7 +78,7 @@ export default {
 			<div class="item-input">
 				<input type="number" v-model.number="CarbFactor" 
 					id="CarbFactor" min="0" step="0.1" 
-					@change="controllerChanged">
+					@change="valueChanged">
 			</div>
 			<div class="item-unit">U/(10g CHO)</div>
 		</label>
@@ -80,7 +87,7 @@ export default {
 			<div class="item-input">
 				<input type="number" v-model.number="PreBolusTime" 
 					id="PreBolusTime" min="-30" step="5" 
-					@change="controllerChanged">
+					@change="valueChanged">
 			</div>
 			<div class="item-unit">min</div>
 		</label>

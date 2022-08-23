@@ -100,11 +100,13 @@ export default {
 			</label>
 		</li>
 		<li>
-			<div class="meallabel">{{$t("withAnnouncement")}}:</div>
-			<div class="mealvalue">
-				<input type="checkbox" id="withAnnouncement"
-					@change="changed" v-model.number="withAnnouncement">
-			</div>
+			<label for="withAnnouncement" class="meallabel">
+				<div class="meallabel">{{$t("withAnnouncement")}}:</div>
+				<div class="mealvalue">
+					<input type="checkbox" id="withAnnouncement"
+						@change="changed" v-model.number="withAnnouncement">
+				</div>
+			</label>
 		</li>
 	</ul>
 </template>

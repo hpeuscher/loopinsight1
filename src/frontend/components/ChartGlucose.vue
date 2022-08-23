@@ -79,7 +79,7 @@ export default {
 				const {t, x, u, y, logData} = result
 				this._pushRecord(t, x, u, y, logData)
 			}
-			this._update
+			this._update()
 		},
 		reset() {
 			let datasets = chartGlucose.data.datasets;

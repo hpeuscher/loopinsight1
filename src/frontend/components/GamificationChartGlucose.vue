@@ -4,23 +4,24 @@
    	Distributed under the MIT software license.
 	See https://lt1.org for further information.	*/
 	
-import Chart from 'chart.js/auto';
-import colors from '../Colors.js';
+import Chart from 'chart.js/auto'
+import 'chartjs-adapter-moment'
+import colors from '../Colors.js'
 
 // Chart object
-var chartGlucose;
+var chartGlucose
 
 // glucose color
 function glucoseColor(ctx) {
 	if (ctx.p0.parsed.y < 54 || ctx.p1.parsed.y < 54)
-		return 'rgb(140,25,22,1)';	// very low
+		return 'rgb(140,25,22,1)'	// very low
 	if (ctx.p0.parsed.y < 70 || ctx.p1.parsed.y < 70)
-		return 'rgb(194,1,18,1)';	// low
+		return 'rgb(194,1,18,1)'	// low
 	if (ctx.p0.parsed.y > 250 || ctx.p1.parsed.y > 250)
-		return 'rgb(233,181,17,1)';	// very high
+		return 'rgb(233,181,17,1)'	// very high
 	if (ctx.p0.parsed.y > 180 || ctx.p1.parsed.y > 180)
-		return 'rgb(250,234,0,1)';	// high
-	return 'rgb(120,176,89,1)';		// target
+		return 'rgb(250,234,0,1)'	// high
+	return 'rgb(120,176,89,1)'		// target
 }
 
 
@@ -53,9 +54,9 @@ export default {
 		        },
 				scales: {
 					x: {
-						type: "linear",
-						ticks: {stepSize: 60},
-						suggestedMax: 300,
+						type: "time",
+						offset: false,
+						time: {unit: 'hour'},
 					},
 					y: {
 						type: "linear",
@@ -72,7 +73,15 @@ export default {
 		});
 	},
 	methods: {
-		setup(patient, controller, meals) {
+		setSimulationResults(simResults) {
+			this.reset()
+			for (const result of simResults) {
+				const {t, x, u, y, logData} = result
+				this._pushRecord(t, x, u, y, logData)
+			}
+			this._update()
+		},
+		reset() {
 			let datasets = chartGlucose.data.datasets;
 			// remove prediction data
 			datasets[0].data = [];
@@ -99,13 +108,13 @@ export default {
 			});
 			this.currentDatasetID = datasets.length - 1;
 		},
-		update(){
+		_update(){
 			chartGlucose.update();
 		},
-		pushData(t, _x, _u, y, _log)  {
+		_pushRecord(t, _x, _u, y, _log)  {
 			// glucose (most recent simulation)
 			chartGlucose.data.datasets[this.currentDatasetID].data
-				.push({x:t, y:y.G});
+				.push({x:t.valueOf(), y:y.G});
 		},
 		controllerDataHover(t0, data) {
 			// draw oref0 glucose prediction, if available

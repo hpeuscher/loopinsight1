@@ -1,0 +1,279 @@
+<html>
+    <head>
+        <script src="svg/svg.min.js"></script>
+        <style>
+            html {
+                font-family:Calibri; 
+                font-weight:400; 
+                font-size:16px; 
+            }
+
+            #tooltip {
+                background: white;
+                border: 1px solid black;
+                border-radius: 5px;
+                padding: 5px;
+                font-size:16px; 
+            }
+        </style>
+    </head>
+    <body>
+        <!--div id="modeldiv"/-->
+        <svg id="modelsvg" width="800" xmlns="http://www.w3.org/2000/svg" style="overflow:visible;">
+            <style>
+            text { font-size:16px; text-anchor:middle; pointer-events:visible; }
+            .signal > rect, .signal > circle { stroke:#000; stroke-width:2; fill:none; pointer-events:visible; }
+            .activesignal > rect, .activesignal > circle { stroke: #FF0000; }
+            .activesignal > text { fill: #FF0000; }
+            .connection { stroke:#666666; stroke-width:1.5; stroke-linejoin:round; fill:none; }
+            text.label { font-size:14px;}
+            .arrow { fill:#666666; }
+            </style>
+            <defs>
+                <marker id="head" orient="auto" markerWidth="10" markerHeight="4" refX="4.7" refY="2">
+                    <path d="M0,0 V4 L5,2 Z" class="arrow"/>
+                </marker>
+            </defs>
+        </svg>
+        <div id="tooltip" display="none" style="position: absolute; display: none;"></div>
+    </body>
+    <script type="text/javascript">
+        function connectingArc(s1, phi1, s2, phi2) {
+            return Arc(s1.x, s1.y, s1.geometry.r(phi1), phi1, s2.x, s2.y, s2.geometry.r(phi2), phi2)
+        }
+        function Arc(x1, y1, r1, phi1, x2, y2, r2, phi2) {
+            let d = Math.sqrt( Math.pow(x1-x2,2) + Math.pow(y1-y2,2) ) / 2
+            let i1 = {x: (x1+d*Math.cos(Math.PI/180*phi1)),
+                     y: (y1-d*Math.sin(Math.PI/180*phi1))}
+            let i2 = {x: (x2+d*Math.cos(Math.PI/180*phi2)),
+                     y: (y2-d*Math.sin(Math.PI/180*phi2))}
+            
+            return "M" + (x1+r1*Math.cos(Math.PI/180*phi1)) + " " + (y1-r1*Math.sin(Math.PI/180*phi1)) + 
+                " C" + i1.x + " " + i1.y + 
+                " " + i2.x + " " + i2.y +
+                " " + (x2+r2*Math.cos(Math.PI/180*phi2)) + " " + (y2-r2*Math.sin(Math.PI/180*phi2))
+        }
+        function addTooltip(elem, text) {
+            // todo: tooltip with text
+            elem.mouseenter(function() {
+                let tooltip = document.getElementById("tooltip");
+                tooltip.innerHTML = text;
+                tooltip.style.display = "block";
+                tooltip.style.left = elem.rbox().x + elem.rbox().width*0.1 + 'px';
+                tooltip.style.top = elem.rbox().y + elem.rbox().height*1+2 + 'px';
+                //this.children().fill({ color: '#f06' }).stroke({ color: '#f06' })
+                this.addClass("activesignal")
+            })
+            elem.mouseleave(function() {
+                let tooltip = document.getElementById("tooltip");
+                tooltip.style.display = "none";
+//                this.children().fill({ color: 'initial' }).stroke({ color: 'initial' })
+                this.removeClass("activesignal")
+            })
+        }
+
+        var geoCircle = (r) => { return {
+            draw: (g) => g.circle(2*r), 
+            r: (phi) => r,
+        }}
+        var geoRect = (w,h) => { return {
+            draw: (g) => g.rect(w,h), 
+            r: (phi) => w/2/Math.cos( Math.PI/2*Math.abs(2*phi/180 - Math.floor(2*phi/180+0.5)) ),
+        }}
+
+        
+        var signals = {
+            "Gp":       {x: 550,    y: 150,     geometry: geoCircle(25)},
+            "Gt":       {x: 550,    y: 250,     geometry: geoCircle(25)},
+            "Ip":       {x: 250,    y: 350,     geometry: geoCircle(25)},
+            "Il":       {x: 350,    y: 350,     geometry: geoCircle(25)},
+            "Qsto1":    {x: 150,    y: 50,      geometry: geoCircle(25)},
+            "Qsto2":    {x: 250,    y: 50,      geometry: geoCircle(25)},
+            "Qgut":     {x: 350,    y: 50,      geometry: geoCircle(25)},
+            "I_":       {x: 250,    y: 150,     geometry: geoCircle(25)},
+            "XL":       {x: 350,    y: 150,     geometry: geoCircle(25)},
+            "X":        {x: 350,    y: 250,     geometry: geoCircle(25)},
+            "Isc1":     {x:  50,    y: 300,     geometry: geoCircle(25)},
+            "Isc2":     {x:  50,    y: 400,     geometry: geoCircle(25)},
+ 
+            "Ra":       {x: 450,    y: 50,      geometry: geoRect(50,50)},
+            "EGP":      {x: 450,    y: 150,     geometry: geoRect(50,50)},
+            "E":        {x: 550,    y: 25,      geometry: geoRect(50,50)},
+            "Uid":      {x: 450,    y: 250,     geometry: geoRect(50,50)},
+            "Uii":      {x: 650,    y: 50,      geometry: geoRect(50,50)},
+            "I":        {x: 250,    y: 250,     geometry: geoRect(50,50)},
+            "RaI":      {x: 150,    y: 350,     geometry: geoRect(50,50)},
+        }
+
+        var connections = [
+            //{ id:   "EGP", d: "M800 300 A100 100 0 1 1   800 400" },
+            { d: connectingArc(signals.Gp, -60, signals.Gt, 60), label: {text: "k1"}},
+            { d: connectingArc(signals.Gt, 120, signals.Gp, -120), label: {text: "k2"}},
+            { d: connectingArc(signals.Qsto1, 0, signals.Qsto2, 180), label: {text: "kgri"}},
+            { d: connectingArc(signals.Qsto2, 0, signals.Qgut, 180), label: {text: "kempt"}},
+            { d: connectingArc(signals.Qgut, 0, signals.Ra, 180), label: {text: "kabs"}},
+            { d: connectingArc(signals.Ra, 0, signals.Gp, 120)},
+            { d: connectingArc(signals.E, 270, signals.Gp, 90)},
+            { d: connectingArc(signals.Uii, 180, signals.Gp, 60)},
+            { d: connectingArc(signals.I_, 0, signals.XL, 180), label: {text: "ki"}},
+            { d: connectingArc(signals.I, 0, signals.X, 180), label: {text: "p2u"}},
+            { d: connectingArc(signals.I, 90, signals.I_, -90), label: {text: ""}},
+            { d: connectingArc(signals.XL, 0, signals.EGP, 180)},
+            { d: connectingArc(signals.EGP, 0, signals.Gp, 180)},
+            { d: connectingArc(signals.Gp, 150, signals.EGP, 30), label: {text: "kp2"}},
+            { d: connectingArc(signals.X, 0, signals.Uid, 180), label: {text: "Vmx"}},
+            { d: connectingArc(signals.Uid, 0, signals.Gt, 180), label: {text: "???"}},
+            { d: connectingArc(signals.Ip, 30, signals.Il, 150)},
+            { d: connectingArc(signals.Il, -150, signals.Ip, -30)},
+            { d: connectingArc(signals.RaI, 0, signals.Ip, 180)},
+            { d: connectingArc(signals.Isc1, -90, signals.Isc2, 90), label: {text: "kd"}},
+            { d: connectingArc(signals.Isc1, 0, signals.RaI, 120), label: {text: "ka1"}},
+            { d: connectingArc(signals.Isc2, 0, signals.RaI, -120), label: {text: "ka2"}},
+        ]
+
+        var subsystems = [
+            //{ id:   "EGP", d: "M800 300 A100 100 0 1 1   800 400" },
+            {x: 210, y: 110, width: 180, height: 300, fill: "#DDDDFF", label: { text: "insulin subsystem" } },
+            {x: 410, y: 110, width: 180, height: 300, fill: "#FFDDDD", label: { text: "glucose subsystem" } },
+            {x: 10,  y: 250, width: 180, height: 200, fill: "#DDFFCC", label: { text: "subcutaneous transport" } },
+            {x: 110,  y: 10, width: 380, height: 90,  fill: "#FFDD55", label: { text: "meal subsystem" } },
+        ]
+
+
+        //var modeldiv = document.getElementById("modeldiv");
+        //var draw = SVG().addTo(modeldiv).size(800, 600)
+        var draw = SVG(document.getElementById("modelsvg"));
+
+        for (const s of subsystems) {
+            let g = draw.group().addClass("subsystem")
+            let r = g.rect(s.width, s.height).attr({rx:10, ry:10, fill: s.fill})
+            if (typeof s.label !== "undefined") {
+                let l = g.text(s.label.text).center(s.width/2,s.height-10)
+            }
+            g.move(s.x, s.y)
+        }
+        
+
+
+        for (const s in signals) {
+            let g = draw.group()
+                .addClass("signal")
+                .transform({translate: [signals[s].x, signals[s].y]})
+            let b = signals[s].geometry.draw(g).center(0,0)
+            let t = g.text(s).center(0,0)
+            addTooltip(g, s)
+        }
+
+        for (const s of connections) {
+            let g = draw.group()
+            
+            let p = g.path(s.d).addClass("connection").attr({"marker-end":"url(#head)"})
+
+            if (typeof s.label !== "undefined") {
+                // find point in the middle and path direction
+                let p1 = p.pointAt(p.length()*0.5)
+                let p2 = p.pointAt(p.length()*0.51)
+                let dir = {x: p2.x-p1.x, y: p2.y-p1.y }
+                let len = Math.hypot(dir.x, dir.y)
+                d = {x: dir.x/len, y: dir.y/len }
+                // place label alongside path
+                let l = g.text(s.label.text).addClass("label")
+                l.center(p1.x+Math.abs(dir.y)*l.bbox().width, p1.y-Math.abs(dir.x)*l.bbox().height)
+
+                //let l = g.text(s.label.text).addClass("label").center(p1.x,p1.y-8)
+            }
+        }
+
+        draw.attr({viewBox: draw.bbox()})
+
+
+
+/*
+
+        model = {}
+        model.html = {
+            signals: {
+                "Gp"	: "G<sub>p</sub>",
+                "Gt"	: "G<sub>t</sub>",
+                "Ip"	: "I<sub>p</sub>",
+                "Il"	: "I<sub>l</sub>",
+                "Qsto1"	: "Q<sub>sto1</sub>",
+                "Qsto2"	: "Q<sub>sto2</sub>",
+                "Qgut"	: "Q<sub>gut</sub>",
+                "XL"	: "X<sub>L</sub>",
+                "I_"	: "I'",
+                "X"		: "X",
+                "Isc1"	: "I<sub>sc1</sub>",
+                "Isc2"	: "I<sub>sc1</sub>",
+            }
+        }
+
+        model.lang = {
+            "name"			: "UVA/Padova-Modell",
+            "loaddefaultpatient": "Standardwerte wiederherstellen",
+            signals: {
+                "Gp"		: "Glukose im Plasma",
+                "Gt"		: "Glukose im Gewebe",
+                "Ip"		: "Insulin im Plasma",
+                "Il"		: "Insulin in der Leber",
+                "Qsto1"		: "Kohlenhydrate im Magen, Festphase",
+                "Qsto2"		: "Kohlenhydrate im Magen, Flüssigphase",
+                "Qgut"		: "Glukose im Darm",
+                "XL"		: "Insulin Verzögerungskompartiment 1",
+                "I_"		: "Insulin Verzögerungskompartiment 2",
+                "X"			: "Insulin in der Interstitialflüssigkeit",
+                "Isc1"		: "Subkutanes Insulin im Kompartiment 1",
+                "Isc2"		: "Subkutanes Insulin im Kompartiment 2",
+            },
+            parameters: {
+                "BW"		: "Körpergewicht",
+                "Gpeq"		: "Glukose im Plasma im Gleichgewicht",
+                "VG" 		: "Verteilungsvolumen der Glukose",
+                "k1" 		: "Übergangsgeschwindigkeit von Gp nach Gt",
+                "k2" 		: "Übergangsgeschwindigkeit von Gt nach Gp",
+                "VI" 		: "Verteilungsvolumen des Insulins",
+                "m1" 		: "Übergangsgeschwindigkeit von Il nach Ip",
+                "m2" 		: "Übergangsgeschwindigkeit von Ip nach Il",
+                "m4" 		: "Übergangsgeschwindigkeit von Ip in die Peripherie",
+                "m5" 		: "Geschwindigkeit der hepatischen Extraction (Steigung)",
+                "m6" 		: "Geschwindigkeit der hepatischen Extraction (Offset)",
+                "HEeq" 		: "Hepatische Insulin-Extraktion im Gleichgewicht",
+                "kmax" 		: "Maximale Entleerungsrate des Magens",
+                "kmin" 		: "Minimale Entleerungsrate des Magens",
+                "kabs" 		: "Geschwindigkeit der Absorption im Darm",
+                "kgri" 		: "Geschwindigkeit der Zerkleinerung im Magen",
+                "f" 		: "Anteil der Absorption im Darm",
+                "kp1" 		: "extrapolated at zero glucose and insulin",
+                "kp2" 		: "liver glucose effectiveness",
+                "kp3"		: "amplitude of insulin action on the liver",
+                "kp4"		: "amplitude of portal insulin action on the liver",
+                "ki"		: "delay between insulin signal and insulin action",
+                "Fcns"		: "glucose uptake by the brain and erythrocytes",
+                "Vm0"		: "Michaelis-Menten constant (offset)",
+                "Vmx"		: "Michaelis-Menten constant (slope)",
+                "Km0"		: "Michaelis-Menten constant (offset)",
+                "p2u"		: "insulin action on the peripheral glucose utilization",
+                "ke1"		: "glomerular filtration rate",
+                "ke2"		: "renal threshold of glucose",
+                "ka1"		: "rate constant of nonmonomeric insulin absorption",
+                "ka2"		: "rate constant of monomeric insulin absorption",
+                "kd" 		: "rate constant of insulin dissociation",
+            },
+            signals: {
+                "RaI"		: "insulin appearance rate",
+                "E"			: "renal glucose excretion",
+                "EGP"		: "endogenous glucose production",
+                "Uid"		: "insulin-dependent glucose utilization",
+                "Uii"		: "insulin-independent glucose utilization",
+                "I"			: "plasma insulin concentration",
+                "Qsto"		: "amount of glucose in the stomach",
+                "Ra"		: "appearance rate of glucose in plasma",
+                "S"			: "insulin secretion",
+                "HE"		: "hepatic extraction",
+                "m3"		: "rate constant of insulin degradation in the liver",
+            },
+        }
+*/
+
+    </script>
+</html>

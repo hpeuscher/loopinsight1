@@ -5,44 +5,60 @@
 	See https://lt1.org for further information.	*/
 
 import { defaults } from 'chart.js';
+import { ref } from 'vue'
 
-import ControllerConfig from './GamificationBasalBolus.vue';
-import { ref } from 'vue';
-import ChartGlucose from './GamificationChartGlucose.vue';
-import ChartAGP from './ChartAGP.vue';
+import ControllerConfig from './GamificationBasalBolus.vue'
+import ChartGlucose from './GamificationChartGlucose.vue'
+import ChartAGP from './ChartAGP.vue'
 
-import VirtualPatientUvaPadova from '../../core/models/UvaPadova.js';
+import VirtualPatientUvaPadova from '../../core/models/UvaPadova.js'
+import Simulator from '../../core/Simulator.js'
 
+let controller = {}
+let meals = [
+	{
+		actual: {
+			start: new Date(2022,5,1,8,0,0), 
+			duration: 15, 
+			carbs: 20, 
+		},
+		announcement: {
+			start: new Date(2022,5,1,8,0,0), 
+			carbs: 20, 
+			time: new Date(2022,5,1,0,0,0),
+		},
+	},
+]
+let options = {
+	"t0": new Date(2022,5,1,0,0,0),
+	"tmax": new Date(2022,5,2,0,0,0),
+}
 
 export default {
 	props: {
-		runSimulation: Function
+
 	},
 
 	beforeMount() {
 		// set default options for Chart
-		defaults.maintainAspectRatio = false;
-		defaults.responsive = true;
-		defaults.animation = false;
-		defaults.normalized = true;
+		defaults.maintainAspectRatio = false
+		defaults.responsive = true
+		defaults.animation = false
+		defaults.normalized = true
 		
-		defaults.elements.point.pointStyle = 'line';
-		defaults.elements.point.radius = 0;
+		defaults.elements.point.pointStyle = 'line'
+		defaults.elements.point.radius = 0
 		
-		defaults.plugins.tooltip.callbacks.title = (context) => {
-			return 't = ' + context[0].label + ' min';
-		};
+		defaults.plugins.legend.labels.usePointStyle = true
+		
+		defaults.interaction.mode = 'nearest'
+		defaults.interaction.axis = 'xy'
+		defaults.interaction.intersect = false
+		
+		defaults.scale.title.display = true
+		defaults.scale.title.text = this.$t('timeaxis')
 
-		defaults.plugins.legend.labels.usePointStyle = true;
-		
-		defaults.interaction.mode = 'nearest';
-		defaults.interaction.axis = 'xy';
-		defaults.interaction.intersect = false;
-		
-		defaults.scale.title.display = true;
-		defaults.scale.title.text = this.$t('timeaxis');
-		defaults.scale.ticks.stepSize = 60;
-		defaults.scale.beginAtZero = true;
+		defaults.parsing = false
 	},
 
 	components: {
@@ -53,50 +69,9 @@ export default {
 
 	data() {
 		return {
-			boxactive: false,
-			controller: {},
 			patientData: {},	// todo
 			patientObject: {},	// todo
-			meals: [
-				{
-					actual: {
-						start: 60,	// time
-						duration: 15, 	// in mins
-						carbs: 30, 		// in g
-					},
-					announcement: {
-						start: 60, 		// time
-						carbs: 30, 		// in g
-						time: 0,		// time
-					}
-				},
-				{
-					actual: {
-						start: 300, 		// time
-						duration: 15, 	// in mins
-						carbs: 50, 		// in g
-					},
-					announcement: {
-						start: 300, 		// time
-						carbs: 50, 		// in g
-						time: 0,		// time
-					}
-				},
-				{
-					actual: {
-						start: 600, 		// time
-						duration: 15, 	// in mins
-						carbs: 40, 		// in g
-					},
-					announcement: {
-						start: 600, 		// time
-						carbs: 40, 		// in g
-						time: 0,		// time
-					}
-				}
-			],
 			myCharts: [],
-			tmax: 1200, 
 		}
 	},
 
@@ -106,33 +81,59 @@ export default {
 	
 	methods: {
 		run() {
-			this.reset(this.getPatient(), this.getController(), this.getMeals());
-			this.runSimulation();
+			this.resetCharts();
+				console.log("start simulation");
+								
+				// prepare simulator
+				var sim = new Simulator();
+
+				sim.setPatient(this.getPatient())
+				sim.setController(this.getController())
+				sim.setMeals(meals)
+				sim.setOptions(options)
+				sim.runSimulation()
+
+				// propagate results to charts
+				const results = sim.getSimulationResults()
+				this.propagateSimulationResults(results)
+	
 			this.updateCharts();
 		},
 		getController() {
-			return this.controller;
+			return controller;
 		},
 		getPatient() {
-			return this.patientObject;
-		},
-		getMeals() {
-			return JSON.parse(JSON.stringify(this.meals));
+			return this.patientObject
 		},
 		controllerChanged(newController) {
-			this.controller = newController;
-			this.run();
+			if (typeof newController !== "undefined") {
+				controller = newController
+			}
+			if (typeof this.patientObject.getInitialState !== "undefined") {
+				this.run();
+			}
 		},
 		patientChanged(newPatient) {
 			this.patientObject = newPatient;
 			this.patientData = Object.assign({}, newPatient);
 		},
-		reset(patient, controller, meals) {
-			// todo
+		resetCharts() {
 			for (const chart in this.$refs)
 			{
 				try {
-					this.$refs[chart].setup(patient, controller, meals);
+					this.$refs[chart].reset()
+				}
+				catch {
+				}
+			}
+		},
+		// receive and use simulation data
+		propagateSimulationResults(simResults) {
+			// dispatch simulation output to charts
+			for (const chart in this.$refs)
+			{
+				try {
+					this.$refs[chart].setSimulationResults(simResults);
 				}
 				catch {
 				}
@@ -149,30 +150,7 @@ export default {
 				}
 			}
 		},
-		// receive and use simulation data
-		pushData(t, x, u, y, log) {
-			// console output
-//				console.log("t = " + t + ": G = " + Math.round(y["G"]) + ", IIR = " + u["iir"] + log);
-			
-			// dispatch simulation output to charts
-			for (const chart in this.$refs)
-			{
-				try {
-					this.$refs[chart].pushData(t, x, u, y, log);
-				}
-				catch {
-				}
-			}
-			
-			// break if result is invalid
-			if (isNaN(y["G"])) {
-				console.error("invalid simulation result");
-				console.error(x);
-				return true;
-			}
-			return false;
 
-		},
 		// callback when mouse hovers over treatment chart
 		controllerDataHover(t0, data) {
 
