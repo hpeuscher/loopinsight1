@@ -10,7 +10,10 @@ import MomentTimezoneDataPlugin from 'moment-timezone-data-webpack-plugin';
 import MomentLocalesPlugin from 'moment-locales-webpack-plugin';
 
 export default {
-  entry: './src/frontend/LoopInsighT1.js',
+  entry: {
+	  lt1: './src/frontend/LoopInsighT1.js',
+	  game: './src/frontend/Gamification.js'
+  },
   output: {
     filename: '[name].bundle.js',
     path: path.resolve(__dirname, 'dist'),
@@ -46,6 +49,14 @@ export default {
     new HtmlWebpackPlugin({
       template: './src/frontend/assets/index.htm',
       favicon: './src/frontend/assets/images/favicon.png', 
+	    filename: 'index.html',
+	    chunks: ["index"],
+    }),
+    new HtmlWebpackPlugin({
+      template: './src/frontend/assets/index.htm',
+      favicon: './src/frontend/assets/images/favicon.png',
+	    filename: 'game.html',
+	    chunks: ["game"],
     }),
 	new CopyWebpackPlugin({'patterns': [
         {from:'./src/frontend/assets/images', to:'images'}
