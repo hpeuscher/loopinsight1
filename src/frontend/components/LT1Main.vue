@@ -63,7 +63,7 @@ export default {
 			patientObject: {},	// todo
 			meals: {},
 			myCharts: [],
-			t0String: new Date(Date.now()).toISOString().substr(0,11)+"06:00:00",
+			t0String: new Date(Date.now()).toISOString().substring(0,11)+"06:00",
 			tspan: 8, 
 		}
 	},

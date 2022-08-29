@@ -6,12 +6,10 @@ simDataJson = fileread('headlessComparativeStudyResults.json');
 simData = jsondecode(simDataJson);
 
 %% prepare figure
-close all
-fig = figure('Color', 'w');
+clf(); set(gcf, 'Color', 'w', 'Position', [100 100 750 500]);
 tiledlayout(2,1);
 ax1 = nexttile(); set(ax1, 'NextPlot', 'add');
 ax2 = nexttile(); set(ax2, 'NextPlot', 'add');
-
 
 
 %% process data
@@ -46,19 +44,21 @@ for i=1:length(simData)
     results = table2timetable(x, 'RowTimes', t);
     outputs = table2timetable(y, 'RowTimes', t);
     
-    plot(ax1, results.Time, outputs.G, 'DisplayName', data.id)
-    plot(ax2, results.Time, inputs.iir, 'DisplayName', data.id)
-    plot(ax2, results.Time, inputs.ibolus, '^', 'DisplayName', data.id)
+    h = plot(ax1, results.Time, outputs.G, 'DisplayName', data.id);
+    stairs(ax2, results.Time, inputs.iir, 'Color', h.Color);
+    plot(ax2, results.Time, inputs.ibolus, '^',  ...
+        'MarkerEdgeColor', 'k', 'MarkerFaceColor', h.Color);
 end
 
-%%
+%% format graphs
 axes(ax1); 
 title('glucose concentration in mg/dL'); 
 hold on; box on; grid on;
-legend('show')
+legend('show', 'Location', 'northwest')
 
 axes(ax2); 
 title('insulin infusion: basal rate in U/h and bolus in U'); 
 hold on; box on; grid on;
 
-% xlim([ax1,ax2], results.Time([2,end-1]));
+%% store as file
+print('headlessComparativeStudy.png', '-dpng', '-r300');

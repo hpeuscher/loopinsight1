@@ -110,7 +110,6 @@ export default {
         <div>{{ $t("stats.glucoseVariability") }}</div>
         <div>{{ glucoseVariability }} %</div>
       </div>
-      <div>{{ cgmActive }}</div>
     </div>
     <div class="agpbox">
       <h4>{{ $t("timeInRanges") }}</h4>
