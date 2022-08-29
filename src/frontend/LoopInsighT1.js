@@ -55,6 +55,7 @@ gui.runSimulation = () => {
 	sim.setPatient(gui.$refs.main.getPatient())
 	sim.setController(gui.$refs.main.getController())
 	sim.setMeals(gui.$refs.main.getMeals())
+	sim.setExerciseUnits(gui.$refs.main.getExerciseUnits())
 	sim.setOptions(gui.$refs.main.getOptions())
 	sim.runSimulation()
 

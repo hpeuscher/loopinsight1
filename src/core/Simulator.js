@@ -12,6 +12,8 @@ class Simulator {
 
 	constructor() {
 		this.simulationResults = []
+		this.meals = []
+		this.exercises = []
 	}
 
 	getSimulationResults() {
@@ -43,6 +45,14 @@ class Simulator {
 				}
 			}
 			this.meals.push(meal)
+		}
+	}
+
+	setExerciseUnits(exercises) {
+		this.exercises = []
+		for (let exercise of exercises) {
+			exercise.start = new Date(exercise.start)
+			this.exercises.push(exercise)
 		}
 	}
 
@@ -79,7 +89,7 @@ class Simulator {
 
 		// initialize simulation variables
 		let x = this.patient.getInitialState()
-		let u = { meal: 0, iir: this.patient.IIReq, ibolus: 0 }	// todo: complete list
+		let u = { meal: 0, iir: this.patient.IIReq, ibolus: 0, intensity: 0 }	// todo: complete list
 		let y = this.patient.getOutputs(t, x, u)
 
 		// start simulation
@@ -100,7 +110,8 @@ class Simulator {
 			// store results
 			const carbs = this._momentaryCarbIntake(this.meals, new Date(t))
 			const isMeal = this._newMealStartingAt(this.meals, new Date(t))
-			u = { iir, ibolus, carbs, meal: isMeal }
+			const intensity = this._momentaryExerciseIntensity(this.exercises, new Date(t))
+			u = { iir, ibolus, carbs, meal: isMeal, intensity }
 			this.simulationResults.push({t: new Date(t), x, u, y, logData})
 
 			// proceed one time step
@@ -132,6 +143,24 @@ class Simulator {
 			}
 		}
 		return m
+	}
+
+	/**
+	* Computes momentary exercise intensity
+	 * 
+	 * @param {array} exercises - An array of exercise units
+	 * @param {number} t - The current time
+	 * @returns {number} the current exercise intensity
+	 */
+	_momentaryExerciseIntensity(exercises, t) {
+		let intensity = 0;
+		for (const exercise of exercises) {
+			const tend = new Date(exercise.start.valueOf() + exercise.duration*60000)
+			if (t >= exercise.start && t < tend) {
+				intensity = exercise.intensity
+			}
+		}
+		return intensity
 	}
 
 	/**

@@ -63,6 +63,13 @@ export default {
 						borderColor: colors['THUDarkBlue'], 
 						stepped: "before"
 					},
+					{
+						type: "line", 
+						yAxisID: 'yEx', 
+						label: this.$t("exIntensity"), 
+						borderColor: colors['THULightGray'], 
+						stepped: "before"
+					},
 				],
 			},
 			options: {
@@ -86,6 +93,14 @@ export default {
 						position: 'right',
 						min: 0,
 						suggestedMax: 30,
+						ticks: {stepSize: 10},
+						grid: { drawOnChartArea: false},
+					},
+					yEx: {
+						title: {display: true, text: "%"}, 
+						position: 'right',
+						min: 0,
+						suggestedMax: 100,
 						ticks: {stepSize: 10},
 						grid: { drawOnChartArea: false},
 					},
@@ -133,6 +148,7 @@ export default {
 
 			datasets[3].data.push({x:t, y: u.meal});
 			datasets[4].data.push({x:t, y: u.carbs});
+			datasets[5].data.push({x:t, y: u.intensity});
 		},
 		_update(){
 			chartInsulinCarbs.update();
@@ -160,6 +176,7 @@ export default {
 	"iob":			"calculated IOB in U",
 	"totalmeal":	"total meal in g",
 	"carbspermin":	"intake in g/min",
+	"exIntensity":	"exercise intensity in %",
 }
 </i18n>
 <i18n locale="de">
@@ -170,5 +187,6 @@ export default {
 	"iob":			"Berechnetes IOB in U",
 	"totalmeal":	"Gesamte Mahlzeit in g",
 	"carbspermin":	"Aufnahme in g/min",
+	"exIntensity":	"Sportintensität in %",
 }
 </i18n>

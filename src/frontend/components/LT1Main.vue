@@ -10,6 +10,7 @@ import LoadingScreen from './LoadingScreen.vue'
 import ControllerConfig from './ControllerConfig.vue'
 import VirtualPatientConfig from './VirtualPatientConfig.vue'
 import MealTable from './MealTable.vue'
+import ExerciseTable from './ExerciseTable.vue'
 import ChartGlucose from './ChartGlucose.vue'
 import ChartInsulinCarbs from './ChartInsulinCarbs.vue'
 import ChartControllerOutput from './ChartControllerOutput.vue'
@@ -49,6 +50,7 @@ export default {
 		ControllerConfig,
 		VirtualPatientConfig,
 		MealTable,
+		ExerciseTable,
 		ChartGlucose,
 		ChartInsulinCarbs,
 		ChartControllerOutput,
@@ -61,7 +63,8 @@ export default {
 			boxactive: false,
 			patientData: {},	// todo
 			patientObject: {},	// todo
-			meals: {},
+			meals: [],
+			exerciseUnits: [],
 			myCharts: [],
 			t0String: new Date(Date.now()).toISOString().substring(0,11)+"06:00",
 			tspan: 8, 
@@ -95,6 +98,9 @@ export default {
 		getMeals() {
 			return JSON.parse(JSON.stringify(this.meals))
 		},
+		getExerciseUnits() {
+			return JSON.parse(JSON.stringify(this.exerciseUnits))
+		},
 		getOptions() {
 			//const t0 = new Date((new Date(Date.now())).toDateString() + 
 			//	" " + JSON.parse(JSON.stringify(this.t0)) + ":00")
@@ -113,6 +119,9 @@ export default {
 		},
 		mealsChanged(newMeals) {
 			this.meals = newMeals;
+		},
+		exercisesChanged(newExercises) {
+			this.exerciseUnits = newExercises
 		},
 		resetCharts() {
 			// todo
@@ -182,6 +191,9 @@ export default {
 			<MealTable :t0="t0"
 				@mealsChanged="mealsChanged">
 			</MealTable>
+			<ExerciseTable :t0="t0"
+				@exercisesChanged="exercisesChanged">
+			</ExerciseTable>
 			<div id="generalcontrols" 
 				class="box2 accordionbox" 
 				v-bind:class="{boxactive: boxactive}">
