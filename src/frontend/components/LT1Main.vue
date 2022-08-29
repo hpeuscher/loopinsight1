@@ -6,6 +6,7 @@
 
 import { defaults } from 'chart.js'
 
+import LoadingScreen from "./LoadingScreen.vue";
 import ControllerConfig from './ControllerConfig.vue'
 import VirtualPatientConfig from './VirtualPatientConfig.vue'
 import MealTable from './MealTable.vue'
@@ -44,6 +45,7 @@ export default {
 	},
 
 	components: {
+		LoadingScreen,
 		ControllerConfig,
 		VirtualPatientConfig,
 		MealTable,
@@ -55,6 +57,7 @@ export default {
 
 	data() {
 		return {
+			isLoading: true,
 			boxactive: false,
 			patientData: {},	// todo
 			patientObject: {},	// todo
@@ -160,6 +163,7 @@ export default {
 
 <template>
 	<div id="container">
+		<!--LoadingScreen v-if="isLoading"></LoadingScree-->
 		<div id="controls" class="box">
 			<h2>{{$t("settings")}}</h2>
 			<ControllerConfig 

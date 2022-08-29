@@ -141,6 +141,13 @@ export default {
 					:value="model.id">{{model.name}}
 				</option>
 			</select>
+			<span v-if="selectedModel" style="margin-left:5px;"><small>
+				<a :href="'https://lt1.org/models/'+selectedModel" 
+					v-tooltip="{content: $t('online_info_tooltip')+' '+selectedModel}"
+					target="_blank">
+					{{$t("online_info")}}
+				</a>
+			</small></span>
 		</p>
 		<Suspense>
 			<component v-for="model in modelList"
@@ -184,6 +191,8 @@ export default {
 		"Gp"			: "glucose concentration in plasma",
 		"Gt"			: "glucose concentration in tissue",
 	},
+	online_info			: "online info",
+	online_info_tooltip	: "follow this link to learn more about the model",
 }
 </i18n>
 
@@ -200,7 +209,9 @@ export default {
 	},
 	outputs: {
 		"Gp"			: "Glukose-Konzentration im Plasma",
-		"Gp"			: "Glukose-Konzentration im Gewebe",
+		"Gt"			: "Glukose-Konzentration im Gewebe",
 	},
+	online_info			: "Online-Info",
+	online_info_tooltip	: "Unter diesem Link finden Sie Details zum Modell",
 }
 </i18n>

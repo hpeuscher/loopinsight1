@@ -13,7 +13,7 @@ const mmolG2mg = 180.16;
 
 
 // physiological model of virtual patient
-class VirtualPatientHovorka extends AbstractVirtualPatient {
+class VirtualPatientCambridge extends AbstractVirtualPatient {
 	
 	constructor(parameters) {
 		super(parameters);
@@ -189,4 +189,4 @@ class VirtualPatientHovorka extends AbstractVirtualPatient {
 	
 }
 
-export default VirtualPatientHovorka;
+export default VirtualPatientCambridge;

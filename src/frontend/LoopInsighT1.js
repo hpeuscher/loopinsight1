@@ -29,10 +29,11 @@ const LT1VueApp = {
 // create
 const app = Vue.createApp(LT1VueApp);
 
+let htmlLocale = document.getElementsByTagName("html")[0].lang
 
 // add multi-language support
 const i18n = createI18n({
-	locale: document.getElementsByTagName("html")[0].lang || navigator.language.split('-')[0],
+	locale: (document.getElementsByTagName("html")[0].lang || navigator.language.split('-')[0]).substring(0,2),
 	fallbackLocale: 'en',
 });
 app.use(i18n);

@@ -4,7 +4,7 @@
    	Distributed under the MIT software license.
 	See https://lt1.org for further information.	*/
 
-import VirtualPatientHovorka from '../../../core/models/Hovorka.js'
+import VirtualPatientCambridge from '../../../core/models/Cambridge.js'
 
 import countDecimals from "../../../common/CountDecimals.js"
 
@@ -12,11 +12,11 @@ export default {
 	emits: ["patientChanged"],
 	data() {
 		return {
-			id: "Hovorka",
-			version: "1.0.0",
+			id: "Cambridge",
+			version: "0.2.0",
 			name: "",
 			hyperlink: "",
-			patient: new VirtualPatientHovorka(),
+			patient: new VirtualPatientCambridge(),
 		}
 	},
 	beforeMount() {
@@ -162,7 +162,7 @@ export default {
 
 <i18n locale="en">
 {
-	"name"			: "Cambridge / Hovorka",
+	"name"			: "Cambridge",
 	loaddefaultpatient: "restore default values",
 	states: {
 		"Q1"		: "mass in accessible compartment (plasma)",
@@ -202,7 +202,7 @@ export default {
 
 <i18n locale="de">
 {
-	"name"			: "Cambridge / Hovorka",
+	"name"			: "Cambridge / Cambridge",
 	"loaddefaultpatient": "Standardwerte wiederherstellen",
 	states: {
 		"Q1"		: "mass in accessible compartment (plasma)",
