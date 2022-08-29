@@ -6,7 +6,7 @@
 
 import { defaults } from 'chart.js'
 
-import LoadingScreen from "./LoadingScreen.vue";
+import LoadingScreen from './LoadingScreen.vue'
 import ControllerConfig from './ControllerConfig.vue'
 import VirtualPatientConfig from './VirtualPatientConfig.vue'
 import MealTable from './MealTable.vue'
@@ -66,6 +66,12 @@ export default {
 			t0String: new Date(Date.now()).toISOString().substr(0,11)+"06:00:00",
 			tspan: 8, 
 		}
+	},
+
+	mounted() {
+		setTimeout(() => {
+			this.isLoading = false;
+		}, 1500);
 	},
 
 	computed: {
@@ -163,7 +169,7 @@ export default {
 
 <template>
 	<div id="container">
-		<!--LoadingScreen v-if="isLoading"></LoadingScree-->
+		<LoadingScreen v-if="isLoading"></LoadingScreen>
 		<div id="controls" class="box">
 			<h2>{{$t("settings")}}</h2>
 			<ControllerConfig 
