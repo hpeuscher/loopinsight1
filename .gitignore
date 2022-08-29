@@ -1,1 +1,4 @@
 node_modules
+dist
+examples/headlessComparativeStudyResults.json
+package-lock.json
