@@ -12,6 +12,7 @@ import MomentLocalesPlugin from 'moment-locales-webpack-plugin';
 export default {
   entry: {
 	  index: './src/frontend/LoopInsighT1.js',
+	  model: './src/frontend/ModelStructure.js',
 	  game: './src/frontend/Gamification.js'
   },
   output: {
@@ -29,6 +30,11 @@ export default {
         type: 'javascript/auto',
         loader: '@intlify/vue-i18n-loader'
       },
+      {
+        resourceQuery: /blockType=svg/,
+        type: 'javascript/auto',
+        loader: './src/svg-loader.cjs'
+      }
     ],
   },
   optimization: {
@@ -51,6 +57,13 @@ export default {
       favicon: './src/frontend/assets/images/favicon.png', 
 	    filename: 'index.html',
 	    chunks: ["index"],
+    }),
+    new HtmlWebpackPlugin({
+      template: './src/frontend/assets/model.htm',
+      //templateContent: '<input type="hidden" id="model" value="UvaPadova"/><div id="app"></div>',
+      favicon: './src/frontend/assets/images/favicon.png', 
+	    filename: 'model.html',
+	    chunks: ["model"],
     }),
     new HtmlWebpackPlugin({
       template: './src/frontend/assets/index.htm',

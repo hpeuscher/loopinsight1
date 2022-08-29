@@ -163,7 +163,7 @@ export default {
 		"I_"	: "I'",
 		"X"		: "X",
 		"Isc1"	: "I<sub>sc1</sub>",
-		"Isc2"	: "I<sub>sc1</sub>",
+		"Isc2"	: "I<sub>sc2</sub>",
 	},
 	parameters: {
 		"BW"	: "BW",
@@ -348,3 +348,75 @@ export default {
 	},
 }
 </i18n>
+
+<svg>
+{
+
+	subsystems: [
+		{x: 210, y: 110, width: 180, height: 300, fill: "#DDDDFF", label: { text: "insulin subsystem" } },
+		{x: 410, y:  10, width: 280, height: 300, fill: "#FFDDDD", label: { text: "glucose subsystem" } },
+		{x: -40,  y: 250, width: 230, height: 200, fill: "#DDFFCC", label: { text: "subcutaneous transport" } },
+		{x: 60,  y: 10, width: 330, height: 90,  fill: "#FFDD55", label: { text: "meal subsystem" } },
+	],
+
+	nodes: {
+		"Gp":       { x: 550,   y: 150,     geometry: {shape: "circle", d: 50} },
+		"Gt":       { x: 550,   y: 250,     geometry: {shape: "circle", d: 50} },
+		"Ip":       { x: 250,   y: 350,     geometry: {shape: "circle", d: 50} },
+		"Il":       { x: 350,   y: 350,     geometry: {shape: "circle", d: 50} },
+		"Qsto1":    { x: 150,   y: 50,      geometry: {shape: "circle", d: 50} },
+		"Qsto2":    { x: 250,   y: 50,      geometry: {shape: "circle", d: 50} },
+		"Qgut":     { x: 350,   y: 50,      geometry: {shape: "circle", d: 50} },
+		"I_":       { x: 250,   y: 150,     geometry: {shape: "circle", d: 50} },
+		"XL":       { x: 350,   y: 150,     geometry: {shape: "circle", d: 50} },
+		"X":        { x: 350,   y: 250,     geometry: {shape: "circle", d: 50} },
+		"Isc1":     { x:  50,   y: 300,     geometry: {shape: "circle", d: 50} },
+		"Isc2":     { x:  50,   y: 400,     geometry: {shape: "circle", d: 50} },
+
+		"G":        { x: 650,   y: 150,     geometry: {shape: "square", d: 40} },
+		"Ra":       { x: 450,   y: 50,      geometry: {shape: "square", d: 40} },
+		"EGP":      { x: 450,   y: 150,     geometry: {shape: "square", d: 40} },
+		"E":        { x: 550,   y: 50,      geometry: {shape: "square", d: 40} },
+		"Uid":      { x: 450,   y: 250,     geometry: {shape: "square", d: 40} },
+		"Uii":      { x: 650,   y: 50,      geometry: {shape: "square", d: 40} },
+		"I":        { x: 250,   y: 250,     geometry: {shape: "square", d: 40} },
+		"RaI":      { x: 150,   y: 350,     geometry: {shape: "square", d: 40} },
+	},
+
+	connections: [
+		{ type: "arrow",	from: {id: "Gp",    angle:  -60		}, 	to: {id: "Gt",		angle: 60	},	label: {text: "k1"} },
+		{ type: "arrow",	from: {id: "Gt",    angle:  120		}, 	to: {id: "Gp",		angle: -120	},	label: {text: "k2"} },
+		{ type: "arrow",	from: {id: "Qsto1"}, 					to: {id: "Qsto2",				},	label: {text: "kgri"} },
+		{ type: "arrow",	from: {id: "Qsto2"}, 					to: {id: "Qgut",				},	label: {text: "kempt"} },
+		{ type: "arrow",	from: {id: "Qgut"}, 					to: {id: "Ra",					},	label: {text: "kabs"} },
+		{ type: "arrow",	from: {id: "Ra",    angle:  0    	}, 	to: {id: "Gp",		angle: 120 	},	},
+		{ type: "arrow",	from: {id: "E",     angle:  270  	}, 	to: {id: "Gp",		angle: 90  	},	},
+		{ type: "arrow",	from: {id: "Uii",   angle:  180  	}, 	to: {id: "Gp",		angle: 60  	},	},
+		{ type: "arrow",	from: {id: "I_"						}, 	to: {id: "XL"					},	label: {text: "ki"} },
+		{ type: "arrow",	from: {id: "I"						}, 	to: {id: "X"					},	label: {text: "p2u"} },
+		{ type: "arrow",	from: {id: "I"						}, 	to: {id: "I_"					},	label: {text: ""} },
+		{ type: "arrow",	from: {id: "XL"						}, 	to: {id: "EGP"					},	},
+		{ type: "arrow",	from: {id: "EGP"}, 						to: {id: "Gp"					},	},
+		{ type: "arrow",	from: {x: 450, y: 100, }, 				to: {id: "EGP"					},	label: {text: "kp1"} },
+		{ type: "arrow",	from: {id: "Gp",    angle:  150  	}, 	to: {id: "EGP",		angle: 30  	},	label: {text: "kp2"} },
+		{ type: "arrow",	from: {id: "X"						}, 	to: {id: "Uid"					},	label: {text: "Vmx"} },
+		{ type: "arrow",	from: {x: 450, 	y: 300				},	to: {id: "Uid"					},	label: {text: "Vm0"} },
+		{ type: "arrow",	from: {id: "Uid"					}, 	to: {id: "Gt"					},	},
+		{ type: "arrow",	from: {id: "Ip",    angle:  30		}, 	to: {id: "Il",		angle: 150 	},	},
+		{ type: "arrow",	from: {id: "Il",    angle:  -150	}, 	to: {id: "Ip",		angle: -30 	},	},
+		{ type: "arrow",	from: {id: "RaI"					},	to: {id: "Ip",					},	},
+		{ type: "arrow",	from: {id: "Isc1",  angle:  -90		}, 	to: {id: "Isc2",	angle: 90  	},	label: {text: "kd"} },
+		{ type: "arrow",	from: {id: "Isc1",  angle:  0		}, 	to: {id: "RaI",		angle: 120 	},	label: {text: "ka1"} },
+		{ type: "arrow",	from: {id: "Isc2",  angle:  0		}, 	to: {id: "RaI",		angle: -120	},	label: {text: "ka2"} },
+		{ from: {id: "Ip", angle: 90}, 	to: {id: "I", angle: -90} },
+		{ from: {id: "Gp", angle: 0}, 	to: {id: "G", angle: 180} },
+	],
+
+	
+	inputs: {
+		"CHO":	{ to: {id: "Qsto1", angle: 0 } },
+		"iir":	{ to: {id: "Isc1", angle: 0 } },
+	},
+
+}
+</svg>

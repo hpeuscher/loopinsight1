@@ -241,3 +241,65 @@ export default {
 	},
 }
 </i18n>
+
+
+<svg>
+{
+
+	subsystems: [
+		{x: 60,		y: 110,		width: 330, height: 100, fill: "#DDDDFF", label: { text: "endogenous glucose production" } },
+		{x: 400,	y:  10,		width: 320, height: 390, fill: "#FFDDDD", label: { text: "glucose subsystem" } },
+		{x: 60,		y: 300,		width: 330, height: 100, fill: "#DDFFCC", label: { text: "insulin pharmacokinetics" } },
+		{x: 60,		y: 10,		width: 330, height: 90,  fill: "#FFDD55", label: { text: "meal subsystem" } },
+	],
+
+	nodes: {
+		"Q1":	{ x: 500,	y: 150,		geometry: {shape: "circle", d: 50} },
+		"Q2":	{ x: 600,	y: 150,		geometry: {shape: "circle", d: 50} },
+		"S1":	{ x: 150,	y: 350,		geometry: {shape: "circle", d: 50} },
+		"S2":	{ x: 250,	y: 350,		geometry: {shape: "circle", d: 50} },
+		"I"	:	{ x: 350,	y: 350,		geometry: {shape: "circle", d: 50} },
+		"x3":	{ x: 450,	y: 250,		geometry: {shape: "circle", d: 50} },
+		"x1":	{ x: 550,	y: 250,		geometry: {shape: "circle", d: 50} },
+		"x2":	{ x: 650,	y: 250,		geometry: {shape: "circle", d: 50} },
+		"D1":	{ x: 150,	y:  50,		geometry: {shape: "circle", d: 50} },
+		"D2":	{ x: 250,	y:  50,		geometry: {shape: "circle", d: 50} },
+
+		"Ra":	{ x: 350,	y:  50,		geometry: {shape: "square", d: 40} },
+		"EGP":	{ x: 350,	y:  150,	geometry: {shape: "square", d: 40} },
+
+		"G":	{ x: 500,	y:  50,		geometry: {shape: "square", d: 40, doubleLine: 1},	class: "output" },
+	},
+
+	connections: [
+		{ type: "arrow",	from: {id: "Q1",	angle:  -30	}, 	to: {id: "Q2",	angle: -150 	}, id: "Q1Q2"},
+		{ type: "arrow",	from: {id: "Q2",	angle:  150	}, 	to: {id: "Q1",	angle: 30 		}, label: {text: "k12"} },
+		{ type: "arrow",	from: {id: "Q2"					}, 	to: {x: 675, 	y: 150 			}, id: "Q2away", label: {text: ""} },
+		{ type: "arrow",	from: {id: "x1"					}, 	to: {id: "Q1Q2"					}, label: {text: ""}, style: "stroke-dasharray: 5 5" },
+		{ type: "arrow",	from: {id: "x2"					}, 	to: {id: "Q2away", angle: -90	}, label: {text: ""}, style: "stroke-dasharray: 5 5" },
+		{ type: "arrow",	from: {id: "S1"					}, 	to: {id: "S2"					}, label: {text: "tmaxI"} },
+		{ type: "arrow",	from: {id: "S2"					}, 	to: {id: "I"					}, label: {text: "tmaxI"} },
+		{ type: "arrow",	from: {id: "I"					}, 	to: {x:	385, y: 385				}, label: {text: "ke"} },
+		{ type: "arrow",	from: {id: "I",		angle:  20	}, 	to: {id: "x3",	angle:  -110	}, label: {text: "SIE"} },
+		{ type: "arrow",	from: {id: "I",		angle:  10	}, 	to: {id: "x1",	angle:  -120	}, label: {text: "SIT"} },
+		{ type: "arrow",	from: {id: "I",		angle:  0	}, 	to: {id: "x2",	angle:  -135	}, label: {text: "SID"} },
+		{ type: "arrow",	from: {id: "x3"					}, 	to: {x:485, 	y:285			}, label: {text: "ka3"} },
+		{ type: "arrow",	from: {id: "x1"					}, 	to: {x:585, 	y:285			}, label: {text: "ka1"} },
+		{ type: "arrow",	from: {id: "x2"					}, 	to: {x:685, 	y:285			}, label: {text: "ka2"} },
+		{ type: "arrow",	from: {id: "D1"					}, 	to: {id: "D2"					}, label: {text: "tmaxG"} },
+		{ type: "arrow",	from: {id: "D2"					}, 	to: {id: "Ra"					}, label: {text: "tmaxG"} },
+		{ type: "arrow",	from: {id: "D2"					}, 	to: {x: 285, y: 85				}, label: {text: "tmaxG"} },
+		{ type: "arrow",	from: {id: "Ra",	angle:  0	}, 	to: {id: "Q1",	angle:  120		}, },
+		{ type: "arrow",	from: {id: "x3",	angle:  105	}, 	to: {id: "EGP",	angle:  -15		}, style: "stroke-dasharray: 5 5" },
+		{ type: "arrow",	from: {id: "EGP"				}, 	to: {id: "Q1"					}, },
+		{ type: "arrow",	from: {x: 250, y:150			}, 	to: {id: "EGP"					}, label: {text: "EGP0"} },
+		{ from: {id: "Q1"}, 	to: {id: "G"} },
+	],
+
+	inputs: {
+		"CHO":	{ to: {id: "D1", angle: 0 } },
+		"iir":	{ to: {id: "S1", angle: 0 } },
+	},
+
+}
+</svg>
