@@ -182,7 +182,9 @@ class ControllerOref0 extends AbstractController {
 
 		// redirect console outputs to capture them
 		debugLog = "";
-		process.stderr = [];
+		if (typeof process.stderr === "undefined") {
+			process.stderr = [];
+		}
 		process.stderr.write = log_fun;
 		console.error = log_fun;
 
@@ -268,8 +270,11 @@ class ControllerOref0 extends AbstractController {
 		// store console outputs of determine-basal
 		const logData = { ...basal }
 		logData.debug = debugLog.split(";").map(s => s.trim()).filter(s => s.length != 0);
-		logData.reason = logData.reason.split(/[,;]/).map(s => s.trim());
-
+		try {
+			logData.reason = logData.reason.split(/[,;]/).map(s => s.trim());
+		} catch {
+			logData.reason = ""
+		}
 		return {iir: this.IIR, ibolus: this.bolus, logData}
 	}
 
