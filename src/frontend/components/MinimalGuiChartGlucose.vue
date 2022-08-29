@@ -9,7 +9,7 @@ import 'chartjs-adapter-moment'
 import colors from '../Colors.js'
 
 // Chart object
-var chartGlucose
+var minimalGuiChartGlucose
 
 // glucose color
 function glucoseColor(ctx) {
@@ -34,8 +34,8 @@ export default {
 		};
 	},
 	mounted() {
-		const ctx = document.getElementById("canvas_glucose_concentration");
-		chartGlucose = new Chart(ctx, {
+		const ctx = document.getElementById("canvas_minimal_gui_glucose_concentration");
+		minimalGuiChartGlucose = new Chart(ctx, {
 			data: {
 				datasets: [
 					{
@@ -82,7 +82,7 @@ export default {
 			this._update()
 		},
 		reset() {
-			let datasets = chartGlucose.data.datasets;
+			let datasets = minimalGuiChartGlucose.data.datasets;
 			// remove prediction data
 			datasets[0].data = [];
 			if (this.preserveOldCurves) {
@@ -93,8 +93,8 @@ export default {
 			}
 			else {
 				// remove all but first (prediction)
-				chartGlucose.data.datasets = datasets.slice(0,1);
-				datasets = chartGlucose.data.datasets;
+				minimalGuiChartGlucose.data.datasets = datasets.slice(0,1);
+				datasets = minimalGuiChartGlucose.data.datasets;
 			}
 			// create new curve
 			datasets.push({
@@ -109,11 +109,11 @@ export default {
 			this.currentDatasetID = datasets.length - 1;
 		},
 		_update(){
-			chartGlucose.update();
+			minimalGuiChartGlucose.update();
 		},
 		_pushRecord(t, _x, _u, y, _log)  {
 			// glucose (most recent simulation)
-			chartGlucose.data.datasets[this.currentDatasetID].data
+			minimalGuiChartGlucose.data.datasets[this.currentDatasetID].data
 				.push({x:t.valueOf(), y:y.G});
 		},
 		controllerDataHover(t0, data) {
@@ -121,7 +121,7 @@ export default {
 			if (typeof data !== "undefined") {
 				let predBG = data.predictedBG;
 				if (typeof predBG !== "undefined") {
-					chartGlucose.data.datasets[0].data = predBG.map(p=>{
+					minimalGuiChartGlucose.data.datasets[0].data = predBG.map(p=>{
 						return {x:p.t, y:p.BG}
 					});
 					this.update();
@@ -136,7 +136,7 @@ export default {
 <template>
 	<div class="lt1box box2">
 		<div class="canvasdiv">
-			<canvas id="canvas_glucose_concentration" />
+			<canvas id="canvas_minimal_gui_glucose_concentration" />
 		</div>
 	</div>
 </template>

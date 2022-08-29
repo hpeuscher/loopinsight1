@@ -5,12 +5,12 @@
 
 // prepare Vue app
 import * as Vue from 'vue';
-import Gamification from './components/Gamification.vue';
+import MinimalGui from './components/MinimalGui.vue';
 
 const LT1VueApp = {
-	template: '<Gamification :runSimulation="runSimulation" ref="main" />',
+	template: '<MinimalGui :runSimulation="runSimulation" ref="main" />',
 	components: {
-		Gamification,
+		MinimalGui,
 	},
 	data() {
 		return {
@@ -29,10 +29,8 @@ const app = Vue.createApp(LT1VueApp);
 // add multi-language support
 import { createI18n } from "vue-i18n";
 
-//const VueI18n = require("vue-i18n");
-//const i18n = VueI18n.createI18n({
 const i18n = createI18n({
-	locale: document.getElementsByTagName("html")[0].lang || navigator.language.split('-')[0],
+	locale: (document.getElementsByTagName("html")[0].lang || navigator.language.split('-')[0]).substring(0,2),
 	fallbackLocale: 'en',
 });
 app.use(i18n);
@@ -45,7 +43,4 @@ app.use(VTooltip);
 
 
 // mount
-const gui = app.mount('#app');
-
-//gui.meals = 
-
+const gui = app.mount('#app_minimal_gui');

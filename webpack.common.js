@@ -13,7 +13,7 @@ export default {
   entry: {
 	  index: './src/frontend/LoopInsighT1.js',
 	  model: './src/frontend/ModelStructure.js',
-	  game: './src/frontend/Gamification.js'
+	  minimalGui: './src/frontend/MinimalGui.js'
   },
   output: {
     filename: '[name].bundle.js',
@@ -66,10 +66,10 @@ export default {
 	    chunks: ["model"],
     }),
     new HtmlWebpackPlugin({
-      template: './src/frontend/assets/index.htm',
+      template: './src/frontend/assets/minimalGui.htm',
       favicon: './src/frontend/assets/images/favicon.png',
-	    filename: 'game.html',
-	    chunks: ["game"],
+	    filename: 'minimalGui.html',
+	    chunks: ["minimalGui"],
     }), 
   	new CopyWebpackPlugin({'patterns': [
         {from:'./src/frontend/assets/images', to:'images'}

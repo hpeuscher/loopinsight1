@@ -7,8 +7,8 @@
 import { defaults } from 'chart.js';
 import { ref } from 'vue'
 
-import ControllerConfig from './GamificationBasalBolus.vue'
-import ChartGlucose from './GamificationChartGlucose.vue'
+import ControllerConfig from './MinimalGuiBasalBolus.vue'
+import ChartGlucose from './MinimalGuiChartGlucose.vue'
 import ChartAGP from './ChartAGP.vue'
 
 import VirtualPatientUvaPadova from '../../core/models/UvaPadova.js'
