@@ -8,14 +8,17 @@ import VirtualPatientCambridge from '../../../core/models/Cambridge.js'
 
 import countDecimals from "../../../common/CountDecimals.js"
 
+export const profile = {
+	id: "Cambridge",
+	version: "0.2.0",
+	name: "Cambridge",
+}
+
 export default {
 	emits: ["patientChanged"],
 	data() {
 		return {
-			id: "Cambridge",
-			version: "0.2.0",
-			name: "",
-			hyperlink: "",
+			...profile,
 			patient: new VirtualPatientCambridge(),
 		}
 	},

@@ -8,14 +8,17 @@ import VirtualPatientUvaPadova from '../../../core/models/UvaPadova.js';
 
 import countDecimals from "../../../common/CountDecimals.js"
 
+export const profile = {
+	id: "UvaPadova",
+	version: "0.2.0",
+	name: "UVA/Padova mockup",
+}
+
 export default {
 	emits: ["patientChanged"],
 	data() {
 		return {
-			id: "UvaPadova",
-			version: "0.2.0",
-			name: "",
-			hyperlink: "",
+			...profile,
 			patient: new VirtualPatientUvaPadova(),
 		}
 	},

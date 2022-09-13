@@ -7,11 +7,29 @@
 import {defineAsyncComponent} from "vue";
 
 // find all model components in folder and load them dynamically
-const modelList = require.context('./models/', false, /$/).keys().map(x => { return x.match(/\w+/)[0]})
+const modelList = require.context('./models/', false, /$/, 'lazy').keys().map(x => { return x.match(/\w+/)[0]})
 let modelComponents = {};
+let modelInfo = {}
 for (let i=modelList.length-1; i>=0; i--) {
 	const key = modelList[i];
-	modelComponents[key] = defineAsyncComponent(() => import("./models/"+key+".vue"))
+	// import module dynamically, tell webpack how to name the chunk 
+	let model = import(
+		/* webpackChunkName: "models_[request]" */ 
+		/* webpackMode: "lazy" */
+		/* webpackExports: ["default"] */
+		`./models/${key}.vue`
+	)
+	// store component (default export) for async load
+	modelComponents[key] = defineAsyncComponent(() => model)
+	// fetch meta information (profile) to list model in dropdown menu
+	model.then( (result) => {
+		if (typeof result.profile !== "undefined") {
+			modelInfo[key] = result.profile
+		}
+		else {
+			console.log("missing meta information of model " + key)
+		}	
+	}) 
 }
 
 export default {
@@ -22,7 +40,7 @@ export default {
 	data() {
 		return {
 			boxactive: false,	// open accordion box
-			modelInfo: {},
+			modelInfo: modelInfo,
 			modelList: modelList,
 			selectedModel: "UvaPadova",
 		}
@@ -39,7 +57,7 @@ export default {
 		},
 		
 		getPatientView() {
-			return this.modelInfo[this.selectedModel].ref
+			return this.$refs["model"]
 		},
 		
 		selectionChanged() {
@@ -50,22 +68,6 @@ export default {
 			this.$emit("patientChanged", newPatient)
 		},
 		
-		// during rendering of model components, store information
-		// about them (including translated name)
-		setModelRef(el) {
-			if (el) {
-				const id = el.$["vnode"].key
-				if (!this.modelInfo.hasOwnProperty(id)) {
-					this.modelInfo[id] = {
-						filename: id,
-						id: el.id,
-						name: el.name, 
-						version: el.version,
-						ref: el,
-					}
-				}
-			}
-    	},
 
 		loadPatient(event) {
 			// import model from uploaded JSON file
@@ -150,12 +152,11 @@ export default {
 			</small></span>
 		</p>
 		<Suspense>
-			<component v-for="model in modelList"
-				:key="model"
+			<component
 				@patientChanged="patientChanged"
-				:ref="setModelRef"
-				:is="model"
-				v-show="selectedModel === model"/>
+				:is="selectedModel"
+				ref="model"
+			/>
 		</Suspense>
 	</div>
 </template>

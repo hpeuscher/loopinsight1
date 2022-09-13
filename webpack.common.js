@@ -18,7 +18,7 @@ export default {
   output: {
     filename: '[name].bundle.js',
     path: path.resolve(__dirname, 'dist'),
-    chunkFilename: '[id].[chunkhash].js'
+    chunkFilename: '[id].bundle.js'
   },
   module: {
     rules: [
@@ -38,9 +38,23 @@ export default {
     ],
   },
   optimization: {
+    moduleIds: 'named',
+    chunkIds: 'named',
     splitChunks: {
       name: false,
       chunks: 'all',
+      cacheGroups: {
+        vendor: {
+          test: /[\\/]node_modules[\\/]/,
+          name: 'vendors',
+          chunks: 'all',
+        },
+        backend: {
+          test: /[\\/]core[\\/]/,
+          name: 'lt1core',
+          chunks: 'all',
+        },
+      },
     },
   },
   plugins: [
@@ -70,7 +84,7 @@ export default {
       favicon: './src/frontend/assets/images/favicon.png',
 	    filename: 'minimalGui.html',
 	    chunks: ["minimalGui"],
-    }), 
+    }),
   	new CopyWebpackPlugin({'patterns': [
         {from:'./src/frontend/assets/images', to:'images'}
     ]}),

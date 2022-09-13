@@ -6,6 +6,12 @@
 
 import ControllerPID from '../../../core/controllers/PID.js';
 
+export const profile = {
+	id: "PID",
+	version: "0.2.0",
+	name: "PID",
+}
+
 export default {
 
 	props: {
@@ -16,8 +22,7 @@ export default {
 
 	data() {
 		return {
-			version: "1.0.0",
-			name: "",
+			...profile,
 			useBolus: true,
 			PreBolusTime: 30,
 			CarbFactor: 1.5,

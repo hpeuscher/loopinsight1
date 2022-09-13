@@ -7,11 +7,30 @@
 import {defineAsyncComponent} from "vue";
 
 // find all controller components in folder and load them dynamically
-const controllerList = require.context('./controllers/', false, /$/).keys().map(x => { return x.match(/\w+/)[0]})
+const controllerList = require.context('./controllers/', false, /$/, 'lazy').keys().map(x => { return x.match(/\w+/)[0]})
 let controllerComponents = {};
+let controllerInfo = {};
 for (let i=controllerList.length-1; i>=0; i--) {
-	let key = controllerList[i];
-	controllerComponents[key] = defineAsyncComponent(() => import("./controllers/"+key+".vue"))
+	const key = controllerList[i];
+	// import module dynamically, tell webpack how to name the chunk 
+	let controller = import(
+		/* webpackChunkName: "controllers_[request]" */ 
+		/* webpackMode: "lazy" */
+		/* webpackExports: ["default"] */
+		`./controllers/${key}.vue`
+	)
+	// store component (default export) for async load
+	controllerComponents[key] = defineAsyncComponent(() => controller)
+	// fetch meta information (profile) to list controller in dropdown menu
+	controller.then( (result) => {
+		if (typeof result.profile !== "undefined") {
+			controllerInfo[key] = result.profile
+		}
+		else {
+			console.log("missing meta information of controller " + key)
+		}
+	}) 
+
 }
 
 export default {
@@ -26,7 +45,7 @@ export default {
 	data() {
 		return {
 			boxactive: false,	// open accordion box
-			controllerInfo: {},
+			controllerInfo: controllerInfo,
 			controllerList: controllerList,
 			selectedController: "Oref0",
 		}
@@ -38,7 +57,7 @@ export default {
 
 	methods: {
 		getController() {
-			return this.controllerInfo[this.selectedController].ref.getController()
+			return this.$refs["controller"].getController()
 		},
 
 		selectionChanged() {
@@ -49,21 +68,6 @@ export default {
 			this.$emit("controllerChanged", newController)
 		},
 
-		// during rendering of controller components, store information
-		// about them (including translated name)
-		setControllerRef(el) {
-			if (el) {
-				const id = el.$["vnode"].key
-				if (!this.controllerInfo.hasOwnProperty(id)) {
-					this.controllerInfo[id] = {
-						id: id,
-						name: el.name, 
-						version: el.version,
-						ref: el,
-					}
-				}
-			}
-    	},
 	},
 }
 </script>
@@ -84,13 +88,12 @@ export default {
 			</select>
 		</p>
 		<Suspense>
-			<component v-for="controller in controllerList"
-				:key="controller"
+			<component 
 				:patient="patient" 
 				@controllerChanged="controllerChanged"
-				:ref="setControllerRef"
-				:is="controller"
-				v-show="selectedController === controller"/>
+				ref="controller"
+				:is="selectedController"
+			/>
 		</Suspense>
 	</div>
 </template>

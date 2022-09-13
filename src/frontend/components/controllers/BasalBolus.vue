@@ -6,6 +6,12 @@
 
 import ControllerBasalBolus from '../../../core/controllers/BasalBolus.js';
 
+export const profile = {
+	id: "BasalBolus",
+	version: "0.2.0",
+	name: "Basal + Bolus (CSII)",
+}
+
 export default {
 	props: {
 		patient: Object,
@@ -15,8 +21,7 @@ export default {
 
 	data() {
 		return {
-			version: "1.0.0",
-			name: "",
+			...profile,
 			useBolus: true,
 			PreBolusTime: 30,
 			CarbFactor: 1.5,

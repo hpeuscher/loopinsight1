@@ -9,11 +9,19 @@ import { SVG } from '@svgdotjs/svg.js'
 import {defineAsyncComponent} from "vue"
 
 // find all model components in folder and load them dynamically
-const modelList = require.context('./models/', false, /.vue?$/).keys().map(x => { return x.match(/\w+/)[0]})
+const modelList = require.context('./models/', false, /.vue?$/, 'lazy').keys().map(x => { return x.match(/\w+/)[0]})
 let modelComponents = {}
 for (let i=modelList.length-1; i>=0; i--) {
-	const key = modelList[i]
-	modelComponents[key] = defineAsyncComponent(() => import("./models/"+key+".vue"))
+	const key = modelList[i];
+	// import module dynamically, tell webpack how to name the chunk 
+	let model = import(
+		/* webpackChunkName: "models_[request]" */ 
+		/* webpackMode: "lazy" */
+		/* webpackExports: ["default"] */
+		`./models/${key}.vue`
+	)
+	// store component (default export) for async load
+	modelComponents[key] = defineAsyncComponent(() => model)
 }
 
 

@@ -6,6 +6,12 @@
 
 import ControllerOref0 from '../../../core/controllers/Oref0.js';
 
+export const profile = {
+	id: "Oref0",
+	version: "0.2.0",
+	name: "oref0 / OpenAPS",
+}
+
 export default {
 	props: {
 		patient: Object,
@@ -15,8 +21,7 @@ export default {
 
 	data() {
 		return {
-			version: "1.0.0",
-			name: "",
+			...profile,
 			profile: {
 				max_iob: 3.5,
 				dia: 6,

@@ -8,14 +8,17 @@ import VirtualPatientUvaPadova_Breton2008 from '../../../core/models/UvaPadova_B
 
 import countDecimals from "../../../common/CountDecimals.js"
 
+export const profile = {
+	id: "UvaPadova_Breton2008",
+	version: "0.2.0",
+	name: "UVA/Padova (Breton 2008)",
+}
+
 export default {
 	emits: ["patientChanged"],
 	data() {
 		return {
-			id: "UvaPadova_Breton2008",
-			version: "1.0.0",
-			name: "",
-			hyperlink: "",
+			...profile,
 			patient: new VirtualPatientUvaPadova_Breton2008(),
 		}
 	},
