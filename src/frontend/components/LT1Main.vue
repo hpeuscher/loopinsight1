@@ -284,11 +284,14 @@ div#results {
 
 #container input,select {
 	padding: 0.25rem;
-	font-size: 0.8rem;
+	font-size: 0.85rem;
 	box-sizing: border-box;
 	font-family: inherit;
 }
 
+#container input[type=datetime-local] {
+	letter-spacing: -0.03em;
+}
 
 /* outer boxes */
 .box {
@@ -327,17 +330,12 @@ div#results {
 }
 #container h3	{
 	margin: 0px;
-	font-size: 1.25rem;
+	font-size: 1.15rem;
 	line-height: 1.25rem;
 	font-weight: bold;
 	position: relative;
 	margin-bottom: 1rem;
 	color: #586067;
-}
-#container h3	{
-	font-size:1.1rem;
-	font-weight:bold;
-	margin-bottom:0.5rem;
 }
 #container h4	{
 	font-size:1rem;

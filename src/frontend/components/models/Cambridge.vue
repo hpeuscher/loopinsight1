@@ -199,6 +199,7 @@ export default {
 		"tmaxI"		: "time-to-maximum of absorption of subcutaneously injected short-acting insulin",
 	},
 	signals: {
+		"EGP"		: "endogenous glucose production",
 	},
 }
 </i18n>
@@ -241,6 +242,7 @@ export default {
 		"tmaxI"		: "time-to-maximum of absorption of subcutaneously injected short-acting insulin",
 	},
 	signals: {
+		"EGP"		: "endogene Glukoseproduktion",
 	},
 }
 </i18n>

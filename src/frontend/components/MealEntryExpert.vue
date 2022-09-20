@@ -86,12 +86,12 @@ export default {
 	
 	<ul style="padding-left:0;">
 		<li>{{$t("announcedmeal")}}:</li>
-		<ul>
+		<ul class="">
 			<li v-tooltip="$t('announcement.start_TT')">
 				<label for="actual_start" class="meallabel">
 					<div class="meallabel">{{$t("announcement.start")}}:</div>
 					<div class="mealtime">
-						<input type="datetime-local" id="announced_start"
+						<input type="datetime-local"
 							:min="t0String"
 							v-model="tAnnouncedStartString"
 							@change="changed">
@@ -102,7 +102,7 @@ export default {
 				<label for="announced_carbs" class="meallabel">
 					<div class="meallabel">{{$t("announcement.carbs")}}:</div>
 					<div class="mealvalue">
-						<input type="Number" id="announced_carbs" 
+						<input type="Number"
 							min="0"
 							v-model.number="meal.announcement.carbs"
 							@change="changed">
@@ -113,7 +113,7 @@ export default {
 				<label for="announcement_time" class="meallabel">
 					<div class="meallabel">{{$t("announcement.time")}}:</div>
 					<div class="mealtime">
-						<input type="datetime-local" id="announcement_time"
+						<input type="datetime-local"
 							:min="t0String"
 							v-model="tAnnouncementTimeString"
 							 @change="changed">
@@ -128,7 +128,6 @@ export default {
 					<div class="meallabel">{{$t("actual.start")}}:</div>
 					<div class="mealtime">
 						<input type="datetime-local" 
-							id="actual_start" 
 							:min="t0String"
 							v-model="tStartString"
 							@change="changed">
@@ -139,7 +138,7 @@ export default {
 				<label for="actual_carbs" class="meallabel">
 					<div class="meallabel">{{$t("actual.carbs")}}:</div>
 					<div class="mealvalue">
-						<input type="Number" id="actual_carbs"
+						<input type="Number"
 							min="0" 
 							v-model.number="meal.actual.carbs"
 							@change="changed">
@@ -150,7 +149,7 @@ export default {
 				<label for="actual_duration" class="meallabel">
 					<div class="meallabel">{{$t("actual.duration")}}:</div>
 					<div class="mealvalue">
-						<input type="Number" id="actual_duration"
+						<input type="Number"
 							min="1" 
 							v-model.number="meal.actual.duration" 
 							@change="changed">

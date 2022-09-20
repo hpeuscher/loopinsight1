@@ -8,8 +8,8 @@ import ExerciseEntry from './ExerciseEntry.vue'
 	
 var defaultExercise = {
 	start: 60,
-	duration: 120,
-	intensity: 30,
+	duration: 30,
+	intensity: 50,
 };
 
 var uniqueExerciseId = 1;

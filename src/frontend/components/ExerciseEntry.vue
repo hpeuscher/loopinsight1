@@ -54,12 +54,12 @@ export default {
 			:value="$t('delete')" 
 			@click="exerciseDelete">
 	</h4>
-	<ul>
+	<ul class="exerciseentry">
 		<li v-tooltip="$t('start_TT')">
 			<label for="start" class="exerciselabel">
 				<div>{{$t("start")}}:</div>
 				<div class="exercisetime">
-					<input type="datetime-local" :min="t0String" id="start"
+					<input type="datetime-local" :min="t0String"
 					@change="changed" v-model="tStartString">
 				</div>
 			</label>
@@ -68,7 +68,7 @@ export default {
 			<label for="duration" class="exerciselabel">
 				<div>{{$t("duration")}}:</div>
 				<div class="exercisevalue">
-					<input type="Number" min="0" id="duration"
+					<input type="Number" min="0" step="5"
 						@change="changed" v-model.number="exercise.duration">
 				</div>
 			</label>
@@ -77,7 +77,7 @@ export default {
 			<label for="intensity" class="exerciselabel">
 				<div>{{$t("intensity")}}:</div>
 				<div class="exercisevalue">
-					<input type="Number" min="0" id="intensity"
+					<input type="Number" min="0" max="100" step="5" id="intensity"
 						@change="changed" v-model.number="exercise.intensity">
 				</div>
 			</label>
@@ -91,12 +91,16 @@ export default {
 		margin-bottom: 0.5em;
 	}
 
-	ul {
+	ul.exerciseentry {
 		list-style:none;
 		padding-left:1em;
 		line-height:1.75em;
 	}
-		
+	
+	ul.exerciselist li {
+		width: 300px;
+	}
+
 	.exerciselabel div {
 		display: inline-block;
 		width: 150px;

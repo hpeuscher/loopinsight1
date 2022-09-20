@@ -80,12 +80,12 @@ export default {
 			:value="$t('delete')" 
 			@click="mealDelete">
 	</h4>
-	<ul>
+	<ul class="mealentry">
 		<li v-tooltip="$t('actual.start_TT')">
 			<label for="actual_start" class="meallabel">
 				<div>{{$t("actual.start")}}:</div>
 				<div class="mealtime">
-					<input type="datetime-local" :min="t0String" id="actual_start"
+					<input type="datetime-local" :min="t0String"
 					@change="changed" v-model="tStartString">
 				</div>
 			</label>
@@ -94,7 +94,7 @@ export default {
 			<label for="actual_carbs" class="meallabel">
 				<div>{{$t("actual.carbs")}}:</div>
 				<div class="mealvalue">
-					<input type="Number" min="0" id="actual_carbs"
+					<input type="Number" min="0"
 						@change="changed" v-model.number="meal.actual.carbs">
 				</div>
 			</label>
@@ -103,7 +103,7 @@ export default {
 			<label for="withAnnouncement" class="meallabel">
 				<div class="meallabel">{{$t("withAnnouncement")}}:</div>
 				<div class="mealvalue">
-					<input type="checkbox" id="withAnnouncement"
+					<input type="checkbox"
 						@change="changed" v-model.number="withAnnouncement">
 				</div>
 			</label>
