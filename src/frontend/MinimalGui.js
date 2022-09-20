@@ -8,16 +8,9 @@ import * as Vue from 'vue';
 import MinimalGui from './components/MinimalGui.vue';
 
 const LT1VueApp = {
-	template: '<MinimalGui :runSimulation="runSimulation" ref="main" />',
+	template: '<MinimalGui/>',
 	components: {
 		MinimalGui,
-	},
-	data() {
-		return {
-			runSimulation: () => {
-				// dummy, replaced by actual callback
-			},
-		}
 	},
 };
 

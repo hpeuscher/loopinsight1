@@ -46,17 +46,6 @@ export default {
 			)
 			return controller
 		},
-
-		// setup (called before simulation)
-		setup(patient) {
-			this.controller.setParams(
-				this.IIRb,
-				this.useBolus, 
-				this.PreBolusTime, 
-				this.CarbFactor
-			);
-			this.controller.setup(patient);
-		},
 		// compute insulin demand (function is called every minute)
 		update(t, y, x, announcement) {
 			// compute bolus (IIR remains constant all the time)
@@ -96,10 +85,7 @@ export default {
 
 
 <style scoped>
-.disabled {
-	pointer-events: none;
-    opacity: 0.4;
-}
+
 </style>
 
 

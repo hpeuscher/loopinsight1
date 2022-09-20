@@ -5,7 +5,6 @@
 	See https://lt1.org for further information.	*/
 
 import { defaults } from 'chart.js';
-import { ref } from 'vue'
 
 import ControllerConfig from './MinimalGuiBasalBolus.vue'
 import ChartGlucose from './MinimalGuiChartGlucose.vue'
@@ -15,7 +14,8 @@ import VirtualPatientUvaPadova from '../../core/models/UvaPadova.js'
 import Simulator from '../../core/Simulator.js'
 
 let controller = {}
-let meals = [
+const patient = new VirtualPatientUvaPadova()
+const meals = [
 	{
 		actual: {
 			start: new Date(2022,5,1,8,0,0), 
@@ -29,10 +29,16 @@ let meals = [
 		},
 	},
 ]
-let options = {
+const options = {
 	"t0": new Date(2022,5,1,0,0,0),
 	"tmax": new Date(2022,5,2,0,0,0),
 }
+
+// prepare simulator
+const sim = new Simulator()
+sim.setPatient(patient)
+sim.setMeals(meals)
+sim.setOptions(options)
 
 export default {
 	props: {
@@ -69,53 +75,31 @@ export default {
 
 	data() {
 		return {
-			patientData: {},	// todo
-			patientObject: {},	// todo
-			myCharts: [],
+			patientData: patient,
 		}
 	},
 
 	mounted() {
-		this.patientChanged(new VirtualPatientUvaPadova());
+		this.run()
 	},
 	
 	methods: {
 		run() {
 			this.resetCharts();
-				console.log("start simulation");
-								
-				// prepare simulator
-				var sim = new Simulator();
+			sim.setController(controller)
+			sim.runSimulation()
 
-				sim.setPatient(this.getPatient())
-				sim.setController(this.getController())
-				sim.setMeals(meals)
-				sim.setOptions(options)
-				sim.runSimulation()
-
-				// propagate results to charts
-				const results = sim.getSimulationResults()
-				this.propagateSimulationResults(results)
+			// propagate results to charts
+			const results = sim.getSimulationResults()
+			this.propagateSimulationResults(results)
 	
 			this.updateCharts();
-		},
-		getController() {
-			return controller;
-		},
-		getPatient() {
-			return this.patientObject
 		},
 		controllerChanged(newController) {
 			if (typeof newController !== "undefined") {
 				controller = newController
-			}
-			if (typeof this.patientObject.getInitialState !== "undefined") {
 				this.run();
 			}
-		},
-		patientChanged(newPatient) {
-			this.patientObject = newPatient;
-			this.patientData = Object.assign({}, newPatient);
 		},
 		resetCharts() {
 			for (const chart in this.$refs)
@@ -149,11 +133,6 @@ export default {
 				catch {
 				}
 			}
-		},
-
-		// callback when mouse hovers over treatment chart
-		controllerDataHover(t0, data) {
-
 		},
 	},
 }
@@ -367,6 +346,7 @@ input#startbutton {
 	"tmax": 		"Simulation timespan",
 	"results":		"Results",
 	"timeaxis":		"time in min",
+	"explanations":	"Try to choose these settings such that blood glucose spends as much time in range as possible!"
 }
 </i18n>
 <i18n locale="de">
