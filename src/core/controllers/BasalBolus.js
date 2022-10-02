@@ -3,21 +3,13 @@
    Distributed under the MIT software license.
    See https://lt1.org for further information.	*/
 
+import ControllerMealBolus from './MealBolus.js'
 
-import AbstractController from '../AbstractController.js';
+class ControllerBasalBolus extends ControllerMealBolus {
 
-class ControllerBasalBolus extends AbstractController {
-
-	constructor() {
-		super()
-		this.setParameters(1, false, 0, 0)
-	}
-
-	setParameters(basalRate, useBolus, preBolusTime, carbFactor) {
-		this.IIR = basalRate
-		this.useBolus = useBolus
-		this.preBolusTime = preBolusTime	// time between meal and bolus
-		this.carbFactor = carbFactor		// insulin units per 10g CHO
+	constructor({basalRate = 1}) {
+		super(arguments)			// meal bolus
+		this.basalRate = basalRate	// basal rate in U/h
 	}
 
 	// reset before new simulation
@@ -34,14 +26,11 @@ class ControllerBasalBolus extends AbstractController {
 	 * @returns {{iir: number, ibolus: number, logData: Object}} - TODO
 	 */
 	 computeTreatment(t, _y, _x) {
-		// compute bolus (IIR remains constant all the time)
-		this.bolus = this.useBolus * this.announcedCarbs(t + this.preBolusTime * 60e3) / 10.0
-			* this.carbFactor
+		// compute meal bolus
+		const mealBolus = super.computeTreatment(t, _y, _x)
 
-		return {iir: this.IIR, ibolus: this.bolus}
+		return {...mealBolus, iir: this.basalRate}
 	}
-
-
 }
 
 export default ControllerBasalBolus;

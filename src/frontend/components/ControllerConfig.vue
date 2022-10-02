@@ -6,31 +6,14 @@
 
 import {defineAsyncComponent} from "vue";
 
-// find all controller components in folder and load them dynamically
-const controllerList = require.context('./controllers/', false, /$/, 'lazy').keys().map(x => { return x.match(/\w+/)[0]})
-let controllerComponents = {};
-let controllerInfo = {};
-for (let i=controllerList.length-1; i>=0; i--) {
-	const key = controllerList[i];
-	// import module dynamically, tell webpack how to name the chunk 
-	let controller = import(
-		/* webpackChunkName: "controllers_[request]" */ 
-		/* webpackMode: "lazy" */
-		/* webpackExports: ["default"] */
-		`./controllers/${key}.vue`
-	)
-	// store component (default export) for async load
-	controllerComponents[key] = defineAsyncComponent(() => controller)
-	// fetch meta information (profile) to list controller in dropdown menu
-	controller.then( (result) => {
-		if (typeof result.profile !== "undefined") {
-			controllerInfo[key] = result.profile
-		}
-		else {
-			console.log("missing meta information of controller " + key)
-		}
-	}) 
-
+// find all local controller components
+const controllerList = require.context('./controllers/', false, /$/).keys().map(x => { return x.match(/\w+/)[0]})
+let controllerImports = {}
+let controllerComponents = {}
+for (const key of controllerList) {
+	// import module dynamically
+	controllerImports[key] = import(`./controllers/${key}.vue`)
+	controllerComponents[key] = defineAsyncComponent(() => controllerImports[key])
 }
 
 export default {
@@ -45,14 +28,23 @@ export default {
 	data() {
 		return {
 			boxactive: false,	// open accordion box
-			controllerInfo: controllerInfo,
-			controllerList: controllerList,
+			controllerProfiles: {},
 			selectedController: "Oref0",
 		}
 	},
 
-	updated() {
-		this.selectionChanged()
+	beforeMount() {
+		for (const key of controllerList) {
+			controllerImports[key].then( (controllerModule) => {
+				this.controllerProfiles[key] = controllerModule.profile
+				// extract name entry from every locale of i18n
+				const nameTranslations = controllerModule.default.__i18n.reduce((x,y)=>({ ...x, [y.locale]: {["name."+key]: y.resource.name}}), {})
+				// store these information into our translation resource
+				for (const locale in nameTranslations) {
+					this.$i18n.mergeLocaleMessage(locale, nameTranslations[locale])
+				}
+			})
+		}
 	},
 
 	methods: {
@@ -81,14 +73,14 @@ export default {
 		</p>
 		<p style="text-align:center;">
 			<select id="algorithm" v-model="selectedController" @change="selectionChanged">
-				<option v-for="controller in controllerInfo" 
+				<option v-for="controller in controllerProfiles" 
 					:key="controller.id"
-					:value="controller.id">{{controller.name}}
+					:value="controller.id">{{$t("name."+controller.id)}}
 				</option>
 			</select>
 		</p>
 		<Suspense>
-			<component 
+			<component
 				:patient="patient" 
 				@controllerChanged="controllerChanged"
 				ref="controller"

@@ -104,8 +104,8 @@ class Simulator {
 
 			// compute controller output
 			let { logData, iir, ibolus } = this.controller.computeTreatment(t, y, x)
-			if (iir<0) iir = 0
-			if (ibolus<0) ibolus = 0
+			if (iir < 0 || typeof iir === "undefined") iir = 0
+			if (ibolus < 0 || typeof ibolus === "undefined") ibolus = 0
 
 			// store results
 			const carbs = this._momentaryCarbIntake(this.meals, new Date(t))

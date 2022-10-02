@@ -4,12 +4,13 @@
    See https://lt1.org for further information.	*/
 
 
-import AbstractController from '../AbstractController.js'
+import ControllerMealBolus from './MealBolus.js'
 
 import determine_basal from 'oref0/lib/determine-basal/determine-basal.js';
 import tempBasalFunctions from 'oref0/lib/basal-set-temp.js';
 import iob from 'oref0/lib/iob/index.js';
 import getMealData from 'oref0/lib/meal/total.js';
+import glucoseGetLast from 'oref0/lib/glucose-get-last.js'
 
 // redirect console outputs of determine-basal and store them
 var debugLog = "";
@@ -43,17 +44,11 @@ var log_fun = function () {
 };
 
 
-class ControllerOref0 extends AbstractController {
+class ControllerOref0 extends ControllerMealBolus {
 
-	constructor() {
-		super()
-		// todo: initialize parameters with default values
-	};
+	constructor({profile}) {
+		super(arguments)				// meal bolus
 
-	setParameters(profile, useBolus, PreBolusTime, CarbFactor) {
-		// patient profile
-		// todo: create default profile
-		//profile = Object.assign(oref0Profile.defaults(), profile);
 		this.profile = profile;
 		this.profile.type = "current";
 		this.profile.min_5m_carbimpact = 12;
@@ -61,29 +56,27 @@ class ControllerOref0 extends AbstractController {
 			sensitivities: [
 				{ offset: 0, sensitivity: 100 }
 			]
-		};
+		}
 
-		// manual pre-bolus setup
-		this.useBolus = useBolus;
-		this.PreBolusTime = PreBolusTime; 	// time between meal and bolus
-		this.CarbFactor = CarbFactor;		// insulin units per 10g CHO
+		this.patient = {}
 	}
 
 	// reset and initialize
 	reset() {
-		// default basal rate
 		this.currenttemp = {}
 		this.treatmentHistory = []
-
-		// clear glucose measurement history
 		this.glucoseHistory = []
-		this.hist = []
 
 		// reset treatment
 		this.ibolus = 0
-		this.IIR = 0
+		this.IIR = this.patient.IIReq
 	}
 
+	// obtain information about patient
+	setPatient(patient) {
+		this.patient = patient
+	}
+	
 
 	/**
 	 * computes insulin demand
@@ -94,26 +87,21 @@ class ControllerOref0 extends AbstractController {
 	 * @returns {{iir: number, ibolus: number, logData: Object}} - TODO
 	 */
 	 computeTreatment(t, y, _x) {
+		const mealBolus = super.computeTreatment(t, y, _x)
 
 		let tNow = new Date(t);
 		let G = y["G"];
 
-
-
-		// compute (simulated manual) bolus
-		this.bolus =
-			this.useBolus *
-			this.announcedCarbs(t + this.PreBolusTime * 60e3) / 10.0 *
-			this.CarbFactor;
-		if (this.bolus) {
+		const ibolus = mealBolus["ibolus"]
+		if (ibolus) {
 			this.treatmentHistory.push({
 				_type: "Bolus",
-				timestamp: tNow.toISOString(),	// todo : required?
-				amount: this.bolus,				// todo : required?
-				insulin: this.bolus,
-				date: tNow,						// todo : required?
-				dateString: tNow.toISOString(),	// todo : required?
-				started_at: tNow,				// todo : required?
+				timestamp: tNow.toISOString(),
+				amount: ibolus,
+				insulin: ibolus,
+				date: tNow,
+				dateString: tNow.toISOString(),
+				started_at: tNow,
 			})
 		}
 
@@ -142,9 +130,6 @@ class ControllerOref0 extends AbstractController {
 			glucose: G
 		});
 
-		// add current glucose measurement to history
-		this.hist.push(G);
-
 
 		// add effect of current temp (5min) to treatment history (->IOB)
 		this.treatmentHistory.push({
@@ -153,31 +138,12 @@ class ControllerOref0 extends AbstractController {
 			rate: (this.IIR - this.patient.IIReq),
 			date: tNow - 5 * 60 * 1000,
 			timestamp: new Date(tNow - 5 * 60 * 1000),
-			insulin: 5 / 60 * (this.IIR - this.patient.IIReq),
+			insulin: 5 / 60 * (this.IIR - this.patient.IIReq), // TODO : add duration
 		});
 
 
 		// compute glucose trends
-		// todo: check if these formulas are correct
-		let glucose_status = { "glucose": G, "date": tNow };
-		if (this.hist.length >= 5) {
-			glucose_status["delta"] = G - this.hist.at(-5);
-		}
-		else {
-			glucose_status["delta"] = 0;
-		}
-		if (this.hist.length >= 15) {
-			glucose_status["short_avgdelta"] = (G - this.hist.at(-15)) / 3.0;
-		}
-		else {
-			glucose_status["short_avgdelta"] = 0;
-		}
-		if (this.hist.length >= 45) {
-			glucose_status["long_avgdelta"] = (G - this.hist.at(-45)) / 9.0;
-		}
-		else {
-			glucose_status["long_avgdelta"] = 0;
-		}
+		let glucose_status = glucoseGetLast(this.glucoseHistory)
 
 
 		// redirect console outputs to capture them
@@ -190,7 +156,7 @@ class ControllerOref0 extends AbstractController {
 
 
 		// configure autosens
-		let autosens = { ratio: 1.0 };	// todo
+		let autosens = { ratio: 1.0 };	//***  todo -> separate task, every xx minutes, see autosense.js
 
 
 		// compute IOB based on temp and bolus history
@@ -212,7 +178,7 @@ class ControllerOref0 extends AbstractController {
 			glucose: this.glucoseHistory,
 			basalprofile: {
 				basals: [
-					{ minutes: 0, rate: 1 }	// todo
+					{ minutes: 0, rate: 1 }	// todo: for time-variant patient physiology, define profile of basal rate over the day
 				]
 			}
 		};
@@ -257,6 +223,7 @@ class ControllerOref0 extends AbstractController {
 			// remember new temp
 			this.currenttemp = {
 				duration: basal.duration,
+				deliverAt: basal.deliverAt,
 				rate: basal.rate,
 				temp: "absolute"
 			}
@@ -275,7 +242,7 @@ class ControllerOref0 extends AbstractController {
 		} catch {
 			logData.reason = ""
 		}
-		return {iir: this.IIR, ibolus: this.bolus, logData}
+		return {iir: this.IIR, ibolus, logData}
 	}
 
 }

@@ -4,12 +4,11 @@
    	Distributed under the MIT software license.
 	See https://lt1.org for further information.	*/
 
-import ControllerPID from '../../../core/controllers/PID.js';
+import ImportController from "../../util/ImportController.js"
 
 export const profile = {
 	id: "PID",
 	version: "0.2.0",
-	name: "PID",
 }
 
 export default {
@@ -20,57 +19,55 @@ export default {
 
 	emits: ["controllerChanged"],
 
+	controller: {},
+
 	data() {
 		return {
-			...profile,
+			preBolusTime: 30,
+			carbFactor: 1.5,
 			useBolus: true,
-			PreBolusTime: 30,
-			CarbFactor: 1.5,
-			IIRb: 0,
+			defaultBasalRate: 0,
 			kP: 0.01,
 			kI: 0.001,
 			kD: 0.05,
-			target: 100,
-			bolus: 0,
+			targetBG: 100,
 		}
 	},
 	
 	watch: {
-		"patient.IIReq": {
-			handler: function(val) { 
-				this.IIRb = Math.round(val*20)/20
-				this.valueChanged()
-			},
-			immediate: true,
-		}
-	},
-	
-	beforeMount() {
-		this.name = this.$t("name");
+		"patient.IIReq"() { 
+			this.patientChanged()
+		},
 	},
 
-	mounted() {
-		this.valueChanged();
+	async mounted() {
+		const loadController = ImportController("PID")
+		const ControllerPID = await loadController()
+		this.controller = new ControllerPID(this.$data)
+		this.patientChanged()
 	},
 
 	methods: {
-		valueChanged() {	
-			this.$emit("controllerChanged", this.getController())
+		patientChanged() {
+			this.defaultBasalRate = Math.round(this.patient.IIReq*20)/20
+			this.valueChanged()
+		},
+
+		valueChanged() {
+			this.controller.defaultBasalRate = this.defaultBasalRate
+			this.controller.kP = this.kP
+			this.controller.kI = this.kI
+			this.controller.kC = this.kD
+			this.controller.targetBG = this.targetBG
+			this.controller.active = this.useBolus
+			this.controller.carbFactor = this.carbFactor
+			this.controller.preBolusTime = this.preBolusTime
+
+			this.$emit("controllerChanged", this.controller)
 		},
 
 		getController() {
-			let controller = new ControllerPID()
-			controller.setParameters(
-				this.IIRb,
-				this.kP,
-				this.kI,
-				this.kD,
-				this.target,
-				this.useBolus, 
-				this.PreBolusTime, 
-				this.CarbFactor,
-			)
-			return controller
+			return this.controller
 		},
 	},
 }
@@ -81,11 +78,11 @@ export default {
 	<div id="controlleroptions" class="parameterlist">
 		<ul>
 			<li class="item">
-				<label for="IIRb">
-					<div class="item-description">{{$t("IIRb")}}</div>
+				<label for="defaultBasalRate">
+					<div class="item-description">{{$t("defaultBasalRate")}}</div>
 					<div class="item-input">
-						<input type="number" v-model.number="IIRb" 
-							id="IIRb" min="0" step="0.05" 
+						<input type="number" v-model.number="defaultBasalRate" 
+							id="defaultBasalRate" min="0" step="0.05" 
 							@change="valueChanged">
 					</div>
 					<div class="item-unit">U/h</div>
@@ -125,11 +122,11 @@ export default {
 				</label>
 			</li>
 			<li class="item">
-				<label for="target">
-					<div class="item-description">{{$t("target")}}</div>
+				<label for="targetBG">
+					<div class="item-description">{{$t("targetBG")}}</div>
 					<div class="item-input">
-						<input type="number" v-model.number="target" 
-							id="target" min="0" step="0.05" 
+						<input type="number" v-model.number="targetBG" 
+							id="targetBG" min="0" step="0.05" 
 							@change="valueChanged">
 					</div>
 					<div class="item-unit">mg/dl</div>
@@ -147,22 +144,22 @@ export default {
 				</label>
 			</li>
 			<li class="item" v-bind:class="{disabled: !useBolus}">
-				<label for="CarbFactor">
-					<div class="item-description">{{$t("CarbFactor")}}</div>
+				<label for="carbFactor">
+					<div class="item-description">{{$t("carbFactor")}}</div>
 					<div class="item-input">
-						<input type="number" v-model.number="CarbFactor" 
-							id="CarbFactor" min="0" step="0.1" 
+						<input type="number" v-model.number="carbFactor" 
+							id="carbFactor" min="0" step="0.1" 
 							@change="valueChanged">
 					</div>
 					<div class="item-unit">U/(10g CHO)</div>
 				</label>
 			</li>
 			<li class="item" v-bind:class="{disabled: !useBolus}">
-				<label for="PreBolusTime">
-					<div class="item-description">{{$t("PreBolusTime")}}</div>
+				<label for="preBolusTime">
+					<div class="item-description">{{$t("preBolusTime")}}</div>
 					<div class="item-input">
-						<input type="number" v-model.number="PreBolusTime" 
-							id="PreBolusTime" min="0" step="5" 
+						<input type="number" v-model.number="preBolusTime" 
+							id="preBolusTime" min="0" step="5" 
 							@change="valueChanged">
 					</div>
 					<div class="item-unit">min</div>
@@ -184,26 +181,26 @@ export default {
 <i18n locale="en">
 {
 	"name": "PID controller + bolus",
-	"IIRb": "basal rate",
+	"defaultBasalRate": "default basal rate",
 	"kP": "proportional factor",
 	"kI": "integral factor",
 	"kD": "differential factor",
-	"target": "target glucose concentration",
+	"targetBG": "target glucose concentration",
 	"useBolus": "bolus with meal",
-	"CarbFactor": "carb factor",
-	"PreBolusTime": "time between bolus and meal",
+	"carbFactor": "carb factor",
+	"preBolusTime": "time between bolus and meal",
 }
 </i18n>
 <i18n locale="de">
 {
 	"name": "PID-Regler + Bolus",
-	"IIRb": "Basalrate",
+	"defaultBasalRate": "Standardbasalrate",
 	"kP": "Proportional-Faktor",
 	"kI": "Integral-Faktor",
 	"kD": "Differential-Faktor",
-	"target": "Ziel-Konzentration",
+	"targetBG": "Ziel-Konzentration",
 	"useBolus": "Bolus zur Mahlzeit",
-	"CarbFactor": "KE-Faktor",
-	"PreBolusTime": "Spritz-Ess-Abstand",
+	"carbFactor": "KE-Faktor",
+	"preBolusTime": "Spritz-Ess-Abstand",
 }
 </i18n>

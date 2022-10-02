@@ -4,12 +4,11 @@
    	Distributed under the MIT software license.
 	See https://lt1.org for further information.	*/
 
-import ControllerOref0 from '../../../core/controllers/Oref0.js';
+import ImportController from "../../util/ImportController.js"
 
 export const profile = {
 	id: "Oref0",
-	version: "0.2.0",
-	name: "oref0 / OpenAPS",
+	version: "0.3.0",
 }
 
 export default {
@@ -19,9 +18,10 @@ export default {
 
 	emits: ["controllerChanged"],
 
+	controller: {},
+
 	data() {
 		return {
-			...profile,
 			profile: {
 				max_iob: 3.5,
 				dia: 6,
@@ -33,34 +33,31 @@ export default {
 				carb_ratio: 9,
 				maxCOB: 120,
 			},
+			carbFactor: 1.5,
+			preBolusTime: 30,
 			useBolus: true,
-			PreBolusTime: 30,
-			CarbFactor: 1.5,
 		}
 	},
 
-	beforeMount() {
-		this.name = this.$t("name");
-	},
-
-	mounted() {
+	async mounted() {
+		const loadController = ImportController("Oref0")
+		const ControllerOref0 = await loadController()
+		this.controller = new ControllerOref0(this.$data)
 		this.valueChanged()
 	},
 
 	methods: {
 		valueChanged() {
-			this.$emit("controllerChanged", this.getController())
+			this.carbFactor = Math.round(10 / this.profile.carb_ratio * 100) / 100;
+			this.controller.profile = this.profile
+			this.controller.carbFactor = this.carbFactor
+			this.controller.preBolusTime = this.preBolusTime
+			this.controller.active = this.useBolus
+			this.$emit("controllerChanged", this.controller)
 		},
 
 		getController() {
-			this.CarbFactor = Math.round(10 / this.profile.carb_ratio * 100) / 100;
-			let controller = new ControllerOref0()
-			controller.setParameters(
-				JSON.parse(JSON.stringify(this.profile)),
-				this.useBolus,
-				this.PreBolusTime,
-				this.CarbFactor)
-			return controller
+			return this.controller
 		},
 	},
 }
@@ -81,24 +78,24 @@ export default {
 					<div class="item-unit"></div>
 				</label>
 			</li>
-			<li class="item" v-tooltip="$t('tooltips.CarbFactor')">
-				<label for="CarbFactor">
-					<div class="item-description">{{$t("CarbFactor")}}</div>
+			<li class="item" v-tooltip="$t('tooltips.carbFactor')">
+				<label for="carbFactor">
+					<div class="item-description">{{$t("carbFactor")}}</div>
 					<div class="item-input">
-						<input type="number" v-model.number="CarbFactor" 
-							id="CarbFactor" min="0" step="0.1" class="disabled"
+						<input type="number" v-model.number="carbFactor" 
+							id="carbFactor" min="0" step="0.1" class="disabled"
 							@change="valueChanged">
 					</div>
 					<div class="item-unit">U/(10g CHO)</div>
 				</label>
 			</li>
-			<li class="item" v-tooltip="$t('tooltips.PreBolusTime')"
+			<li class="item" v-tooltip="$t('tooltips.preBolusTime')"
 				v-bind:class="{disabled: !useBolus}">
-				<label for="PreBolusTime">
-					<div class="item-description">{{$t("PreBolusTime")}}</div>
+				<label for="preBolusTime">
+					<div class="item-description">{{$t("preBolusTime")}}</div>
 					<div class="item-input">
-						<input type="number" v-model.number="PreBolusTime" 
-							id="PreBolusTime" min="0" step="5" 
+						<input type="number" v-model.number="preBolusTime" 
+							id="preBolusTime" min="0" step="5" 
 							@change="valueChanged">
 					</div>
 					<div class="item-unit">min</div>
@@ -197,8 +194,8 @@ export default {
 {
 	"name": "OpenAPS (oref0)",
 	"useBolus": "Patient administers meal bolus",
-	"CarbFactor": "carb factor",
-	"PreBolusTime": "time between bolus and meal",
+	"carbFactor": "carb factor",
+	"preBolusTime": "time between bolus and meal",
 	"ISF": "Insulin sensitivity factor (ISF)",
 	"min_bg": "minimum BG target",
 	"max_bg": "maximum BG target",
@@ -208,8 +205,8 @@ export default {
 	"max_basal": "maximum basal",
 	"tooltips" : {
 		"useBolus": "Choose if the virtual patient manually administers a meal bolus.",
-		"CarbFactor": "The carb factor defines how much insulin is required to compensate for an amount of carbs. It is coupled with carb ratio.",
-		"PreBolusTime": "This defines how much before the meal a bolus is administered.",
+		"carbFactor": "The carb factor defines how much insulin is required to compensate for an amount of carbs. It is coupled with carb ratio.",
+		"preBolusTime": "This defines how much before the meal a bolus is administered.",
 		"ISF": "The ISF is used to predict the eventual blood glucose concentration after all remaining insulin on board has taken its effect.",
 		"min_bg": "The algorithm tries to keep blood glucose above this value.",
 		"max_bg": "The algorithm tries to keep blood glucose below this value.",
@@ -224,8 +221,8 @@ export default {
 {
 	"name": "OpenAPS (oref0)",
 	"useBolus": "Bolus zur Mahlzeit",
-	"CarbFactor": "KE-Faktor",
-	"PreBolusTime": "Spritz-Ess-Abstand",
+	"carbFactor": "KE-Faktor",
+	"preBolusTime": "Spritz-Ess-Abstand",
 	"ISF": "Insulin sensitivity factor (ISF)",
 	"min_bg": "Untergrenze Zielwert Glukose",
 	"max_bg": "Obergrenze Zielwert Glukose",
@@ -235,8 +232,8 @@ export default {
 	"max_basal": "Maximale Basalrate",
 	"tooltips" : {
 		"useBolus": "Legt fest, ob vom virtuellen Patienten ein manueller Mahlzeitenbolus abgegeben wird.",
-		"CarbFactor": "Der KE-Faktor beschreibt, wie viel Insulin benötigt wird, um eine Kohlenhydrateinheit auszugleichen. Er ist hier an die Einstellung Carb Ratio gekoppelt.",
-		"PreBolusTime": "Der Spritz-Ess-Abstand legt fest, wie lange vor der Mahlzeit ein Bolus abgegeben wird.",
+		"carbFactor": "Der KE-Faktor beschreibt, wie viel Insulin benötigt wird, um eine Kohlenhydrateinheit auszugleichen. Er ist hier an die Einstellung Carb Ratio gekoppelt.",
+		"preBolusTime": "Der Spritz-Ess-Abstand legt fest, wie lange vor der Mahlzeit ein Bolus abgegeben wird.",
 		"ISF": "Der ISF dient zur Vorhersage des finalen Glukosespiegels, sobald alles verbleibende Insulin (IOB) seine Wirkung entfaltet hat.",
 		"min_bg": "Der Algorithmus versucht den Glukosespiegel über diesem Wert zu halten.",
 		"max_bg": "Der Algorithmus versucht den Glukosespiegel unter diesem Wert zu halten.",

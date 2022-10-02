@@ -3,34 +3,24 @@
    Distributed under the MIT software license.
    See https://lt1.org for further information.	*/
 
+import ControllerMealBolus from './MealBolus.js'
 
-import AbstractController from '../AbstractController.js';
+class ControllerPID extends ControllerMealBolus {
 
-class ControllerPID extends AbstractController {
-
-	constructor() {
-		super()
-		this.setParameters(1, 0.01, 0, 0, 100, false, 0, 0) 
+	constructor({defaultBasalRate = 1, kP = 1, kI = 0.01, kD = 0, targetBG = 100}) {
+		super(arguments)			// meal bolus
+		this.defaultBasalRate = defaultBasalRate
+		this.kP = kP
+		this.kI = kI
+		this.kD = kD
+		this.target = targetBG
 		this.reset()
-	}
-
-	setParameters(basalRate, kP, kI, kD, target, useBolus, PreBolusTime, CarbFactor) {
-
-		this.IIReq = basalRate;
-		this.kP = kP;
-		this.kI = kI;
-		this.kD = kD;
-		this.target = target;
-		this.useBolus = useBolus;
-		this.PreBolusTime = PreBolusTime;	// time between meal and bolus
-		this.CarbFactor = CarbFactor;		// insulin units per 10g CHO
 	}
 
 	// reset before new simulation
 	reset() {
-		this.e_int = 0;
-		this.e_old = undefined;
-		this.IIR = this.IIReq;
+		this.e_int = 0
+		this.e_old = undefined
 	}
 
 	/**
@@ -43,23 +33,20 @@ class ControllerPID extends AbstractController {
 	 */
 	 computeTreatment(t, y, _x) {
 
-		// compute bolus (IIR remains constant all the time)
-		this.bolus = this.useBolus * this.announcedCarbs(t + this.PreBolusTime * 60e3) / 10.0
-			* this.CarbFactor
+		// compute meal bolus
+		const mealBolus = super.computeTreatment(t, y, _x)
 
 		// PID law
 		let e = this.target - y.G
 		this.e_int += e / 60
 
-		let u = this.IIReq - this.kP * e - this.kI * this.e_int
+		let iir = this.defaultBasalRate - this.kP * e - this.kI * this.e_int
 		if (typeof this.e_old !== "undefined") {
-			u -= this.kD * (e - this.e_old) * 60
+			iir -= this.kD * (e - this.e_old) * 60
 		}
 		this.e_old = e
 
-		this.IIR = u
-
-		return {iir: this.IIR, ibolus: this.bolus}
+		return {...mealBolus, iir}
 	}
 
 

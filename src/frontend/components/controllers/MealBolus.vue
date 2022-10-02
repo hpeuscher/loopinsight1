@@ -7,7 +7,7 @@
 import ImportController from "../../util/ImportController.js"
 
 export const profile = {
-	id: "BasalBolus",
+	id: "MealBolus",
 	version: "0.3.0",
 }
 
@@ -22,37 +22,22 @@ export default {
 
 	data() {
 		return {
-			carbFactor: 1.5,
-			preBolusTime: 30,
-			useBolus: true,
-			basalRate: 0,
+			carbFactor: 1,
+			preBolusTime: 15,
 		}
 	},
 
-	watch: {
-		"patient.IIReq"() { 
-			this.patientChanged()
-		},
-	},
-
 	async mounted() {
-		const loadController = ImportController("BasalBolus")
-		const ControllerBasalBolus = await loadController()
-		this.controller = new ControllerBasalBolus(this.$data)
-		this.patientChanged()
+		const loadController = ImportController("MealBolus", "0.2.0")
+		const ControllerMealBolus = await loadController()
+		this.controller = new ControllerMealBolus(this.$data)
+		this.valueChanged()
 	},
 
 	methods: {
-		patientChanged() {
-			this.basalRate = Math.round(this.patient.IIReq*20)/20
-			this.valueChanged()
-		},
-		
 		valueChanged() {
 			this.controller.carbFactor = this.carbFactor
 			this.controller.preBolusTime = this.preBolusTime
-			this.controller.active = this.useBolus
-			this.controller.basalRate = this.basalRate
 			this.$emit("controllerChanged", this.controller)
 		},
 		
@@ -69,44 +54,22 @@ export default {
 	<div id="controlleroptions" class="parameterlist">
 		<ul>
 			<li class="item">
-				<label for="basalRate">
-					<div class="item-description">{{$t("basalRate")}}</div>
-					<div class="item-input">
-						<input type="number" v-model.number="basalRate" 
-							id="basalRate" min="0" step="0.05" 
-							@change="valueChanged">
-					</div>
-					<div class="item-unit">U/h</div>
-				</label>
-			</li>
-			<li class="item">
-				<label for="useBolus">
-					<div class="item-description">{{$t("useBolus")}}</div>
-					<div class="item-input">
-						<input type="checkbox" v-model="useBolus"
-							id="useBolus" 
-							@change="valueChanged">
-					</div>
-					<div class="item-unit"></div>
-				</label>
-			</li>
-			<li class="item" v-bind:class="{disabled: !useBolus}">
 				<label for="CarbFactor">
 					<div class="item-description">{{$t("CarbFactor")}}</div>
 					<div class="item-input">
 						<input type="number" v-model.number="carbFactor" 
-							id="CarbFactor" min="0" step="0.1" 
+							min="0" step="0.1" 
 							@change="valueChanged">
 					</div>
 					<div class="item-unit">U/(10g CHO)</div>
 				</label>
 			</li>
-			<li class="item" v-bind:class="{disabled: !useBolus}">
+			<li class="item">
 				<label for="PreBolusTime">
 					<div class="item-description">{{$t("PreBolusTime")}}</div>
 					<div class="item-input">
 						<input type="number" v-model.number="preBolusTime" 
-							id="PreBolusTime" min="0" step="5" 
+							min="0" step="5" 
 							@change="valueChanged">
 					</div>
 					<div class="item-unit">min</div>
@@ -117,28 +80,17 @@ export default {
 </template>
 
 
-<style scoped>
-.disabled {
-	pointer-events: none;
-    opacity: 0.4;
-}
-</style>
-
-
 <i18n locale="en">
 {
-	"name": "CSII (basal rate + bolus)",
-	"basalRate": "basal rate",
-	"useBolus": "bolus with meal",
+	"name": "Only meal bolus",
 	"CarbFactor": "carb factor",
 	"PreBolusTime": "time between bolus and meal",
 }
 </i18n>
+
 <i18n locale="de">
 {
-	"name": "CSII (Basalrate + Bolus)",
-	"basalRate": "Basalrate",
-	"useBolus": "Bolus zur Mahlzeit",
+	"name": "Nur Mahlzeitenbolus",
 	"CarbFactor": "KE-Faktor",
 	"PreBolusTime": "Spritz-Ess-Abstand",
 }
