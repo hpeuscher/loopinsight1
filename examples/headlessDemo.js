@@ -14,8 +14,8 @@ import VirtualPatientUvaPadova from '../src/core/models/UvaPadova.js'
 // define a patient object
 let patient = new VirtualPatientUvaPadova()
 // define a controller/algorithm
-let controller = new ControllerBasalBolus()
-controller.setParameters(patient.IIReq, true, 30, 1.5)
+let controller = new ControllerBasalBolus({basalRate: patient.IIReq, active: true, preBolusTime: 30, carbFactor: 1.5})
+
 // define a set of meals
 let meals = [
 	{

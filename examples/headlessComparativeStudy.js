@@ -75,13 +75,14 @@ function performSimulationWithController(controller) {
 }
 
 // first controller/algorithm
-let controller1 = new ControllerBasalBolus()
-controller1.setParameters(patient.IIReq, true, 30, 1.5)
+let controller1 = new ControllerBasalBolus({
+	basalRate: patient.IIReq,
+	active: true, preBolusTime: 30, carbFactor: 1.5	// meal bolus
+})
 
 // second controller
-let controller2 = new ControllerOref0()
-controller2.setParameters(
-	{
+let controller2 = new ControllerOref0(
+	{profile: {
 		max_iob: 3.5,
 		dia: 6,
 		max_daily_basal: 1.3,
@@ -92,7 +93,8 @@ controller2.setParameters(
 		carb_ratio: 8,
 		maxCOB: 120,
 	}, 	// oref0 profile information
-	true, 30, 1.5) // meal bolus
+	active: true, preBolusTime: 30, carbFactor: 1.5	// meal bolus
+})
 
 // run simulations
 const results = [
