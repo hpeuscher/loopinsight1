@@ -8,6 +8,7 @@ import CopyWebpackPlugin from 'copy-webpack-plugin';
 import webpack from 'webpack';
 import MomentTimezoneDataPlugin from 'moment-timezone-data-webpack-plugin';
 import MomentLocalesPlugin from 'moment-locales-webpack-plugin';
+import FindLocalModules from './src/FindLocalModules.js'
 
 export default {
   entry: {
@@ -18,7 +19,7 @@ export default {
   output: {
     filename: '[name].bundle.js',
     path: path.resolve(__dirname, 'dist'),
-    chunkFilename: '[id].bundle.js'
+    chunkFilename: '[name].bundle.js'
   },
   module: {
     rules: [
@@ -38,27 +39,16 @@ export default {
     ],
   },
   optimization: {
-    moduleIds: 'named',
-    chunkIds: 'named',
     splitChunks: {
-      name: false,
       chunks: 'all',
       cacheGroups: {
-        vendor: {
-          test: /[\\/]node_modules[\\/]/,
-          name: 'vendors',
-          chunks: 'all',
-        },
-        backend: {
-          test: /[\\/]core[\\/]/,
-          name: 'lt1core',
-          chunks: 'all',
-        },
+        defaultVendors: false,
       },
     },
   },
   plugins: [
     new webpack.DefinePlugin({
+      __LT1_LOCAL_MODELS__: JSON.stringify(await FindLocalModules('./core/models')),
       __VUE_OPTIONS_API__: false,
       __VUE_PROD_DEVTOOLS__: false
     }),

@@ -4,70 +4,94 @@
    	Distributed under the MIT software license.
 	See https://lt1.org for further information.	*/
 
-import {defineAsyncComponent} from "vue";
-
-// find all model components in folder and load them dynamically
-const modelList = require.context('./models/', false, /$/, 'lazy').keys().map(x => { return x.match(/\w+/)[0]})
-let modelComponents = {};
-let modelInfo = {}
-for (let i=modelList.length-1; i>=0; i--) {
-	const key = modelList[i];
-	// import module dynamically, tell webpack how to name the chunk 
-	let model = import(
-		/* webpackChunkName: "models_[request]" */ 
-		/* webpackMode: "lazy" */
-		/* webpackExports: ["default"] */
-		`./models/${key}.vue`
-	)
-	// store component (default export) for async load
-	modelComponents[key] = defineAsyncComponent(() => model)
-	// fetch meta information (profile) to list model in dropdown menu
-	model.then( (result) => {
-		if (typeof result.profile !== "undefined") {
-			modelInfo[key] = result.profile
-		}
-		else {
-			console.log("missing meta information of model " + key)
-		}	
-	}) 
-}
+import countDecimals from "../../common/CountDecimals.js"
 
 export default {
 	emits: ["patientChanged"],
 
-	components: modelComponents,
-
 	data() {
 		return {
 			boxactive: false,	// open accordion box
-			modelInfo: modelInfo,
-			modelList: modelList,
+			modelInfo: __LT1_LOCAL_MODELS__,	// provided by webpack define plugin
+			modelImports: {},
 			selectedModel: "UvaPadova",
+			patient: {},
+			tooltipStrings: {},
+			htmlStrings: {},
+			unitStrings: {},
 		}
 	},
 
-	updated() {
+	computed: {
+		modelList: function() { return Object.keys(this.modelInfo) },
+	},
+
+	beforeMount() {
+		// import module dynamically
+		for (const key of this.modelList) {
+			this.modelImports[key] = () => import(
+				/* webpackChunkName: "models_[request]" */ 
+				/* webpackMode: "lazy" */
+				`../../core/models/${key}`
+			)
+		}
+	},
+
+	mounted() {
 		this.selectionChanged()
 	},
 
 	methods: {
 
 		getPatient() {
-			return this.getPatientView().patient
-		},
-		
-		getPatientView() {
-			return this.$refs["model"]
+			return this.patient
 		},
 		
 		selectionChanged() {
-			this.patientChanged(this.getPatient())
+			const modelModule = this.modelImports[this.selectedModel]()
+			modelModule.then( (model) => {
+				this.patient = new model.default(JSON.parse(JSON.stringify(this.patient.parameters || {})))
+				this.tooltipStrings = model.i18n[this.$i18n.locale] || model.i18n[this.$i18n.fallbackLocale] 
+				this.htmlStrings = model.html || {}
+				this.unitStrings = model.units || {}
+				this.valuesChanged()
+			})
 		},
 
-		patientChanged(newPatient) {
-			this.$emit("patientChanged", newPatient)
+		valuesChanged() {
+			this.computeSteadyState()
+			this.$emit("patientChanged", this.patient)
+		},
+
+		computeSteadyState() {
+			this.patient.computeSteadyState()
+		},
+
+		loaddefaultpatient() {
+			this.patient.setParameters(this.patient.defaultParameters)
+			this.valuesChanged()
 		},
 		
+		setParameters(parameters) {
+			this.patient.parameters = Object.assign(this.patient.parameters, 
+				JSON.parse(JSON.stringify(parameters)))
+		},
+		
+		stepDistance(key) {
+			return Math.pow(10, countDecimals(this.patient.parameters[key]))
+		},
+
+		parameterTooltip(key) {
+			return this.tooltipStrings[key] || key
+		},
+
+		parameterUnit(key) {
+			return this.unitStrings[key]
+		},
+
+		parameterHtml(key) {
+			return this.htmlStrings[key] || key
+		},
 
 		loadPatient(event) {
 			// import model from uploaded JSON file
@@ -87,7 +111,8 @@ export default {
 				if (Object.values(this.modelInfo).map((x)=>x.id).includes(content.id)) {
 					this.selectedModel = content.id;
 					//todo: version
-					this.getPatientView().setParameters(content.parameters);
+					this.patient.setParameters(content.parameters)
+					this.selectionChanged()
 				}
 				else {
 					console.error("unknown model or version");
@@ -145,23 +170,42 @@ export default {
 			</select>
 			<span v-if="selectedModel" style="margin-left:5px;"><small>
 				<a :href="'https://lt1.org/models/'+selectedModel" 
-					v-tooltip="{content: $t('online_info_tooltip')+' '+selectedModel}"
+					v-tooltip="{content: $t('online_info_tooltip')}"
 					target="_blank">
 					{{$t("online_info")}}
 				</a>
 			</small></span>
 		</p>
-		<Suspense>
-			<component
-				@patientChanged="patientChanged"
-				:is="selectedModel"
-				ref="model"
-			/>
-		</Suspense>
+		<div>
+			<p style="text-align:center;">
+				<input type="button" 
+					:value="$t('loaddefaultpatient')" 
+					@click="loaddefaultpatient">
+			</p>
+
+		</div>
+		<div id="patientoptions" class="parameterlist">
+			<ul>
+				<li v-for="(id) in patient.parameterList" class="item" :key="id">
+					<label :for="'param'+id" >
+						<div class="item-description"
+							v-tooltip="{content: parameterTooltip(id)}">
+							<span v-html="parameterHtml(id)"></span>
+						</div>
+						<div class="item-input">
+							<input v-model.number=patient.parameters[id] 
+								:id="'param'+id"
+								type="number" :min=0
+								@change="valuesChanged()"
+								:step="stepDistance(id)">
+						</div>
+						<div class="item-unit">{{parameterUnit(id)}}</div>
+					</label>
+				</li>	
+			</ul>
+		</div>
 	</div>
 </template>
-
-}
 
 <i18n locale="units">
 {
@@ -181,6 +225,7 @@ export default {
 {
 	"model"				: "Choose physiological model",
 	"patientsettings"	: "Virtual Patient",
+	"loaddefaultpatient": "restore default values",
 	"savepatient"		: "save patient",
 	"loadpatient"		: "load patient",
 	inputs: {
@@ -193,7 +238,8 @@ export default {
 		"Gt"			: "glucose concentration in tissue",
 	},
 	online_info			: "online info",
-	online_info_tooltip	: "follow this link to learn more about the model",
+	online_info_tooltip	: "follow this link to learn more about the model.",
+	"experimental"		: "Attention. This model is in an experimental stage.",
 }
 </i18n>
 
@@ -201,6 +247,7 @@ export default {
 {
 	"model"				: "Physiologisches Modell auswählen",
 	"patientsettings"	: "Virtuelle Patient:in",
+	"loaddefaultpatient": "Standardwerte wiederherstellen",
 	"savepatient"		: "Patient:in speichern",
 	"loadpatient"		: "Patient:in laden",
 	inputs: {
@@ -213,6 +260,7 @@ export default {
 		"Gt"			: "Glukose-Konzentration im Gewebe",
 	},
 	online_info			: "Online-Info",
-	online_info_tooltip	: "Unter diesem Link finden Sie Details zum Modell",
+	online_info_tooltip	: "Unter diesem Link finden Sie Details zum Modell.",
+	"experimental"		: "Achtung! Dieses Modell ist in einem experimentellen Stadium.",
 }
 </i18n>

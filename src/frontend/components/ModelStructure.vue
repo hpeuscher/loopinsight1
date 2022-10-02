@@ -6,25 +6,6 @@
 
 import { SVG } from '@svgdotjs/svg.js'
 
-import {defineAsyncComponent} from "vue"
-
-// find all model components in folder and load them dynamically
-const modelList = require.context('./models/', false, /.vue?$/, 'lazy').keys().map(x => { return x.match(/\w+/)[0]})
-let modelComponents = {}
-for (let i=modelList.length-1; i>=0; i--) {
-	const key = modelList[i];
-	// import module dynamically, tell webpack how to name the chunk 
-	let model = import(
-		/* webpackChunkName: "models_[request]" */ 
-		/* webpackMode: "lazy" */
-		/* webpackExports: ["default"] */
-		`./models/${key}.vue`
-	)
-	// store component (default export) for async load
-	modelComponents[key] = defineAsyncComponent(() => model)
-}
-
-
 // check if argument is a valid number
 const isNumber = function (value) { 
     return typeof value === "number" && isFinite(value)
@@ -185,27 +166,31 @@ export default {
     data() {
 		return {
             model: this.selectedModel,
-			modelRefs: {},
-			modelList: modelList,
+			modelInfo: __LT1_LOCAL_MODELS__,	// provided by webpack define plugin
+			modelImports: {},
 		}
 	},
 
-    components: modelComponents,
+    computed: {
+		modelList: function() { return Object.keys(this.modelInfo) },
+	},
+
+	beforeMount() {
+		// import module dynamically
+		for (const key of this.modelList) {
+			this.modelImports[key] = () => import(
+				/* webpackChunkName: "models_[request]" */ 
+				/* webpackMode: "lazy" */
+				`../../core/models/${key}`
+			)
+		}
+	},
 
     mounted() {
         this.selectionChanged()
     },
 
 	methods: {
-	
-		// during rendering of model components, store refs for later access
-		setModelRef(el) {
-			if (el) {
-				const id = el.$["vnode"].key
-				this.modelRefs[id] = el
-			}
-    	},
-
 
         selectionChanged() {
             // check if valid model is selected
@@ -217,16 +202,21 @@ export default {
                     this.model = this.selectedModel
                 }
             }
-            if (modelList.indexOf(this.model) < 0 ) {
+            if (this.modelList.indexOf(this.model) < 0 ) {
                 console.log("unknown model \""+this.model+"\"")
                 return
             }
             console.log("selected model: \""+this.model+"\"")
             
-            this.renderSVG() 
+            //const model = this.modelRefs[this.model]
+            const modelModule = this.modelImports[this.model]()
+			modelModule.then( (model) => {
+                this.renderSVG(model)
+            })
+             
         },
 
-        renderSVG() {
+        renderSVG(model) {
 
             // find SVG in DOM
             let svgelem = document.getElementById("lt1_model_svg")
@@ -239,25 +229,14 @@ export default {
                 return
             }
 
-            //const model = this.modelRefs[this.model]
-            const model = this.modelRefs[this.model]
-            const elements = model.$options.__svg
+            const elements = model.diagram
 
-            function translate(key, locale) {
-                if (typeof key === "undefined" || key==="") {
-                    return undefined
-                }
-                if (model.$te("parameters."+key, locale)) {
-                    return model.$t("parameters."+key, locale)
-                }
-                else if (model.$te("states."+key, locale)) {
-                    return model.$t("states."+key, locale)
-                }
-                else if (model.$te("signals."+key, locale)) {
-                    return model.$t("signals."+key, locale)
-                }
-                return key
-            }
+            const tooltipStrings = model.i18n[this.$i18n.locale] || model.i18n[this.$i18n.fallbackLocale] 
+            const parameterTooltip = (key) => tooltipStrings[key] || key
+            const htmlStrings = model.html || {}
+            const parameterHtml = (key) => htmlStrings[key] || key
+            // const unitStrings = model.units || {}
+            // const parameterUnit = (key) => unitStrings[key]
 
             // draw subsystems
             for (const s of elements.subsystems) {
@@ -289,14 +268,12 @@ export default {
                 let fObj = g.foreignObject(g.bbox().width,g.bbox().height)
                 var div = document.createElement('div')
                 div.classList.add("signal")
-                div.innerHTML = "<span>" + 
-                    translate(id, "html") + 
-                    "</span>";
+                div.innerHTML = "<span>" + parameterHtml(id) + "</span>"
                 let t = fObj.add(div)
                 fObj.center(0,0)
 
                 // add tooltip
-                addTooltip(g, translate(id))
+                addTooltip(g, parameterTooltip(id))
             }
 
             // draw inputs
@@ -309,7 +286,7 @@ export default {
                 // create SVG group
                 let g = draw.group()
                 // add label
-                let l = g.text(translate(id, "html")).addClass("label")
+                let l = g.text(parameterHtml(id)).addClass("label")
                 //l.center(s.to.x-l.bbox().width/2-5, s.to.y)
                 l.move(2, -l.bbox().height/2)
                 const w = Math.max(l.bbox().width + 4, 30)
@@ -318,7 +295,7 @@ export default {
                 g.move( s.to.x - Math.cos(s.to.angle * Math.PI / 180)*s.to.radius(s.to.angle) - g.bbox().width, 
                         s.to.y - Math.sin(s.to.angle * Math.PI / 180)*s.to.radius(s.to.angle) - g.bbox().height/2)
                 // add tooltip
-                addTooltip(g, translate(id))
+                addTooltip(g, parameterTooltip(id))
             }
 
             // draw connections
@@ -371,7 +348,7 @@ export default {
                              p1.y-Math.abs(dir.x)*l.bbox().height*0.7)
 
                     //let l = g.text(s.label.text).addClass("label").center(p1.x,p1.y-8)
-                    addTooltip(g, translate(s.label.text))
+                    addTooltip(g, parameterTooltip(s.label.text))
                 } }
             }
 
@@ -400,15 +377,6 @@ export default {
             </defs>
         </svg>
         <div id="tooltip" display="none" style="position: absolute; display: none;"></div>
-        <Suspense>
-            <component v-for="m in modelList"
-                @patientChanged="selectionChanged"
-                :key="m"
-                :ref="setModelRef"
-                :is="m"
-                v-show="false"
-            />
-        </Suspense>
 	</div>
 </template>
 
