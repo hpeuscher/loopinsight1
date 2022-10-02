@@ -11,49 +11,36 @@ export default {
 		patient: Object,
 	},
 	emits: ["controllerChanged"],
+	controller: {},
 	data() {
 		return {
 			useBolus: true,
-			PreBolusTime: 30,
-			CarbFactor: 1.5,
-			IIRb: 0,
-			bolus: 0,
-		}
-	},
-	watch: {
-		"patient.IIReq": {
-			handler: function(val) { 
-				this.IIRb = Math.round(val*20)/20
-				this.valueChanged()
-			},
-			immediate: true,
+			preBolusTime: 30,
+			carbFactor: 1.5,
+			basalRate: 0,
 		}
 	},
 	mounted() {
+		this.controller = new ControllerBasalBolus(this.$data)
+		this.basalRate = Math.round(this.patient.IIReq*20)/20
+		this.valueChanged()
+	},
+	watch: {
+		"patient.IIReq"() { 
+			this.valueChanged()
+		},
 	},
 	methods: {
 		valueChanged() {
-			this.$emit("controllerChanged", this.getController())
+			this.controller.carbFactor = this.carbFactor
+			this.controller.preBolusTime = this.preBolusTime
+			this.controller.active = this.useBolus
+			this.controller.basalRate = this.basalRate
+			this.$emit("controllerChanged", this.controller)
 		},
 		
 		getController() {
-			let controller = new ControllerBasalBolus()
-			controller.setParameters(
-				this.IIRb,
-				this.useBolus, 
-				this.PreBolusTime, 
-				this.CarbFactor
-			)
-			return controller
-		},
-		// compute insulin demand (function is called every minute)
-		update(t, y, x, announcement) {
-			// compute bolus (IIR remains constant all the time)
-			return this.controller.update(t, y, x, announcement);
-		},
-		// return current treatment
-		getTreatment() {
-			return this.controller.getTreatment();
+			return this.controller
 		},
 	},
 }
@@ -62,20 +49,20 @@ export default {
 
 <template>
 	<div id="controlleroptions" class="parameterlist">
-		<label for="CarbFactor">
-			<div class="item-description">{{$t("CarbFactor")}}</div>
+		<label for="carbFactor">
+			<div class="item-description">{{$t("carbFactor")}}</div>
 			<div class="item-input">
-				<input type="number" v-model.number="CarbFactor" 
-					id="CarbFactor" min="0" step="0.1" 
+				<input type="number" v-model.number="carbFactor" 
+					id="carbFactor" min="0" step="0.1" 
 					@change="valueChanged">
 			</div>
 			<div class="item-unit">U/(10g CHO)</div>
 		</label>
-		<label for="PreBolusTime">
-			<div class="item-description">{{$t("PreBolusTime")}}</div>
+		<label for="preBolusTime">
+			<div class="item-description">{{$t("preBolusTime")}}</div>
 			<div class="item-input">
-				<input type="number" v-model.number="PreBolusTime" 
-					id="PreBolusTime" min="-30" step="5" 
+				<input type="number" v-model.number="preBolusTime" 
+					id="preBolusTime" min="-30" step="5" 
 					@change="valueChanged">
 			</div>
 			<div class="item-unit">min</div>
@@ -93,15 +80,15 @@ export default {
 {
 	"IIRb": "basal rate",
 	"useBolus": "bolus with meal",
-	"CarbFactor": "carb factor",
-	"PreBolusTime": "time between bolus and meal",
+	"carbFactor": "carb factor",
+	"preBolusTime": "time between bolus and meal",
 }
 </i18n>
 <i18n locale="de">
 {
 	"IIRb": "Basalrate",
 	"useBolus": "Bolus zur Mahlzeit",
-	"CarbFactor": "KE-Faktor",
-	"PreBolusTime": "Spritz-Ess-Abstand",
+	"carbFactor": "KE-Faktor",
+	"preBolusTime": "Spritz-Ess-Abstand",
 }
 </i18n>
