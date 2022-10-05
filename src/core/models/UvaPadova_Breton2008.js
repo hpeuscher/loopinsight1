@@ -64,7 +64,7 @@ class VirtualPatientUvaPadova {
 			"BW"	: 75,
 			"HRb"	: 60,
 			"HRmax"	: 197,		//220-age
-			"Gpeq"	: 180,
+			"Gpeq"	: 100,		// mg/dL	
 			"VG" 	: 1.88,			// [Dalla Man, IEEE TBME, 2007]
 			"k1" 	: 0.065,		// [Dalla Man, IEEE TBME, 2007]
 			"k2" 	: 0.079,		// [Dalla Man, IEEE TBME, 2007]
@@ -128,14 +128,15 @@ class VirtualPatientUvaPadova {
 	// compute equilibrium
 	computeSteadyState() {
 		const params = this.parameters;
+		const Gpeq = params.Gpeq * params.VG	// convert from mg/dL to mg/kg
 		
 		// tissue glucose concentration
-		const D = Math.pow(params.Vm0-params.k1*params.Gpeq+params.Km0*params.k2,2) 
-				+ 4*params.k2*params.Km0*params.k1*params.Gpeq;
-		const Gteq = (-params.Vm0 + params.k1*params.Gpeq - params.Km0*params.k2 
+		const D = Math.pow(params.Vm0-params.k1*Gpeq+params.Km0*params.k2,2) 
+				+ 4*params.k2*params.Km0*params.k1*Gpeq;
+		const Gteq = (-params.Vm0 + params.k1*Gpeq - params.Km0*params.k2 
 				+ Math.sqrt(D)) / 2 / params.k2;
-		const EGPeq = params.Fcns + params.k1*params.Gpeq - params.k2*Gteq;
-		const XLeq = (params.kp1 - params.kp2*params.Gpeq - EGPeq) / params.kp3;
+		const EGPeq = params.Fcns + params.k1*Gpeq - params.k2*Gteq;
+		const XLeq = (params.kp1 - params.kp2*Gpeq - EGPeq) / params.kp3;
 		const Ipb = XLeq * params.VI;
 		const m3eq = params.HEeq * params.m1 / (1 - params.HEeq);
 		const Ilb = Ipb * params.m2 / (params.m1 + m3eq);
@@ -151,7 +152,7 @@ class VirtualPatientUvaPadova {
 				* 60 / pmol_per_U;	// pmol/min  -> U/h
 		
 		this.xeq = {
-			"Gp": params.Gpeq,
+			"Gp": Gpeq,
 			"Gt": Gteq,
 			"Ip": Ipb,
 			"Il": Ilb,
@@ -334,7 +335,7 @@ export const units = {
 	"BW"	: "kg",
 	"HRb"	: "bpm",
 	"HRmax"	: "bpm",
-	"Gpeq"	: "mg/kg",
+	"Gpeq"	: "mg/dL",
 	"VG" 	: "dL/kg",
 	"k1" 	: "1/min",
 	"k2" 	: "1/min",

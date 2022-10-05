@@ -30,7 +30,7 @@ class VirtualPatientCambridge {
 		
 		// default parameters
 		this.defaultParameters = {
-			"Gpeq"	: 6,		// mmol/L
+			"Gpeq"	: 100,		// mg/dL
 			"BW"	: 75,		// kg
 			"k12"	: 0.066,	// 1/min
 			"ka1" 	: 0.006,	// 1/min
@@ -73,8 +73,9 @@ class VirtualPatientCambridge {
 	computeSteadyState() {
 		const params = this.parameters
 		
-		const Q1eq = params.Gpeq * params.VG * params.BW
-		const F01eq = params.F01 * params.BW * Math.min(params.Gpeq / 4.5, 1)
+		const Gpeq = params.Gpeq / mmolG2mg * 10	// in mmol/L
+		const Q1eq = Gpeq * params.VG * params.BW
+		const F01eq = params.F01 * params.BW * Math.min(Gpeq / 4.5, 1)
 		const EGP0 = params.EGP0 * params.BW
 
 		const c = -F01eq*params.k12 + EGP0*params.k12
@@ -118,9 +119,9 @@ class VirtualPatientCambridge {
 		const params = this.parameters;
 		
 		// inputs
-		const M = u["carbs"] / mmolG2mg * 1000;	// meal ingestion in mmol/min
-		const IIR = u["iir"] * 1000 / 60;			// insulin infusion rate in mU/min
-		const bolus = u["ibolus"] * 1000;			// insulin bolus in mU
+		const M = (u["carbs"] || 0 ) / mmolG2mg * 1000 	// meal ingestion in mmol/min
+		const IIR = (u["iir"] || 0 ) * 1000 / 60 		// insulin infusion rate in mU/min
+		const bolus = (u["ibolus"] || 0) * 1000			// insulin bolus in mU
 		
 		
 		// plasma glucose concentration
@@ -202,7 +203,7 @@ export const units = {
 	"D1"		: "mmol",
 	"D2"		: "mmol",
 	/* parameters */
-	"Gpeq"		: "mmol/L",
+	"Gpeq"		: "mg/dL",
 	"BW"		: "kg",
 	"k12"		: "1/min",
 	"ka1" 		: "1/min",
