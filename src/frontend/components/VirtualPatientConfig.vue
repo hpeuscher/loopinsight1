@@ -50,7 +50,12 @@ export default {
 		selectionChanged() {
 			const modelModule = this.modelImports[this.selectedModel]()
 			modelModule.then( (model) => {
-				this.patient = new model.default(JSON.parse(JSON.stringify(this.patient.parameters || {})))
+				this.patient = new model.default(/*
+				// todo: find a way to keep values that were changed manually
+				// but take care of parameters that have the same name but
+				// different unit (e.g. Gpeq in UvaPadova <-> Cambridge)
+				JSON.parse(JSON.stringify(this.patient.parameters || {}))
+				*/)
 				this.tooltipStrings = model.i18n[this.$i18n.locale] || model.i18n[this.$i18n.fallbackLocale] 
 				this.htmlStrings = model.html || {}
 				this.unitStrings = model.units || {}

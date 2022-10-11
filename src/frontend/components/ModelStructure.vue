@@ -175,6 +175,12 @@ export default {
 		modelList: function() { return Object.keys(this.modelInfo) },
 	},
 
+    watch: {
+		"selectedModel"() { 
+			this.selectionChanged()
+		},
+	},
+
 	beforeMount() {
 		// import module dynamically
 		for (const key of this.modelList) {
@@ -186,9 +192,6 @@ export default {
 		}
 	},
 
-    mounted() {
-        this.selectionChanged()
-    },
 
 	methods: {
 

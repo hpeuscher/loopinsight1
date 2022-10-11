@@ -8,7 +8,7 @@ import ControllerMealBolus from './MealBolus.js'
 class ControllerBasalBolus extends ControllerMealBolus {
 
 	constructor({basalRate = 1}) {
-		super(arguments)			// meal bolus
+		super(...arguments)			// meal bolus
 		this.basalRate = basalRate	// basal rate in U/h
 	}
 
@@ -29,7 +29,7 @@ class ControllerBasalBolus extends ControllerMealBolus {
 		// compute meal bolus
 		const mealBolus = super.computeTreatment(t, _y, _x)
 
-		return {...mealBolus, iir: this.basalRate}
+		return {ibolus: mealBolus.ibolus, iir: this.basalRate}
 	}
 }
 

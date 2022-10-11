@@ -47,7 +47,7 @@ var log_fun = function () {
 class ControllerOref0 extends ControllerMealBolus {
 
 	constructor({profile}) {
-		super(arguments)				// meal bolus
+		super(...arguments)				// meal bolus
 
 		this.profile = profile;
 		this.profile.type = "current";

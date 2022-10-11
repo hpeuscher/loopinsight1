@@ -8,7 +8,7 @@ import ControllerMealBolus from './MealBolus.js'
 class ControllerPID extends ControllerMealBolus {
 
 	constructor({defaultBasalRate = 1, kP = 1, kI = 0.01, kD = 0, targetBG = 100}) {
-		super(arguments)			// meal bolus
+		super(...arguments)			// meal bolus
 		this.defaultBasalRate = defaultBasalRate
 		this.kP = kP
 		this.kI = kI
