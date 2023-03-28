@@ -416,7 +416,7 @@ export const html = {
 	"m1" 	: "m<sub>1</sub>",
 	"m2" 	: "m<sub>2</sub>",
 	"m4" 	: "m<sub>4</sub>",
-	"m5" 	: "m<sub>4</sub>",
+	"m5" 	: "m<sub>5</sub>",
 	"m6" 	: "m<sub>6</sub>",
 	"HEeq" 	: "HE<sub>eq</sub>",
 	"kmax" 	: "k<sub>max</sub>",
