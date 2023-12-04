@@ -1,0 +1,11 @@
+{
+    "extension": ["ts", "js", "mjs"],
+    "spec": "test/**/*.test.*",
+    "node-option": [
+        "experimental-specifier-resolution=node",
+        "loader=ts-node/esm"
+      ],    
+    "package": "./package.json",
+    "bail": false,
+    "recursive": true
+}

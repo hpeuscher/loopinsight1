@@ -1,0 +1,18 @@
+{
+    "type": "actuator",
+    "model": "StaticInsulinPump",
+    "version": "2.0.0",
+    "name": "Medtronic MiniMed M670G",
+    "parameters": {
+        "bias_basal": 0,
+        "relerr_basal": 3.74,
+        "abserr_basal": 100.13,
+        "bias_bolus": 0,
+        "relerr_bolus": 2.48,
+        "abserr_bolus": 100.25,
+        "max_bolus": 75,
+        "inc_bolus": 0.025,
+        "max_basal": 35,
+        "inc_basal": 0.025
+    }
+}

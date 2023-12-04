@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8" />
+		<title>LT1 - Closed-Loop Type 1 Diabetes Simulator</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<meta name="author" content="Heiko Peuscher" />
+		<style>
+			@import url('https://fonts.googleapis.com/css2?family=ABeeZee&display=swap');
+            body {
+                font-family: ABeeZee;
+                overflow-y: scroll;
+            }
+		</style>
+        <script type="module" src="./LT1Main.ts"></script>
+        <link rel="stylesheet" href="../assets/styles/LT1style.css" />
+    </head>
+	<body>
+		<p style="text-align:center;">
+			<a href="https://lt1.org/" target="_blank">
+				<img alt="LoopInsighT1 Logo" 
+					src="../assets/images/LT1_logo.png" height="85">
+			</a>
+		</p>
+        <hr/>
+		<div id="LT1Main" style="text-align:center;">
+            <style lang="css">
+                #loading {
+                    position: fixed;
+                    z-index: 1000;
+                    background-color: white;
+                    height: 100%;
+                    text-align: center;
+                    line-height: 50vh;
+                    left: 0px; right: 0px;
+                }
+            </style>
+            <div id="loading">LOADING...</div>
+        </div>
+	</body>
+</html>

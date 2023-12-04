@@ -1,0 +1,8 @@
+{
+    "type": "sensor",
+    "model": "Facchinetti2014",
+    "version": "2.0.0",
+    "name": "Dexcom SEVEN Plus",
+    "description": "Default parameters in CGM sensor model by Facchinetti2014",
+    "parameters": {}
+}
