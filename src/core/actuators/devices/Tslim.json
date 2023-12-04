@@ -1,0 +1,18 @@
+{
+    "type": "actuator",
+    "model": "StaticInsulinPump",
+    "version": "3.0.0",
+    "name": "t:slim X2 (Tandem Diabetes Care)",
+    "parameters": {
+        "bias_basal": 0,
+        "relerr_basal": 2.95,
+        "abserr_basal": 100.61,
+        "bias_bolus": 0,
+        "relerr_bolus": 0.9376,
+        "abserr_bolus": 101.8755,
+        "max_bolus": 25,
+        "inc_bolus": 0.01,
+        "max_basal": 15,
+        "inc_basal": 0.001
+    }
+}

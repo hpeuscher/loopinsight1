@@ -1,0 +1,32 @@
+{
+  "compilerOptions": {
+    "outDir": "./dist/",
+    "sourceMap": true,
+    "noImplicitAny": true,
+    "module": "nodenext",
+    "target": "ES2022",
+    "lib": ["ES2022", "DOM"],
+    "strict": true,
+    "allowSyntheticDefaultImports": true,
+    "resolveJsonModule": true,
+    "allowJs": true,
+    "esModuleInterop": true,
+    "moduleResolution": "nodenext",
+    "baseUrl": "."
+  },
+  "include": [
+    "./**/*.ts",
+    "./src/**/*.vue",
+    "./@types/*"
+  ],
+  "exclude": [
+    "node_modules"
+  ],
+  "ts-node": {
+    "files": true,
+    "esm": true,
+  },
+  "files": [
+    "./@types/oref0.d.ts"
+  ],
+}

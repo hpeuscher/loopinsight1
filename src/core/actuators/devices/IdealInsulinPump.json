@@ -1,0 +1,18 @@
+{
+    "type": "actuator",
+    "model": "StaticInsulinPump",
+    "version": "2.0.0",
+    "name": "Ideal insulin pump",
+    "parameters": {
+        "bias_basal": 0,
+        "relerr_basal": 0,
+        "abserr_basal": 0,
+        "bias_bolus": 0,
+        "relerr_bolus": 0,
+        "abserr_bolus": 0,
+        "max_bolus": 100,
+        "inc_bolus": 0,
+        "max_basal": 100,
+        "inc_basal": 0
+    }
+}

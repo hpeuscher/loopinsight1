@@ -1,0 +1,74 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Serve",
+            "command": "npm run serve",
+            "request": "launch",
+            "type": "node-terminal"
+        },
+        {
+            "name": "Build",
+            "command": "npm run build",
+            "request": "launch",
+            "type": "node-terminal"
+        },
+        {
+            "name": "Run unit tests",
+            "command": "npm run test",
+            "request": "launch",
+            "type": "node-terminal"
+        },
+        {
+            "name": "Launch Chrome (debug)",
+            "type": "chrome",
+            "request": "launch",
+            "url": "http://localhost:8080",
+            "webRoot": "${workspaceFolder}",
+            "sourceMaps": true
+        },
+        {
+            "name": "Launch Edge (debug)",
+            "type": "msedge",
+            "request": "launch",
+            "url": "http://localhost:8080",
+            "webRoot": "${workspaceFolder}",
+            "sourceMaps": true
+        },
+		{
+            "name": "Run minimal demo (JS)",
+            "command": "node --loader ts-node/esm ./MinimalDemoJS.js",
+            "request": "launch",
+            "cwd": "${workspaceRoot}/examples/MinimalDemo/",
+            "type": "node-terminal"
+        },
+        {
+            "name": "Run minimal demo (TS)",
+            "command": "node --loader ts-node/esm ./MinimalDemoTS.ts",
+            "request": "launch",
+            "cwd": "${workspaceRoot}/examples/MinimalDemo/",
+            "type": "node-terminal"
+        },
+		{
+            "name": "Run controller study demo",
+            "command": "node --loader ts-node/esm ./ControllerStudyDemo.ts",
+            "request": "launch",
+            "cwd": "${workspaceRoot}/examples/ControllerStudyDemo",
+            "type": "node-terminal"
+        },
+		{
+            "name": "Omnipod in silico study",
+            "command": "node --loader ts-node/esm ./OmnipodInSilicoStudy.ts",
+            "request": "launch",
+            "cwd": "${workspaceRoot}/examples/OmnipodStudy/",
+            "type": "node-terminal",
+        },
+        {
+            "name": "Exercise models comparison",
+            "command": "node --loader ts-node/esm ./ExerciseModelsComparison.ts",
+            "request": "launch",
+            "cwd": "${workspaceRoot}/examples/ExerciseModelsComparison/",
+            "type": "node-terminal",
+        },
+    ]
+}

@@ -1,5 +1,6 @@
 node_modules
+coverage
 dist
-examples/headlessComparativeStudyResults.json
-examples/headlessComparativeStudy.png
+examples/**.json
+examples/**.png
 package-lock.json

@@ -1,0 +1,8 @@
+{
+    "type": "sensor",
+    "model": "Vettoretti2018",
+    "version": "2.0.0",
+    "name": "Dexcom G5",
+    "description": "Default parameters in CGM sensor model by Vettoretti 2018 based on Facchinetti 2014",
+    "parameters": {}
+}
