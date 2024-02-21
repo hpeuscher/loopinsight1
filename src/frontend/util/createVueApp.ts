@@ -13,16 +13,11 @@ import { createI18n } from 'vue-i18n'
 /**
  * utility function for creation of Vue app
  * @param{string} id - name of DOM element to mount app (without #)
- * @param{Vue.Component} Component - main Vue component
+ * @param{Vue.Component} component - main Vue component
  */
-export default function(id: string, Component: Vue.Component) {
+export default function(id: string, component: Vue.Component): Vue.ComponentPublicInstance {
     // create Vue app
-    const app = Vue.createApp({
-        template: '<Component/>',
-        components: {
-            Component,
-        }
-    })
+    const app = Vue.createApp(component)
 
     // add multi-language support
     const locale = (document.getElementsByTagName("html")[0].lang || 
@@ -39,5 +34,6 @@ export default function(id: string, Component: Vue.Component) {
     app.use(FloatingVue)
 
     // mount
-    app.mount('#'+id)
+    return app.mount('#'+id)
+
 }

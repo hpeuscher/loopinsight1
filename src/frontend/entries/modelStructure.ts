@@ -8,4 +8,18 @@
 import ModelStructure from '../structureDiagrams/ModelStructure.vue'
 import createVueApp from '../util/createVueApp.js'
 
-createVueApp('modelStructure', ModelStructure)
+const app = createVueApp('modelStructure', {
+	data() { return {
+		selectedModel: "",
+	}},
+	template: '<ModelStructure :selectedModel="this.selectedModel" />',
+	components: {
+		ModelStructure,
+	},
+})
+
+// pre-select model through hidden input form, if desired
+const selection = document.getElementById("selectedModel")
+if (selection !== null) {
+	(<any>app).selectedModel = (<any>selection).value
+}

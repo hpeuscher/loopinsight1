@@ -232,9 +232,6 @@ export default defineComponent({
         },
     },
 
-    data() {
-    },
-
     mounted() {
         this.renderSVG(this.diagram)
     },
