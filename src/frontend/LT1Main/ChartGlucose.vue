@@ -54,9 +54,13 @@ export default defineComponent({
                 },
                 scales: {
                     x: {
-                        type: "time",
+                        type: "time",   
                         offset: false,
-                        time: { unit: 'hour' },
+                        time: {
+                            displayFormats: {
+                                hour: 'HH:mm'
+                            }
+                        },
                     },
                     y: {
                         type: "linear",

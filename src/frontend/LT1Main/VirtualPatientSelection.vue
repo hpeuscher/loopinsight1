@@ -133,7 +133,7 @@ export default defineComponent({
             :type="'patient'"
             :modelInfo="modelInfo"
             :modelImports="modelImports"
-            :defaultModel="'UvaPadova'"
+            :defaultModel="'UvaPadova_T1DMS'"
             @valueChanged="valueChanged"
         />
     </AccordionBox>

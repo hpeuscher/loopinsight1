@@ -90,9 +90,11 @@ export default class OmnipodDash
 
         if (dt > 0) {
             // add oscillation depending on insulin dose
-            totalIIR = this._periodicOscillation(totalIIR / MIN_PER_HOUR / dt)
-                * MIN_PER_HOUR * dt
+            totalIIR = this._periodicOscillation(iir * dt / MIN_PER_HOUR + ibolus)
+                * MIN_PER_HOUR / dt
         }
+        else
+            totalIIR = iir
 
         // disable bolus output after 1 minute
         // TODO: What if the block is called earlier than that?!!
@@ -114,6 +116,9 @@ export default class OmnipodDash
         const A0 = params.A0
         /** period of one full rotation in U */
         const dosePeriod = params.dosePeriod
+        /** increment of internal gear angle */
+        const deltaPhi = insulinDose * 2 * Math.PI / dosePeriod
+
         /** first harmonic oscillation */
         const phi1 = params.phi1 + 2 * Math.PI / dosePeriod * this._integral
         const A1 = params.A1
@@ -122,9 +127,9 @@ export default class OmnipodDash
         const A2 = params.A2
         
         /** delivery as superposition */
-        const delivery = A0 * insulinDose +
-            A1 * (Math.cos(phi1 + insulinDose) - Math.cos(phi1)) +
-            A2 * (Math.cos(phi2 + insulinDose) - Math.cos(phi2))
+        const delivery = dosePeriod / (2*Math.PI) * ( A0 * deltaPhi +
+            A1   * (- Math.cos(phi1 + deltaPhi) + Math.cos(phi1)) +
+            A2/2 * (- Math.cos(phi2 + 2 * deltaPhi) + Math.cos(phi2)) )
 
         // increase internal counter (wheel position)
         this._integral += insulinDose

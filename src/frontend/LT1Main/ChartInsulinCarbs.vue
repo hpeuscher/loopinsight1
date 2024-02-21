@@ -91,6 +91,17 @@ export default defineComponent({
                         borderColor: colors['THULightGray'],
                         stepped: "before"
                     },
+                    <ChartDatasetCustomTypesPerDataset>{
+                        type: "line",
+                        data: [],
+                        yAxisID: 'y',
+                        label: this.$t("pumpoutput"),
+                        borderColor: colors['THURed'],
+                        spanGaps: true,
+                        stepped: "before",
+                        hidden: true,
+                    },
+                    
                 ]
             },
             options: {
@@ -99,15 +110,19 @@ export default defineComponent({
                 },
                 scales: {
                     x: {
-                        type: "time",
+                        type: "time",   
                         offset: false,
-                        time: { unit: 'hour' },
+                        time: {
+                            displayFormats: {
+                                hour: 'HH:mm'
+                            }
+                        },
                     },
                     y: {
                         title: { display: true, text: "U, U/h" },
                         min: 0,
                         ticks: { stepSize: 1 },
-                        suggestedMax: 3,
+                        suggestedMax: 2,
                     },
                     yG: {
                         title: { display: true, text: "g, g/min" },
@@ -182,6 +197,7 @@ export default defineComponent({
             datasets[3].data.push({ x: t.valueOf(), y: u.meal || NaN })
             datasets[4].data.push({ x: t.valueOf(), y: u.carbs || 0 })
             datasets[5].data.push({ x: t.valueOf(), y: u.exercise || 0 })
+            datasets[6].data.push({ x: t.valueOf(), y: (u.iir || 0) > 10 ? NaN : (u.iir || 0)  })
         },
         update() {
             chartInsulinCarbs.update()
@@ -205,6 +221,7 @@ export default defineComponent({
 	"title":		"Insulin dosage and carb intake",
 	"iir":			"insulin infusion rate in U/h",
 	"ibolus":		"insulin bolus in U",
+    "pumpoutput":   "insulin pump output in U/h",
 	"iob":			"calculated IOB in U",
 	"totalmeal":	"total meal in g",
 	"carbspermin":	"intake in g/min",
@@ -216,6 +233,7 @@ export default defineComponent({
 	"title": 		"Insulindosierung und Mahlzeiten",
 	"iir":			"Insulinrate in U/h",
 	"ibolus":		"Insulinbolus in U",
+    "pumpoutput":   "Insulinabgabe der Pumpe in U/h",
 	"iob":			"Berechnetes IOB in U",
 	"totalmeal":	"Gesamte Mahlzeit in g",
 	"carbspermin":	"Aufnahme in g/min",
