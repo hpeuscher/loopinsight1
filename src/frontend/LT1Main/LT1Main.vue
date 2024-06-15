@@ -67,6 +67,14 @@ export default defineComponent({
         ChartAGP,
     },
 
+    created() {
+        window.addEventListener('keydown', (e) => {
+            if (e.ctrlKey && e.key == 'Enter') {
+                this.run()
+            }
+        })
+    },
+
     data() {
         return {
             patient: {} as Patient,
@@ -200,7 +208,7 @@ export default defineComponent({
             <MealTable v-if='options.t0' :t0="options.t0" @mealsChanged="mealsChanged" ref="meals" />
             <ExerciseTable v-if='options.t0' :t0="options.t0" @exercisesChanged="exercisesChanged" />
             <SimulationOptionsConfig @valueChanged="optionsChanged" ref="options" />
-            <div>
+            <div style="text-align:center;">
                 <input type="button" id="startbutton" :value="$t('run')" @click="run" v-tooltip="{
                     global: true,
                     theme: {
@@ -209,6 +217,10 @@ export default defineComponent({
                         padding: '2rem'
                     },
                 }">
+                <br/>
+                <div style="font-size: 0.8em;">
+                    {{ $t("shortcut") }}
+                </div>
             </div>
         </div>
         <div class="box lt1-results">
@@ -226,11 +238,9 @@ export default defineComponent({
 
 /* button "run simulation" */
 input#startbutton {
-    float: right;
-    margin: 1rem;
+    margin: 1rem 0rem 0.2rem;
     padding: 0.5rem;
     font-size: 1rem;
-    padding: 0.5em;
 }
 
 </style>
@@ -241,6 +251,7 @@ input#startbutton {
 	"settings": 	"Settings",
 	"run": 			"run simulation",
 	"results":		"Results",
+    "shortcut":     "or press Ctrl+Enter",
 }
 </i18n>
 <i18n locale="de">
@@ -248,5 +259,6 @@ input#startbutton {
 	"settings": 	"Einstellungen",
 	"run": 			"Simulation starten",
 	"results":		"Ergebnisse",
+    "shortcut":     "oder Strg+Eingabe drücken"
 }
 </i18n>
