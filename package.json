@@ -7,7 +7,7 @@
     "serve": "npx cross-env NODE_OPTIONS=--loader=ts-node/esm --moduleResolution=nodenext --target=es2017 webpack serve --config webpack.dev.js --stats-modules-space 999",
     "build": "npx cross-env NODE_OPTIONS=--loader=ts-node/esm --moduleResolution=nodenext --target=es2017 webpack build --config webpack.prod.js --stats-modules-space 999",
     "postinstall": "patch-package",
-    "test": "npx c8 mocha"
+    "test": "npx c8 mocha --reporter mocha-badge-generator"
   },
   "author": "Heiko Peuscher",
   "license": "MIT",
@@ -33,6 +33,7 @@
     "file-loader": "^6.2.0",
     "html-webpack-plugin": "^5.5.0",
     "mocha": "^10.2.0",
+    "mocha-badge-generator": "^0.11.0",
     "patch-package": "^8.0.0",
     "process": "^0.11.10",
     "source-map": "^0.8.0-beta.0",
