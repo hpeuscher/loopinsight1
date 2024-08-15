@@ -122,7 +122,7 @@ export async function getJsonContent(
 
         // import assertions: https://nodejs.org/api/esm.html#json-modules
         const options = {
-            assert: {
+            with: {
                 type: "json"
             }
         }
