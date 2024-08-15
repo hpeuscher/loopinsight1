@@ -7,7 +7,8 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![TypeScript](https://img.shields.io/badge/%3C%2F%3E-TypeScript-%230074c1.svg)](http://www.typescriptlang.org/)
 [![PR's welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://LT1.org/contribute)
-![test](https://github.com/hpeuscher/lt1-private/actions/workflows/test.yml/badge.svg)
+<!-- ![test](https://github.com/hpeuscher/lt1-private/actions/workflows/test.yml/badge.svg) -->
+![Test](test/badge.svg)
 
 <hr/>
 
