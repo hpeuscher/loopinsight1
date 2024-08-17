@@ -79,15 +79,18 @@ export default defineComponent({
                 return
             }
             const target = event.target as HTMLInputElement
-            if (!Array.isArray(target.files)) {
-                return
-            }
-            const file = target.files[0]
-            const content = <ParameterFileContents>await this.loadFile(file)
+            if (target.files) {
+                const file = target.files[0]
+                const content = <ParameterFileContents>await this.loadFile(file)
 
-            const moduleConfig = <InstanceType<typeof ModuleConfig>>
-                this.$refs.moduleConfig
-            moduleConfig.loadFromFile(content)
+                const moduleConfig = <InstanceType<typeof ModuleConfig>>
+                    this.$refs.moduleConfig
+                moduleConfig.loadFromFile(content)
+            }
+
+            // reset filename so that same file can be uploaded again
+            // and triggers another change event
+            target.value = ""
 
         },
 

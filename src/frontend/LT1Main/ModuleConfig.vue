@@ -22,7 +22,10 @@ export default defineComponent({
     },
     
     props: {
-        type: String as PropType<ModuleType>,
+        type: {
+            type: String as PropType<ModuleType>,
+            required: true,
+        },
         modelInfo: {
             type: Object as PropType<ModuleProfileList>,
             required: true,
@@ -117,7 +120,7 @@ export default defineComponent({
             const paramConfig = <InstanceType<typeof ParameterConfig>>
                 this.$refs.paramConfig
             paramConfig.setConfig(this.module.getParameterDescription())
-            this.module.restoreDefaultParameterValues()
+            // this.module.restoreDefaultParameterValues()
 
             console.log("Loaded new " + moduleContents.profile.type + " " + id)
             this.$emit("valueChanged", this.getModule())
@@ -126,7 +129,7 @@ export default defineComponent({
         /** returns description of module including parameters */
         getParameterFile(): ParameterFileContents {
             return {
-                type: "patient",
+                type: this.type,
                 model: this.modelInfo[this.selectedModel].id,
                 version: this.modelInfo[this.selectedModel].version,
                 created: new Date(Date.now()),

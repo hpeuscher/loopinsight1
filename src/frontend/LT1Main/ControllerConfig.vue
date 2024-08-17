@@ -100,10 +100,10 @@ export default defineComponent({
 
             this.controller = new moduleContents.default()
 
-            this.description = moduleContents.i18n_label?.[this.$i18n.locale] ??
+            this.description = moduleContents.i18n_label?.[this.$i18n?.locale] ??
                 moduleContents.html ?? {}
 
-            this.tooltip = moduleContents.i18n_tooltip?.[this.$i18n.locale] ?? {}
+            this.tooltip = moduleContents.i18n_tooltip?.[this.$i18n?.locale] ?? {}
 
             const paramConfig = <InstanceType<typeof ParameterConfig>>this.$refs.paramConfig
             if (typeof paramConfig === "undefined")

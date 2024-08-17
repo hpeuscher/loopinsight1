@@ -183,7 +183,8 @@ export class ODEPatientMixin
             try {
                 IIReq = this.computeIIR(params.Gpeq, {} as Date)
             }
-            catch {
+            catch (e) {
+                console.warn("computation of equilibrium basal rate failed: " + e)
                 IIReq = NaN
             }
         }

@@ -65,7 +65,7 @@ export default class CorrectionBolus
             // correct its value using current BG measurement
             /** actual blood glucose in mg/dl */
             const actualBG = Math.round(s.CGM?.() || s.SMBG?.() || NaN)
-            console.assert(!isNaN(actualBG))
+            console.assert(!isNaN(actualBG), "BG = " + actualBG + " at " + _t.toLocaleTimeString())
             /** error between desired and actual BG in mg/dl */
             const BGerror = Math.round(actualBG - params.targetBG)
             /** correction bolus */
