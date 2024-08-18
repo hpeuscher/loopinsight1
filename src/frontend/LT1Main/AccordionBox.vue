@@ -6,7 +6,7 @@
  * See https://lt1.org for further information.
  */
 
-import { defineComponent} from 'vue'
+import { defineComponent } from 'vue'
 
 export default defineComponent({
     props: {
@@ -24,40 +24,59 @@ export default defineComponent({
 
 
 <template>
-    <div :class="{box2: true, accordionbox: true, boxactive: boxactive }">
+    <div :class="{ accordionbox: true, boxactive }">
         <h3 @click="[boxactive = !boxactive]">{{ title }}</h3>
-        <slot />
+        <div class="accordioncontent">
+            <slot></slot>
+        </div>
     </div>
 </template>
 
 
 <style scoped>
-/* box that can be opened or closed */
 .accordionbox {
-    height: 1rem;
-    overflow: hidden;
-    box-sizing: content-box;
+    border: solid;
+    border-width: 1px;
+    border-color: #aaaaaa;
+    padding: .5rem;
+    margin-top: 0.5rem;
+    display: grid;
+    grid-template-rows: 1rem 0fr;
+    transition: grid-template-rows 0.5s;
 }
 
 .boxactive {
-    height: auto;
-    overflow: visible;
+    grid-template-rows: 2rem 1fr !important;
+}
+
+div.accordioncontent {
+    overflow: hidden;
+}
+
+h3 {
+    font-size: 1rem;
+    line-height: 1rem;
+    font-weight: bold;
+    position: relative;
+    margin-bottom: 1rem;
+    color: #586067;
+    background-color: #f4f4ff;
+    width: 100%;
+    padding: .5rem;
+    margin: -.5rem;
+    height: 1rem;
+    border-bottom: 1px solid #aaaaaa;
 }
 
 /* arrow to open or close box content */
-.lt1-container .accordionbox h3::after {
+.accordionbox h3::after {
     position: absolute;
-    font-size: 1.25rem;
     right: 0.5rem;
-    /*    top: -.25em;*/
     transition: all 0.5s;
-    content: "\27A6";
-    transform: rotate(90deg);
+    content: "\25BC";
 }
 
-.lt1-container .boxactive h3::after {
-    content: "\27A5";
-    transform: rotate(180deg);
+.boxactive h3::after {
+    transform: scaleY(-1);
 }
-
 </style>

@@ -94,7 +94,7 @@ export default defineComponent({
             <label for="actual_carbs" class="meallabel">
                 <div>{{ $t("actual.carbs") }}:</div>
                 <div class="mealvalue">
-                    <input type="Number" min="0" step="5" @change="mealChanged" v-model.number="meal.carbs">
+                    <input type="Number" min="0" step="5" @change="mealChanged" v-model.number="meal.carbs">&nbsp;g
                 </div>
             </label>
         </li>
@@ -123,7 +123,7 @@ ul {
 
 .meallabel div {
     display: inline-block;
-    width: 150px;
+    width: 120px;
 }
 
 .mealvalue {
@@ -148,7 +148,7 @@ ul {
 	"withAnnouncement"		: "With announcement",
 	"actualmeal"			: "actual meal",
 	"actual.start"			: "start time",
-	"actual.carbs"			: "carbs in g",
+	"actual.carbs"			: "carbs",
 	"actual.start_TT"		: "time when the meal actually started",
 	"actual.carbs_TT"		: "mass of carbohydrates actually ingested",
 }
@@ -158,10 +158,10 @@ ul {
 {
 	"meal"					: "Mahlzeit",
 	"delete"				: "löschen",
-	"withAnnouncement"		: "Mit Ankündigung",
+	"withAnnouncement"		: "Ankündigung",
 	"actualmeal"			: "Tatsächliche Mahlzeit",
 	"actual.start"			: "Beginn",
-	"actual.carbs"			: "Kohlenhydrate in g",
+	"actual.carbs"			: "Kohlenhydrate",
 	"actual.start_TT"		: "Zeitpunkt, zu dem die Mahlzeit tatsächlich beginnt",
 	"actual.carbs_TT"		: "Masse der tatsächlich aufgenommenen Kohlenhydrate",
 }

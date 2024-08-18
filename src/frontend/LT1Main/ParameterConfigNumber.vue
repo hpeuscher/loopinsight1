@@ -87,11 +87,3 @@ export default defineComponent({
         <slot></slot>
     </li>
 </template>
-
-<style scoped>
-.item-unit {
-    font-size: 0.9em;
-    padding-left: 1em;
-    text-align: left;
-}
-</style>

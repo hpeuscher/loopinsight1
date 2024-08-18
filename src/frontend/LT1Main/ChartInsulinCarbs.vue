@@ -6,18 +6,14 @@
  * See https://lt1.org for further information.
  */
 
+import { ChartDatasetCustomTypesPerDataset } from 'chart.js'
+import Chart from 'chart.js/auto'
 import 'chartjs-adapter-luxon'
 import { defineComponent, toRaw } from 'vue'
-import Chart from 'chart.js/auto'
-import { ChartDatasetCustomTypesPerDataset } from 'chart.js'
-import colors from '../util/Colors.js'
-import { SimulationResult } from '../../types/SimulationResult.js'
-import AccordionBox from './AccordionBox.vue'
 import { ControllerInternals } from '../../types/Controller.js'
-
-let chartInsulinCarbs: Chart
-
-declare type ControllerLog = { t: Date, log: ControllerInternals}
+import { SimulationResult } from '../../types/SimulationResult.js'
+import colors from '../util/Colors.js'
+import AccordionBox from './AccordionBox.vue'
 
 export default defineComponent({
     emits: ["selectLog"],
@@ -26,14 +22,25 @@ export default defineComponent({
     },
     data() {
         return {
-            controllerOutput: [] as ControllerLog[],
+            controllerOutput: [] as { t: Date, log: ControllerInternals}[],
         }
+    },
+    setup() {
+        // allocate chart as member
+        const chart = {} as Chart
+        return { chart }
+    },
+    computed: {
+        canvasid(): string {
+            return "canvas_insulin_carbs"
+        },
     },
     mounted() {
         const component = this
-        const id = "canvas_insulin_carbs"
+        const id = this.canvasid
         const canvas = document.getElementById(id) as HTMLCanvasElement
-        chartInsulinCarbs = new Chart(canvas.getContext('2d')!, {
+        const ctx = canvas.getContext('2d')!
+        this.chart = new Chart(ctx, {
             data: {
                 datasets: [
                     <ChartDatasetCustomTypesPerDataset>{
@@ -163,7 +170,7 @@ export default defineComponent({
     },
     methods: {
         reset() {
-            let datasets = chartInsulinCarbs.data.datasets
+            let datasets = this.chart.data.datasets
             for (let i = 0; i < datasets.length; i++) {
                 datasets[i].data = []
             }
@@ -180,7 +187,7 @@ export default defineComponent({
             const c = result.c
             const u = result.u
             const log = result.log
-            const datasets = chartInsulinCarbs.data.datasets
+            const datasets = this.chart.data.datasets
             if (typeof c.iir !== "undefined") {
                 datasets[0].data.push({ x: t.valueOf(), y: c.iir })
             }
@@ -200,7 +207,7 @@ export default defineComponent({
             datasets[6].data.push({ x: t.valueOf(), y: (u.iir || 0) > 10 ? NaN : (u.iir || 0)  })
         },
         update() {
-            chartInsulinCarbs.update()
+            this.chart.update()
         },
     },
 })
@@ -210,7 +217,7 @@ export default defineComponent({
 <template>
     <AccordionBox :title="$t('title')" :initial="true">
         <div class="canvas-chart">
-            <canvas id="canvas_insulin_carbs" />
+            <canvas :id="canvasid"></canvas>
         </div>
     </AccordionBox>
 </template>

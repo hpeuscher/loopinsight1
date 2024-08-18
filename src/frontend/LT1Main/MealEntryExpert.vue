@@ -152,7 +152,7 @@ ul {
 
 .meallabel div {
     display: inline-block;
-    width: 150px;
+    width: 120px;
 }
 
 .mealvalue {

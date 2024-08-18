@@ -45,7 +45,7 @@ div.lt1-results {
 }
 
 .lt1-container input, select {
-    padding: 0.25rem;
+    padding: 0.25rem 0;
     font-size: 0.85rem;
     font-family: inherit;
 }
@@ -60,30 +60,10 @@ div.lt1-results {
     margin: 10px 5px;
 }
 
-/* inner boxes */
-.box2 {
-    border: solid;
-    border-width: 1px;
-    border-color: #aaaaaa;
-    padding: .5rem;
-    margin-top: 0.5rem;
-}
-
-
 /* box title */
 .lt1-container h2 {
     color: #003160;
     margin-left: 0.5rem;
-}
-
-.lt1-container h3 {
-    margin: 0px;
-    font-size: 1.1rem;
-    line-height: 1.2rem;
-    font-weight: bold;
-    position: relative;
-    margin-bottom: 1rem;
-    color: #586067;
 }
 
 .lt1-container h4 {
@@ -162,4 +142,22 @@ text.axis-label {
     margin: 0px;
     font-size: 0.8rem;
     pointer-events: none;
+}
+
+/* button "run simulation" */
+input[type=button], input[type=submit], input[type=reset] {
+    background-color: #f4f4ff;
+    border: 1px solid #aaaaaa;
+    margin: 0.5rem;
+    padding: 0.3rem 0.5rem;
+    font-size: 1rem;
+    border-radius: 3px;
+}
+
+input[type=button]:hover, input[type=submit]:hover, input[type=reset]:hover {
+    background-color: #eeeeee;
+}
+
+input[type=button]:active, input[type=submit]:active, input[type=reset]:active {
+    border: 1px solid #555555;
 }

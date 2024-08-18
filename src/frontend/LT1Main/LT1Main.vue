@@ -16,6 +16,7 @@ import MealTable from './MealTable.vue'
 import ExerciseTable from './ExerciseTable.vue'
 import ChartGlucose from './ChartGlucose.vue'
 import ChartInsulinCarbs from './ChartInsulinCarbs.vue'
+import ChartSignals from './ChartSignals.vue'
 import ChartControllerOutput from './ChartControllerOutput.vue'
 import SimulationOptionsConfig from './SimulationOptionsConfig.vue'
 import ChartAGP from './ChartAGP.vue'
@@ -65,6 +66,7 @@ export default defineComponent({
         ChartInsulinCarbs,
         ChartControllerOutput,
         ChartAGP,
+        ChartSignals,
     },
 
     created() {
@@ -228,6 +230,7 @@ export default defineComponent({
             <ChartGlucose ref="chartGlucose" />
             <ChartInsulinCarbs ref="chartInsulinCarbs" @selectLog="controllerDataHover" />
             <ChartControllerOutput ref="chartControllerOutput" />
+            <ChartSignals ref="chartSignals" />
             <ChartAGP ref="chartAGP" />
         </div>
     </div>
@@ -235,13 +238,6 @@ export default defineComponent({
 
 
 <style lang="css">
-
-/* button "run simulation" */
-input#startbutton {
-    margin: 1rem 0rem 0.2rem;
-    padding: 0.5rem;
-    font-size: 1rem;
-}
 
 </style>
 

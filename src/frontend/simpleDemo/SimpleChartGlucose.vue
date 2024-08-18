@@ -12,15 +12,23 @@ import 'chartjs-adapter-luxon'
 import { glucoseColorLineSegment } from '../util/ChartGlucoseColor.js'
 import { SimulationResult } from '../../types/SimulationResult.js'
 
-// Chart object
-let minimalGuiChartGlucose: Chart
-
 export default defineComponent({
 
+    setup() {
+        // allocate chart as member
+        const chart = {} as Chart
+        return { chart }
+    },
+    computed: {
+        canvasid(): string {
+            return "canvas_minimal_gui"
+        },
+    },
     mounted() {
-        const id = "canvas_minimal_gui_glucose_concentration"
+        const id = this.canvasid
         const canvas = document.getElementById(id) as HTMLCanvasElement
-        minimalGuiChartGlucose = new Chart(canvas.getContext('2d')!, {
+        const ctx = canvas.getContext('2d')!
+        this.chart = new Chart(ctx, {
             type: "line",
             data: {
                 datasets: [{
@@ -61,16 +69,16 @@ export default defineComponent({
         setSimulationResults(simResults: SimulationResult[]) {
             this.reset()
             for (const result of simResults) {
-                minimalGuiChartGlucose.data.datasets[0].data
+                this.chart.data.datasets[0].data
                     .push({ x: result.t.valueOf(), y: result.y.Gp })
             }
             this.update()
         },
         reset() {
-            minimalGuiChartGlucose.data.datasets[0].data = []
+            this.chart.data.datasets[0].data = []
         },
         update() {
-            minimalGuiChartGlucose.update()
+            this.chart.update()
         }
     },
 })
@@ -78,13 +86,23 @@ export default defineComponent({
 
 
 <template>
-    <div class="lt1box box2">
+    <div class="lightbox">
         <div class="canvas-chart">
-            <canvas id="canvas_minimal_gui_glucose_concentration" style="height:300px" />
+            <canvas :id="canvasid" style="height:300px"></canvas>
         </div>
     </div>
 </template>
 
+<style scoped>
+.lightbox {
+    border: solid;
+    border-width: 1px;
+    border-color: #aaaaaa;
+    padding: .5rem;
+    margin-top: 0.5rem;
+}
+
+</style>
 
 <i18n locale="en">
 {

@@ -6,20 +6,17 @@
  * See https://lt1.org for further information.
  */
 
-import { defineComponent } from 'vue'
-import AccordionBox from './AccordionBox.vue'
-import Chart from 'chart.js/auto'
 import { ChartDataset, Point } from 'chart.js'
+import Chart from 'chart.js/auto'
 import 'chartjs-adapter-luxon'
+import { defineComponent } from 'vue'
+import { BGPrediction, ControllerInternals } from '../../types/Controller.js'
+import { SimulationResult } from '../../types/SimulationResult.js'
 import {
     glucoseColorLine,
     glucoseColorLineSegment
 } from '../util/ChartGlucoseColor.js'
-import { SimulationResult } from '../../types/SimulationResult.js'
-import { BGPrediction, ControllerInternals } from '../../types/Controller.js'
-
-// Chart object
-let chartGlucose: Chart
+import AccordionBox from './AccordionBox.vue'
 
 export default defineComponent({
     components: {
@@ -31,10 +28,21 @@ export default defineComponent({
             currentDatasetID: 1,
         }
     },
+    setup() {
+        // allocate chart as member
+        const chart = {} as Chart
+        return { chart }
+    },
+    computed: {
+        canvasid(): string {
+            return "canvas_glucose_concentration"
+        },
+    },
     mounted() {
-        const id = "canvas_glucose_concentration"
+        const id = this.canvasid
         const canvas = document.getElementById(id) as HTMLCanvasElement
-        chartGlucose = new Chart(canvas.getContext('2d')!, {
+        const ctx = canvas.getContext('2d')!
+        this.chart = new Chart(ctx, {
             type: "line",
             data: {
                 datasets: [
@@ -72,7 +80,6 @@ export default defineComponent({
                 },
                 plugins: {
                     legend: {
-                        //display: false
                         labels: {
                             // no legend for controller prediction
                             filter: (item) => (item.datasetIndex || 0) > 0
@@ -84,6 +91,7 @@ export default defineComponent({
     },
     methods: {
         reset() {
+            const chartGlucose = this.chart
             let datasets = chartGlucose.data.datasets
             // remove prediction data
             datasets[0].data = []
@@ -130,38 +138,40 @@ export default defineComponent({
             this.update()
         },
         _pushRecord(result: SimulationResult) {
+            const datasets = this.chart.data.datasets
             // add to glucose plot (most recent simulation)
-            chartGlucose.data.datasets[this.currentDatasetID - 1].data
+            datasets[this.currentDatasetID - 1].data
                 .push({ x: result.t.valueOf(), y: result.y.Gp })
             if (typeof result.s.CGM !== "undefined") {
-                chartGlucose.data.datasets[this.currentDatasetID].data
+                datasets[this.currentDatasetID].data
                     .push({ x: result.t.valueOf(), y: result.s.CGM })
             }
             else if (typeof result.s.SMBG !== "undefined") {
-                chartGlucose.data.datasets[this.currentDatasetID].data
+                datasets[this.currentDatasetID].data
                     .push({ x: result.t.valueOf(), y: result.s.SMBG })
             }
         },
         update() {
+            const config = this.chart.config
             // adapt scale only to real glucose diagram, not predictions
-            const tmax: any = chartGlucose.data.datasets[1].data.at(-1)
-            if (typeof chartGlucose.config.options === "undefined") {
-                chartGlucose.config.options = {}
+            const tmax = <Point>this.chart.data.datasets[1].data.at(-1)
+            if (typeof config.options === "undefined") {
+                config.options = {}
             }
-            if (typeof chartGlucose.config.options.scales === "undefined") {
-                chartGlucose.config.options.scales = {}
+            if (typeof config.options.scales === "undefined") {
+                config.options.scales = {}
             }
-            if (typeof chartGlucose.config.options.scales.x === "undefined") {
-                chartGlucose.config.options.scales.x = {}
+            if (typeof config.options.scales.x === "undefined") {
+                config.options.scales.x = {}
             }
-            chartGlucose.config.options.scales.x.max = tmax?.x || 0
-            chartGlucose.update()
+            config.options.scales.x.max = tmax?.x || 0
+            this.chart.update()
         },
         controllerDataHover(t0: Date, data: ControllerInternals) {
             // draw oref0 glucose prediction, if available
             const predBG = data?.predictedBG
             if (typeof predBG !== "undefined") {
-                chartGlucose.data.datasets[0].data = predBG.map(
+                this.chart.data.datasets[0].data = predBG.map(
                     (p: BGPrediction) => <Point>{ x: p.t.valueOf(), y: p.Gp })
                 this.update()
             }
@@ -176,7 +186,7 @@ export default defineComponent({
         <input type="checkbox" v-model="preserveOldCurves">
         <label for="preserveOldCurves">{{ $t("preserveOldCurves") }}</label>
         <div class="canvas-chart">
-            <canvas id="canvas_glucose_concentration" />
+            <canvas :id="canvasid"></canvas>
         </div>
     </AccordionBox>
 </template>
