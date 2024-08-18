@@ -21,7 +21,7 @@ import * as fs from 'fs'
 import Simulator from '../../src/core/Simulator.js'
 import StaticInsulinPump from '../../src/core/actuators/StaticInsulinPump.js'
 import ControllerBasalBolus from '../../src/core/controllers/BasalBolus.js'
-import VirtualPatientUvaPadova from '../../src/core/models/UvaPadova.js'
+import VirtualPatientUvaPadova from '../../src/core/models/UvaPadova_T1DMS.js'
 import CGM_Breton2008 from '../../src/core/sensors/Breton2008.js'
 
 // prepare the simulator
