@@ -16,7 +16,7 @@ import AbstractController from '../AbstractController.js'
 
 export const profile: ModuleProfile = {
     type: "controller",
-    id: "MealBolusCorrection",
+    id: "CorrectionBolus",
     version: "2.0.0",
     name: "Meal bolus with correction",
 }

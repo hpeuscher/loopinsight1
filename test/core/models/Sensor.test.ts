@@ -49,7 +49,12 @@ for (const filename in modelList) {
 
             // run generic tests for IOModule
             IOModuleTest(
-                sensor, Object.keys(PatientOutputDescription), Object.keys(MeasurementDescription))
+                "sensor",
+                filename,
+                sensor,
+                Object.keys(PatientOutputDescription),
+                Object.keys(MeasurementDescription),
+            )
 
             describe(filename + "#update", () => {
                 it("should compute valid measurements", () => {

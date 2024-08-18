@@ -54,7 +54,12 @@ for (const filename in modelList) {
 
             // run generic tests for IOModule
             IOModuleTest(
-                actuator, Object.keys(ControllerOutputDescription), Object.keys(MedicationDescription))
+                "actuator",
+                filename,
+                actuator,
+                Object.keys(ControllerOutputDescription),
+                Object.keys(MedicationDescription)
+            )
 
             describe(filename + "#update", () => {
                 it("should compute medication", () => {

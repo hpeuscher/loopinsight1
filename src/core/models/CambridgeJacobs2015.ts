@@ -14,7 +14,7 @@ import AbstractODEPatient, { createPatientFromODE } from '../AbstractODEPatient.
 
 export const profile: ModuleProfile = {
     type: "patient",
-    id: "Jacobs2015",
+    id: "CambridgeJacobs2015",
     version: "2.0.0",
     name: "Jacobs 2015",
     extends: "Cambridge"

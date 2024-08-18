@@ -55,7 +55,12 @@ for (const filename in modelList) {
 
             // run generic tests for IOModule
             IOModuleTest(
-                controller, Object.keys(MeasurementDescription), Object.keys(ControllerOutputDescription))
+                "controller",
+                filename,
+                controller,
+                Object.keys(MeasurementDescription),
+                Object.keys(ControllerOutputDescription)
+            )
 
             describe(filename + "#autoConfigure", () => {
                 it("should accept patient information (if existent)", () => {

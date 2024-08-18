@@ -7,14 +7,37 @@
 
 import { expect } from 'chai'
 import IOModule from '../../../src/types/IOModule.js'
+import { ModuleType } from '../../../src/types/ModuleProfile.js'
 
-export default async function
-    (instance: IOModule, inputNames: string[], outputNames: string[]) {
+export default async function (
+    type: ModuleType,
+    filename: string,
+    instance: IOModule,
+    inputNames: string[],
+    outputNames: string[]
+) {
 
     describe("interface IOModule", () => {
 
         if (typeof instance === "undefined")
             return
+
+        describe(filename + "#getModelInfo", () => {
+            it("should return meta information about the model", () => {
+                const modelInfo = instance.getModelInfo()
+                expect(modelInfo).to.be.an("object")
+                describe("model id", () => {
+                    it("should match filename", () => {
+                        expect(modelInfo.id).to.equal(filename)
+                    })
+                })
+                describe("model type", () => {
+                    it("model type should be " + type, () => {
+                        expect(modelInfo.type).to.equal(type)
+                    })
+                })
+            })
+        })
 
         describe("#getInputList", () => {
             let inputs = instance.getInputList()
@@ -45,6 +68,6 @@ export default async function
                 }
             })
         })
-        
+
     })
 }

@@ -54,6 +54,22 @@ for (const filename in modelList) {
             const t = new Date(2023, 9, 3, 12, 0, 0)
             patient.reset?.(t, 1, solver)
 
+            describe(filename + "#getModelInfo", () => {
+                it("should return meta information about the model", () => {
+                    const modelInfo = patient.getModelInfo()
+                    expect(modelInfo).to.be.an("object")
+                    describe("model id", () => {
+                        it("should match filename", () => {
+                            expect(modelInfo.id).to.equal(filename)
+                        })
+                    })
+                    describe("model type", () => {
+                        it("model type should be patient", () => {
+                            expect(modelInfo.type).to.equal("patient")
+                        })
+                    })
+                })
+            })
 
             describe(filename + "#getInputList", () => {
                 it("should return list of inputs as used by model", () => {

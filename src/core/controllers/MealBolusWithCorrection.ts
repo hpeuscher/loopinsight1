@@ -21,7 +21,7 @@ import MealBolus, {
 
 export const profile: ModuleProfile = {
     type: "controller",
-    id: "MealBolusCorrection",
+    id: "MealBolusWithCorrection",
     version: "2.0.0",
     name: "Meal bolus with correction",
 }

@@ -30,7 +30,7 @@ import AbstractSensor from '../AbstractSensor.js'
 
 export const profile: ModuleProfile = {
     type: "sensor",
-    id: "CGM_Breton2008",
+    id: "Breton2008",
     version: "2.0.0",
     name: "CGM sensor (Breton 2008)",
 }
