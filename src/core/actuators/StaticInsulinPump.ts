@@ -11,6 +11,7 @@ import { quantize } from '../../common/UtilityFunctions.js'
 import RNG_Ziggurat_SHR3 from '../../common/random/RNG_Ziggurat_SHR3.js'
 import Actuator, { ControllerOutput, Medication } from '../../types/Actuator.js'
 import { ModuleProfile } from '../../types/ModuleProfile.js'
+import { ParameterDescriptions } from '../../types/ParametricModule.js'
 import AbstractActuator from '../AbstractActuator.js'
 
 export const profile: ModuleProfile = {
@@ -115,7 +116,7 @@ const StaticInsulinPumpParameters = {
     relerr_basal:  {unit: "1", default: 0},
     /** standard deviation of noise in basal rate */
     abserr_basal:  {unit: "U/h", default: 0},
-}
+} satisfies ParameterDescriptions
 
 
 export const i18n_label = {

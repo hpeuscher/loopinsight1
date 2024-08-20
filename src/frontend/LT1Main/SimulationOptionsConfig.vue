@@ -45,9 +45,9 @@ export default defineComponent({
         config() {
             const config: ParameterDescriptions = {
                 t0: { default: new Date(new Date(Date.now()).setHours(0,0,0,0)) },
-                tspan: { unit: "h", default: 24, increment: 4 },
-                seed: { unit: "", default: 1, increment: 1 },
-                dt: { unit: "min", default: 5, increment: 1 },
+                tspan: { unit: "h", default: 24, step: 4 },
+                seed: { unit: "", default: 1, step: 1 },
+                dt: { unit: "min", default: 5, step: 1 },
             }
             return config
         },

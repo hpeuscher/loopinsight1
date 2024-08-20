@@ -19,7 +19,7 @@ import Controller, {
     TracedMeasurement
 } from '../../types/Controller.js'
 import { ModuleProfile } from '../../types/ModuleProfile.js'
-import { TypedParameterValues } from '../../types/ParametricModule.js'
+import { ParameterDescriptions, TypedParameterValues } from '../../types/ParametricModule.js'
 import { PatientProfile } from '../../types/Patient.js'
 import AbstractController from '../AbstractController.js'
 import EventManager from '../EventManager.js'
@@ -64,7 +64,7 @@ export const Oref0Parameters =
 {
     /** default basal rate in U/h */
     current_basal: { unit: 'U/h', default: 0.7 },
-    sens: { unit: '(mg/dl)/U', default: 50, increment: 5 },
+    sens: { unit: '(mg/dl)/U', default: 50, step: 5 },
     dia: { unit: 'h', default: 6 },
     carb_ratio: { unit: 'g/U', default: 8 },
     max_iob: { unit: 'U', default: 3.5 },
@@ -73,7 +73,7 @@ export const Oref0Parameters =
     max_bg: { unit: 'mg/dl', default: 120 },
     min_bg: { unit: 'mg/dl', default: 120 },
     maxCOB: { unit: 'g', default: 120 },
-}
+} satisfies ParameterDescriptions
 
 /** Full oref0 profile contains some more parameters */
 export type Oref0Profile = Partial<TypedParameterValues<typeof Oref0Parameters, {}> & {

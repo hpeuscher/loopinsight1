@@ -8,8 +8,10 @@
 import SteadyStateFinder from '../../common/SteadyStateFinder.js'
 import { ModuleProfile } from '../../types/ModuleProfile.js'
 import ODEPatientModel from '../../types/ODEPatientModel.js'
+import { ParameterDescriptions } from '../../types/ParametricModule.js'
 import {
-    TypedPatientState, PatientInput, PatientOutput
+    TypedPatientState, PatientInput, PatientOutput,
+    StateDescription
 } from '../../types/Patient.js'
 import AbstractODEPatient, { createPatientFromODE } from '../AbstractODEPatient.js'
 
@@ -450,7 +452,7 @@ export const parameterDescription = {
      * [Kovatchev, 2000]
      */
     "rgamma":   { unit: "",     default: 1.509,	},
-}
+} satisfies ParameterDescriptions
 
 /** Description of state variables. */
 export const stateDescription = {
@@ -494,7 +496,7 @@ export const stateDescription = {
     QstoMemory: {unit: "" },
     /** insulin action on endogenous glucose production in 1 */
     MealMemory: {unit: "" },
-}
+} satisfies StateDescription
 
 /** Type for patient state, i.e. numeric values of the state variables. */
 export type State = TypedPatientState<typeof stateDescription>

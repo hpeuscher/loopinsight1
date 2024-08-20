@@ -12,6 +12,7 @@ import Controller, {
     TracedMeasurement
 } from '../../types/Controller.js'
 import { ModuleProfile } from '../../types/ModuleProfile.js'
+import { ParameterDescriptions } from '../../types/ParametricModule.js'
 import { PatientProfile } from '../../types/Patient.js'
 import AbstractController from '../AbstractController.js'
 
@@ -111,16 +112,16 @@ export const PIDParameters = {
     /** target blood glucose in mg/dl */
     targetBG: { unit: 'mg/dl', default: 120 },
     /** default basal rate in U/h */
-    basalRate: { unit: 'U/h', default: 1, min: 0, increment: 0.1 },
+    basalRate: { unit: 'U/h', default: 1, min: 0, step: 0.1 },
     /** gain of proportional controller in U/h / (100 mg/dl) */
-    kP: { unit: 'U/h / (100 mg/dl)', default: 0.5, min: 0, increment: 0.1 },
+    kP: { unit: 'U/h / (100 mg/dl)', default: 0.5, min: 0, step: 0.1 },
     /** gain of integral controller in U/h / (100 mg/dl) / h */
-    kI: { unit: 'U/h / (100 mg/dl) / h', default: 0.01, min: 0, increment: 0.01 },
+    kI: { unit: 'U/h / (100 mg/dl) / h', default: 0.01, min: 0, step: 0.01 },
     /** gain of derivative controller in U/h / (100 mg/dl) * h */
-    kD: { unit: 'U/h / (100 mg/dl) * h', default: 0, min: 0, increment: 0.01 },
+    kD: { unit: 'U/h / (100 mg/dl) * h', default: 0, min: 0, step: 0.01 },
     /** sampling time in minutes */
     samplingTime: { unit: "min", default: 5, min: 1, step: 1 },
-}
+} satisfies ParameterDescriptions
 
 
 export const i18n_label = {

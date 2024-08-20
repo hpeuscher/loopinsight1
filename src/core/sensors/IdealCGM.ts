@@ -7,6 +7,7 @@
 
 import { isMultipleOfSamplingTime } from '../../common/DateUtility.js'
 import { ModuleProfile } from '../../types/ModuleProfile.js'
+import { ParameterDescriptions } from '../../types/ParametricModule.js'
 import Sensor, { Measurement, PatientOutput } from '../../types/Sensor.js'
 import AbstractSensor from '../AbstractSensor.js'
 
@@ -54,7 +55,7 @@ export default class CGMSensor
 export const IdealCGMParameters = {
     /** sampling time in minutes */
     samplingTime: { unit: "min", default: 5 },
-}
+} satisfies ParameterDescriptions
 
 
 export const i18n_label = {

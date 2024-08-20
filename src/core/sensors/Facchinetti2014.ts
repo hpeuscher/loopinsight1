@@ -19,6 +19,7 @@ The CGM sensor model implemented in this file uses information from:
 import { isMultipleOfSamplingTime, nextUpdateTime } from '../../common/DateUtility.js'
 import RNG_Ziggurat_SHR3 from '../../common/random/RNG_Ziggurat_SHR3.js'
 import { ModuleProfile } from '../../types/ModuleProfile.js'
+import { ParameterDescriptions } from '../../types/ParametricModule.js'
 import Sensor, { Measurement, PatientOutput } from '../../types/Sensor.js'
 import AbstractSensor from '../AbstractSensor.js'
 
@@ -153,7 +154,7 @@ export const Facchinetti2014Parameters = {
     b2: { unit: "1/d^2", default: 0 }, // Table 1
     /** sampling time in minutes */
     samplingTime: { unit: "min", default: 5, min: 1, step: 1 },
-}
+} satisfies ParameterDescriptions
 
 
 export const html = {

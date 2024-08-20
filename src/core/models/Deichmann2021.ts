@@ -7,8 +7,9 @@
 
 import { ModuleProfile } from '../../types/ModuleProfile.js'
 import ODEPatientModel from '../../types/ODEPatientModel.js'
+import { ParameterDescriptions } from '../../types/ParametricModule.js'
 import {
-    TypedPatientState, PatientInput, PatientOutput
+    TypedPatientState, PatientInput, PatientOutput, StateDescription
 } from '../../types/Patient.js'
 import AbstractODEPatient, { createPatientFromODE } from '../AbstractODEPatient.js'
 
@@ -163,7 +164,7 @@ const parameterDescription = {
     "Ib": { unit: "uU/ml", default: 10, },
     "HRb": { unit: "bpm", default: 80, },
     "HRmax": { unit: "bpm", default: 200, },	// (##)
-}
+} satisfies ParameterDescriptions
 
 /** Description of state variables. */
 const stateDescription = {
@@ -178,7 +179,7 @@ const stateDescription = {
     "D2": { unit: "" },
     /** integral of heart rate */
     "HRint": { unit: "" },
-}
+} satisfies StateDescription
 
 /** Type for patient state, i.e. numeric values of the state variables. */
 type State = TypedPatientState<typeof stateDescription>

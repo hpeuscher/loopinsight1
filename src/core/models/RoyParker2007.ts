@@ -7,8 +7,10 @@
 
 import { ModuleProfile } from '../../types/ModuleProfile.js'
 import ODEPatientModel from '../../types/ODEPatientModel.js'
+import { ParameterDescriptions } from '../../types/ParametricModule.js'
 import {
-    TypedPatientState, PatientInput, PatientOutput
+    TypedPatientState, PatientInput, PatientOutput,
+    StateDescription
 } from '../../types/Patient.js'
 import AbstractODEPatient, { createPatientFromODE } from '../AbstractODEPatient.js'
 
@@ -223,7 +225,7 @@ const parameterDescription = {
     "kG":   { unit: "", default: 0.022 },		// [Roy; Parker, IEEE, 2006]
     "kP":   { unit: "", default: 0.0097 },		// [Roy; Parker, IEEE, 2006]
     "kF":   { unit: "", default: 0.015 },		// [Roy; Parker, IEEE, 2006]
-}
+} satisfies ParameterDescriptions
 
 /** Description of state variables. */
 const stateDescription = {
@@ -251,7 +253,7 @@ const stateDescription = {
     CurrentMealStart: {unit: "", discontinuous: true},
     /** total amount of current meal */
     CurrentMealCarbs: {unit: "", discontinuous: true},
-}
+} satisfies StateDescription
 
 /** Type for patient state, i.e. numeric values of the state variables. */
 type State = TypedPatientState<typeof stateDescription>

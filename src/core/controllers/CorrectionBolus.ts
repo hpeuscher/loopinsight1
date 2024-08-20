@@ -12,6 +12,7 @@ import Controller, {
     TracedMeasurement
 } from '../../types/Controller.js'
 import { ModuleProfile } from '../../types/ModuleProfile.js'
+import { ParameterDescriptions } from '../../types/ParametricModule.js'
 import AbstractController from '../AbstractController.js'
 
 export const profile: ModuleProfile = {
@@ -96,8 +97,8 @@ export const CorrectionBolusParameters = {
     /** meal correction factor in mg/dl */
     correctionFactor: { unit: '(mg/dl)/U', min: 5, default: 50 },
     /** target blood glucose value in mg/gl */
-    targetBG: { unit: 'mg/dl', default: 100, min: 50, increment: 5 },
-}
+    targetBG: { unit: 'mg/dl', default: 100, min: 50, step: 5 },
+} satisfies ParameterDescriptions
 
 
 export const i18n_label = {

@@ -23,6 +23,7 @@ import JohnsonTransform from '../../common/JohnsonTransform.js'
 import { limit, quantizeFloor } from '../../common/UtilityFunctions.js'
 import RNG_Ziggurat_SHR3 from '../../common/random/RNG_Ziggurat_SHR3.js'
 import { ModuleProfile } from '../../types/ModuleProfile.js'
+import { ParameterDescriptions } from '../../types/ParametricModule.js'
 import { NormalRandomNumberGenerator } from '../../types/RandomNumberGenerator.js'
 import Sensor, { Measurement, PatientOutput } from '../../types/Sensor.js'
 import AbstractSensor from '../AbstractSensor.js'
@@ -176,7 +177,7 @@ export default class CGM_Breton2008
 
 export const Breton2008Parameters = {
     /** partial autocorrelation function coefficient (constant in paper) */
-    PACF: { unit: "1", default: 0.7, min: 0, max: 1, increment: 0.1 },
+    PACF: { unit: "1", default: 0.7, min: 0, max: 1, step: 0.1 },
     alpha: { unit: "1", default: 1 },
     beta: { unit: "mg/dl", default: 0 },
     min: { unit: "mg/dl", default: 0, min: 0 },
@@ -185,7 +186,7 @@ export const Breton2008Parameters = {
     resolution: { unit: "mg/dl", default: 0, min: 0, step: 1 },
     /** sampling time in minutes */
     samplingTime: { unit: "min", default: 5, min: 1, step: 1 },
-}
+} satisfies ParameterDescriptions
 
 
 

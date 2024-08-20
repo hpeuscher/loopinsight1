@@ -77,11 +77,16 @@ export declare type ParameterValues = {
 
 /** description of single parameter */
 export declare type ParameterDescription = {
+    /** Default value */
     default: ParameterValue | ParameterDescriptions
+    /** Unit */
     unit?: string
+    /** Minimum value */
     min?: number
+    /** Maximum value */
     max?: number
-    increment?: number
+    /** Typical step (for graphical user interface) */
+    step?: number
 }
 
 /** set of parameter descriptions to describe a module */

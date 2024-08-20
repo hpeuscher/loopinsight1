@@ -43,7 +43,7 @@ export default defineComponent({
             return this.config?.max ?? +Infinity
         },
         step(): number {
-            return this.config?.increment || this?.stepDistance || 0
+            return this.config?.step || this?.stepDistance || 0
         },
         unit(): string {
             return this.config?.unit || ""

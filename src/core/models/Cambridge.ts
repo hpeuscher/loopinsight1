@@ -7,8 +7,10 @@
 
 import { ModuleProfile } from '../../types/ModuleProfile.js'
 import ODEPatientModel from '../../types/ODEPatientModel.js'
+import { ParameterDescriptions } from '../../types/ParametricModule.js'
 import {
     PatientInput, PatientOutput,
+    StateDescription,
     TypedPatientState
 } from '../../types/Patient.js'
 import AbstractODEPatient, {
@@ -212,7 +214,7 @@ export const parameterDescription = {
     "F01": { unit: "mmol/kg/min", default: 0.0097 },
     /** time-to-maximum of absorption of subcut. injected short-acting insulin */
     "tmaxI": { unit: "min", default: 55 },
-}
+} satisfies ParameterDescriptions
 
 /** Description of state variables. */
 export const stateDescription = {
@@ -236,7 +238,7 @@ export const stateDescription = {
     D1: { unit: "mmol" },
     /** glucose in compartment 2 in mmol */
     D2: { unit: "mmol" },
-}
+} satisfies StateDescription
 
 /** Type for patient state, i.e. numeric values of the state variables. */
 type State = TypedPatientState<typeof stateDescription>

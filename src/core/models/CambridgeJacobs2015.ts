@@ -6,8 +6,10 @@
  */
 
 import { ModuleProfile } from '../../types/ModuleProfile.js'
+import { ParameterDescriptions } from '../../types/ParametricModule.js'
 import {
     PatientInput,
+    StateDescription,
     TypedPatientState
 } from '../../types/Patient.js'
 import { createPatientFromODE } from '../AbstractODEPatient.js'
@@ -140,7 +142,7 @@ export const parameterDescription = {
     ...parameterDescriptionCambridge,
     "PGUb": { unit: "mg/min", default: 35, }, // [Lenart; Parker 2002]
     "HGPb": { unit: "mg/min", default: 155, }, // [Lenart; Parker 2002]
-}
+} satisfies ParameterDescriptions
 
 /** Description of state variables. */
 export const stateDescription = {
@@ -151,7 +153,7 @@ export const stateDescription = {
     "ΓHGPA": { unit: "" },
     /** percentage of volume of oxygen consumed */
     "PVO2max": { unit: "" },
-}
+} satisfies StateDescription
 
 /** Type for patient state, i.e. numeric values of the state variables. */
 type State = TypedPatientState<typeof stateDescription>

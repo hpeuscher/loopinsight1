@@ -12,6 +12,7 @@ import Controller, {
     TracedMeasurement
 } from '../../types/Controller.js'
 import { ModuleProfile } from '../../types/ModuleProfile.js'
+import { ParameterDescriptions } from '../../types/ParametricModule.js'
 import AbstractController from '../AbstractController.js'
 import EventManager from '../EventManager.js'
 
@@ -90,10 +91,10 @@ export default class MealBolus
 
 export const MealBolusParameters = {
     /** carb factor in U/(10g CHO) */
-    carbFactor: { unit: 'U/(10g CHO)', default: 1, min: 0, increment: 0.1 },
+    carbFactor: { unit: 'U/(10g CHO)', default: 1, min: 0, step: 0.1 },
     /** pre-bolus interval in min */
-    premealTime: { unit: 'min', default: 30, increment: 5 },
-}
+    premealTime: { unit: 'min', default: 30, step: 5 },
+} satisfies ParameterDescriptions
 
 
 export const i18n_label = {

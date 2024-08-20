@@ -13,6 +13,7 @@ import Controller, {
     TracedMeasurement
 } from '../../types/Controller.js'
 import { ModuleProfile } from '../../types/ModuleProfile.js'
+import { ParameterDescriptions } from '../../types/ParametricModule.js'
 import { PatientProfile } from '../../types/Patient.js'
 import AbstractController from '../AbstractController.js'
 
@@ -65,10 +66,10 @@ export default class CSII
 export const CSIIParameters =
 {
     /** basal rate in U/h */
-    basalRate: { unit: 'U/h', default: 1, min: 0, increment: 0.1 },
+    basalRate: { unit: 'U/h', default: 1, min: 0, step: 0.1 },
     /** basal rate increment in U/h */
-    inc_basal: { unit: 'U/h', default: 0.05, min: 0, increment: 0.01 },
-}
+    inc_basal: { unit: 'U/h', default: 0.05, min: 0, step: 0.01 },
+} satisfies ParameterDescriptions
 
 
 export const i18n_label = {
