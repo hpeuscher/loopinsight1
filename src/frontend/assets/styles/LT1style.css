@@ -62,8 +62,14 @@ div.lt1-results {
 
 /* box title */
 .lt1-container h2 {
+    font-size: 1.2rem;
     color: #003160;
     margin-left: 0.5rem;
+}
+
+.lt1-container h3 {
+    font-size: 1rem;
+    color: #586067;
 }
 
 .lt1-container h4 {
@@ -148,9 +154,10 @@ text.axis-label {
 input[type=button], input[type=submit], input[type=reset] {
     background-color: #f4f4ff;
     border: 1px solid #aaaaaa;
+    color: #586067;
     margin: 0.5rem;
     padding: 0.3rem 0.5rem;
-    font-size: 1rem;
+    font-size: 0.9rem;
     border-radius: 3px;
 }
 

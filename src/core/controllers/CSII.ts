@@ -19,7 +19,7 @@ import AbstractController from '../AbstractController.js'
 export const profile: ModuleProfile = {
     type: "controller",
     id: "CSII",
-    version: "2.0.0",
+    version: "2.1.0",
     name: "CSII",
 }
 
@@ -48,16 +48,16 @@ export default class CSII
         return ["iir"]
     }
 
-    autoConfigure?(profile: PatientProfile) {
+    autoConfigure(profile: PatientProfile) {
         const IIReq = profile?.IIReq
         if (typeof IIReq !== "undefined") {
-            const increment = this.getParameterValues().inc_basal
-            this.setParameterValues({ basalRate: quantize(IIReq, increment) })
+            this.setParameterValues({ basalRate: IIReq })
         }
     }
 
-    update(_t: Date, _s: TracedMeasurement, _a: AnnouncementList = {}) {
-        this.output = { iir: this.getParameterValues().basalRate }
+    update(t: Date, _s: TracedMeasurement, _a: AnnouncementList = {}) {
+        const params = this.evaluateParameterValuesAt(t)
+        this.output = { iir: quantize(params.basalRate, params.inc_basal) }
     }
 }
 

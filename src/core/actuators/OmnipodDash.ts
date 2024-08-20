@@ -21,7 +21,7 @@ import AbstractActuator from '../AbstractActuator.js'
 export const profile: ModuleProfile = {
     type: "actuator",
     id: "OmnipodDash",
-    version: "2.0.0",
+    version: "2.1.0",
     name: "Omnipod Dash",
 }
 
@@ -57,7 +57,7 @@ export default class OmnipodDash
 
     reset(t: Date, seed: number) {
         // reset total dose integrator
-        this._integral = this.getParameterValues().randomInitialPosition ? seed : 0
+        this._integral = this.evaluateParameterValuesAt(t).randomInitialPosition ? seed : 0
         // remember time
         this._tLast = t
         this.tNext = undefined
@@ -68,7 +68,7 @@ export default class OmnipodDash
     }
 
     update(t: Date, c: ControllerOutput) {
-        const params = this.getParameterValues()
+        const params = this.evaluateParameterValuesAt(t)
         
         let iir = c.iir || 0
         let ibolus = c.ibolus || 0
@@ -90,7 +90,7 @@ export default class OmnipodDash
 
         if (dt > 0) {
             // add oscillation depending on insulin dose
-            totalIIR = this._periodicOscillation(iir * dt / MIN_PER_HOUR + ibolus)
+            totalIIR = this._periodicOscillation(iir * dt / MIN_PER_HOUR + ibolus, t)
                 * MIN_PER_HOUR / dt
         }
         else
@@ -108,9 +108,9 @@ export default class OmnipodDash
      * @param {number} insulinDose - requested dose in U
      * @returns {number} insulin dose superposed by oscillation in U
      */
-    protected _periodicOscillation(insulinDose: number): number {
+    protected _periodicOscillation(insulinDose: number, t: Date): number {
 
-        const params = this.getParameterValues()
+        const params = this.evaluateParameterValuesAt(t)
 
         /** DC gain (average delivery per requested unit) */
         const A0 = params.A0

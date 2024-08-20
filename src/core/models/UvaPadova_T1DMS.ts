@@ -16,7 +16,7 @@ import AbstractODEPatient, { createPatientFromODE } from '../AbstractODEPatient.
 export const profile: ModuleProfile = {
     type: "patient",
     id: "UvaPadova_T1DMS",
-    version: "2.0.0",
+    version: "2.1.0",
     name: "UVA/Padova (T1DMS)",
 }
 
@@ -123,9 +123,43 @@ export class UvaPadova_T1DMS
         return x
     }
 
-    computeDerivatives(_t: Date, x: State, u: PatientInput): State {
+    /**
+     * insulin-dependent glucose utilization in mg/kg/min
+     * [Dalla Man, JDST, 2014] (A10)
+     */
+    Uid(t: Date, x: State, u: PatientInput): number {
+        const params = this.evaluateParameterValuesAt(t)
+        const risk = this.risk(t, x, u)
+        return (params.Vm0 + params.Vmx * x.X * (1 + params.rgamma * risk))
+            * x.Gt / (params.Km0 + x.Gt)
+    }
 
-        const params = this.getParameterValues()
+    /**
+     * blood glucose risk function for Uid computation
+     * [Dalla Man, JDST, 2014] (A12)
+     */
+    risk(t: Date, x: State, _u: PatientInput): number {
+        const params = this.evaluateParameterValuesAt(t)
+        /** plasma glucose concentration in mg/dl */
+        // [Dalla Man, JDST, 2014] (A1), [Dalla Man, IEEE TBME, 2007] (1)
+        const G = x.Gp / params.VG
+        /** plasma glucose concentration at equilibrium */
+        const Gb = params.Gpeq
+        // insulin-dependent glucose utilization // [Dalla Man, JDST, 2014] (A12)
+        const f_risk = (x: number) =>
+            Math.pow(Math.log(x), params.ralpha) - params.rbeta	// (##)
+        const Gth = 60
+        if (G < Gth) {
+            return 10 * Math.pow(f_risk(Gth), 2)
+        } else if (G < Gb - 1e-3) {
+            return 10 * Math.pow(f_risk(G), 2)
+        }
+        return 0
+    }
+
+    computeDerivatives(t: Date, x: State, u: PatientInput): State {
+
+        const params = this.evaluateParameterValuesAt(t)
 
         // inputs
         /** meal ingestion in mg/min */
@@ -141,20 +175,9 @@ export class UvaPadova_T1DMS
         /** plasma glucose concentration at equilibrium */
         const Gb = params.Gpeq
 
-        // insulin-dependent glucose utilization // [Dalla Man, JDST, 2014] (A12)
-        const f_risk = (x: number) => Math.pow(Math.log(x), params.ralpha) - params.rbeta	// (##)
-        let risk = 0
-        const Gth = 60
-        if (G < Gth) {
-            risk = 10 * Math.pow(f_risk(Gth), 2)
-        } else if (G < Gb - 1e-3) {
-            risk = 10 * Math.pow(f_risk(G), 2)
-        }
-
         /** insulin-dependent glucose utilization in mg/kg/min */
         // [Dalla Man, JDST, 2014] (A10)
-        const Uid = (params.Vm0 + params.Vmx * x.X * (1 + params.rgamma * risk))
-            * x.Gt / (params.Km0 + x.Gt)
+        const Uid = this.Uid(t, x, u)
 
         /** insulin-independent glucose utilization in mg/kg/min */
         // [Dalla Man, JDST, 2014] (A9), [Dalla Man, IEEE TBME, 2007] (14)
@@ -293,8 +316,8 @@ export class UvaPadova_T1DMS
         return dx_dt
     }
 
-    computeOutput(_t: Date, x: State): PatientOutput {
-        const params = this.getParameterValues()
+    computeOutput(t: Date, x: State): PatientOutput {
+        const params = this.evaluateParameterValuesAt(t)
         return {
             Gp: x.Gp / params.VG,
             Gt: x.Gs / params.VG,
@@ -335,7 +358,7 @@ export const parameterDescription = {
     "f":        { unit: "1",     default: 0.90,  },	// [Dalla Man, IEEE TBME, 2007]
     "kp1":      { unit: "mg/kg/min",     default: 2.7,   },  // [Dalla Man, IEEE TBME, 2007]
     "kp2":      { unit: "1/min",     default: 0.0021,},	// [Dalla Man, IEEE TBME, 2007]
-    "kp3":      { unit: "mg/kg per pmol/l",     default: 0.009,	},	// [Dalla Man, IEEE TBME, 2007]
+    "kp3":      { unit: "mg/kg/min per pmol/l",     default: 0.009,	},	// [Dalla Man, IEEE TBME, 2007]
     "kp4":      { unit: "mg/kg/min per pmol/kg",     default: 0.0618,},	// [Dalla Man, IEEE TBME, 2007]
     "ki":       { unit: "1/min",     default: 0.0079,},	// [Dalla Man, IEEE TBME, 2007]
     "Fcns":     { unit: "mg/kg/min",     default: 1,     },  // [Dalla Man, IEEE TBME, 2007]
@@ -474,7 +497,7 @@ export const stateDescription = {
 }
 
 /** Type for patient state, i.e. numeric values of the state variables. */
-type State = TypedPatientState<typeof stateDescription>
+export type State = TypedPatientState<typeof stateDescription>
 
 /** Use mixin to create Patient from ODEPatientModel. */
 export default createPatientFromODE

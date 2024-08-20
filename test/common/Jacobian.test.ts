@@ -28,7 +28,6 @@ describe("Jacobian", () => {
         it("should produce correct derivatives at [-1,2,2]", () => {
             const x0: Vector = [-1, 2, 2]
             const jac: Matrix = new Jacobian(fTest, x0).getMatrix()
-            console.log(jac)
             assertTolerantMatrixEquality(jac, [[1, 0, 0], [9, -4, 1], [1, 0, 0]], 1e-6)
         })
     })

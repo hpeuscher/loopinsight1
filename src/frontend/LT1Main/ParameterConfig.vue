@@ -118,6 +118,13 @@ export default defineComponent({
 }
 
 .item-input input {
-    width: 95%;
+    width: 4rem;
+    padding: 1px;
+}
+
+.item-unit {
+    font-size: 0.9em;
+    padding-left: 1em;
+    text-align: left;
 }
 </style>

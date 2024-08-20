@@ -31,7 +31,7 @@ import AbstractSensor from '../AbstractSensor.js'
 export const profile: ModuleProfile = {
     type: "sensor",
     id: "Breton2008",
-    version: "2.0.0",
+    version: "2.1.0",
     name: "CGM sensor (Breton 2008)",
 }
 
@@ -91,11 +91,11 @@ export default class CGM_Breton2008
 
 
     update(t: Date, y: PatientOutput) {
-        // update stochastic error (once a minute!)
-        const sensorNoise = this._getNextNoise()
-
         /** sensor parameters */
-        const params = this.getParameterValues()
+        const params = this.evaluateParameterValuesAt(t)
+
+        // update stochastic error (once a minute!)
+        const sensorNoise = this._getNextNoise(params.PACF)
 
         if (isMultipleOfSamplingTime(t, params.samplingTime)) {
             /** glucose concentration in interstitium */
@@ -121,13 +121,13 @@ export default class CGM_Breton2008
 
     /**
      * Returns next noise sample, must be called every minute.
-     * 
+     * @param {number} PACF - partial autocorrelation function coefficient
      * @returns {number} noise sample
      */
-    protected _getNextNoise(): number {
+    protected _getNextNoise(PACF: number): number {
         if (this.noiseBuffer.length < 8) {
             // need to create additional noise values
-            this._generateNoise()
+            this._generateNoise(PACF)
         }
         // pick left-most element and remove it from buffer
         const nextNoise = this.noiseBuffer[0]
@@ -137,11 +137,11 @@ export default class CGM_Breton2008
 
     /**
      * Generates new values for noise sequence and stores them to buffer.
+     * @param {number} PACF - partial autocorrelation function coefficient
      */
-    protected _generateNoise(): void {
+    protected _generateNoise(PACF: number): void {
         // propagate autoregressive model
-        this.ARstate = this.getParameterValues().PACF * 
-            (this.ARstate + this.rng.getNormal())
+        this.ARstate = PACF * (this.ARstate + this.rng.getNormal())
 
         // pick last Johnson-transformed value 
         // (it's the last sample of straightLinesBuffer)

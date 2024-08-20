@@ -6,13 +6,12 @@
  * See https://lt1.org for further information.
  */
 
-import { defineComponent, PropType } from 'vue'
-import ParameterConfigNumber from './ParameterConfigNumber.vue'
+import { defineComponent, PropType } from 'vue';
 import {
-    ParameterValues,
-    ParameterDescriptions,
+    ParameterDescription,
     ParameterValue,
-} from '../../types/ParametricModule.js'
+} from '../../types/ParametricModule.js';
+import ParameterConfigNumber from './ParameterConfigNumber.vue';
 
 export default defineComponent({
     name: "ParameterConfigObject",
@@ -28,12 +27,12 @@ export default defineComponent({
         id: String,
         /** configuration including units, defaults, ... */
         config: {
-            type: Object as PropType<ParameterDescriptions>,
+            type: Object as PropType<ParameterDescription>,
             required: true,
         },
         /** default values of parameters */
         defaultValue: { 
-            type: Object as PropType<ParameterValues>,
+            type: Object as PropType<number[]>,
             required: true,
         },
         /** text to display in first column of parameter list */
@@ -59,6 +58,7 @@ export default defineComponent({
                 this.valueChanged()
             },
             deep: true,
+            immediate: true,
         },
     },
 
@@ -95,10 +95,10 @@ export default defineComponent({
         </label>
     </li>
     <li>
-        <ParameterConfigNumber v-for="(_cfg, id) in defaultValue" 
+        <ParameterConfigNumber v-for="(_cfg, _id, id) in defaultValue" 
             :config="config"
-            :defaultValue="defaultValue[id]" 
+            :defaultValue="defaultValue[_id]" 
             :tooltip="tooltip"
-            @valueChanged="(value: ParameterValue) => { setValue(id, value) }" />
+            @valueChanged="(value: ParameterValue) => { setValue(_id, value) }" />
     </li>
 </template>

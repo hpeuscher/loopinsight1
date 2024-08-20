@@ -16,7 +16,7 @@ import AbstractActuator from '../AbstractActuator.js'
 export const profile: ModuleProfile = {
     type: "actuator",
     id: "StaticInsulinPump",
-    version: "2.0.0",
+    version: "2.1.0",
     name: "Static insulin pump",
 }
 
@@ -67,7 +67,7 @@ export default class StaticInsulinPump
 
         let iir = c.iir || 0
         let ibolus = c.ibolus || 0
-        const params = this.getParameterValues()
+        const params = this.evaluateParameterValuesAt(t)
 
         // quantize
         iir = quantize(iir, params.inc_basal)

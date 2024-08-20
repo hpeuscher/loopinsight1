@@ -18,7 +18,7 @@ import AbstractController from '../AbstractController.js'
 export const profile: ModuleProfile = {
     type: "controller",
     id: "PID",
-    version: "2.0.0",
+    version: "2.1.0",
     name: "PID",
 }
 
@@ -55,7 +55,7 @@ export default class PID
 
     override reset(t: Date) {
         super.reset(t)
-        this.output = { iir: this.getParameterValues().basalRate }
+        this.output = { iir: this.evaluateParameterValuesAt(t).basalRate }
         this._tLast = t
         this._eIntegral = 0
         this._eOld = NaN
@@ -70,7 +70,7 @@ export default class PID
 
     update(t: Date, s: TracedMeasurement) {
         /** parameters */
-        const params = this.getParameterValues()
+        const params = this.evaluateParameterValuesAt(t)
         // sampling
         if (isMultipleOfSamplingTime(t, params.samplingTime)) {
             /** time since last call in min */

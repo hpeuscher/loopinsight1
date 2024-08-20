@@ -11,6 +11,8 @@ import ParameterConfigBoolean from './ParameterConfigBoolean.vue'
 import ParameterConfigDate from './ParameterConfigDate.vue'
 import ParameterConfigNumber from './ParameterConfigNumber.vue'
 import ParameterConfigArray from './ParameterConfigArray.vue'
+import DailyProfile from '../../common/DailyProfile.js'
+import ParameterConfigDailyProfile from './ParameterConfigDailyProfile.vue'
 import ParametricModule, {
     ParameterValues,
     ParameterDescriptions,
@@ -29,6 +31,7 @@ export default defineComponent({
         ParameterConfigDate,
         ParameterConfigNumber,
         ParameterConfigArray,
+        ParameterConfigDailyProfile,
     },
 
     props: {
@@ -109,7 +112,7 @@ export default defineComponent({
         setParameterValues(parameters: ParameterValues): void {
             if (typeof parameters === "object" && Object.keys(parameters).length > 0) {
                 this.module.setParameterValues(parameters)
-                this.valueChanged()
+                // this.valueChanged()
             }
         },
 
@@ -136,7 +139,8 @@ export default defineComponent({
         /** return component type to process parameter */
         parameterType(id: string): string {
             // TODO: type "string"
-            const value = this.config[id]?.default
+            // const value = this.config[id]?.default
+            const value = this.getParameterValues()[id]
             if (typeof value === "undefined")
                 return ""
             if (typeof value === "number")
@@ -145,6 +149,9 @@ export default defineComponent({
                 return "ParameterConfigBoolean"
             if (Object.prototype.toString.call(value) === "[object Date]")
                 return "ParameterConfigDate"
+            if (value instanceof DailyProfile){
+                return "ParameterConfigDailyProfile"
+            }
             if (Array.isArray(value)) {
                 return "ParameterConfigArray"
             }
@@ -154,6 +161,9 @@ export default defineComponent({
         /** return parameter configuration */
         parameterConfig(id: string): ParameterValue | ParameterDescriptions {
             if (Array.isArray(this.config[id].default)) {
+                return this.config[id]
+            }
+            if (this.config[id]?.default instanceof DailyProfile) {
                 return this.config[id]
             }
             else if (typeof this.config[id].default === "object") {

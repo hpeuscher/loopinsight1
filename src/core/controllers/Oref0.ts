@@ -27,7 +27,7 @@ import EventManager from '../EventManager.js'
 export const profile: ModuleProfile = {
     type: "controller",
     id: "Oref0",
-    version: "2.0.0",
+    version: "2.1.0",
     name: "OpenAPS",
 }
 
@@ -142,12 +142,12 @@ export default class Oref0
     override reset(t: Date) {
         super.reset(t)
 
-        this.profile = { ...this.getParameterValues() }
+        this.profile = { ...this.evaluateParameterValuesAt(t) }
         this.profile.type = "current"
         this.profile.min_5m_carbimpact = 12
         this.profile.isfProfile = {
             sensitivities: [
-                { offset: 0, sensitivity: 100 } // TODO
+                { offset: 0, sensitivity: this.profile.sens! } // TODO
             ]
         }
 
@@ -161,7 +161,7 @@ export default class Oref0
         this.mealManager.reset()
 
         // reset medication
-        this.IIR = this.getParameterValues().current_basal
+        this.IIR = this.evaluateParameterValuesAt(t).current_basal
     }
 
 
@@ -169,6 +169,9 @@ export default class Oref0
         s: TracedMeasurement,
         announcements: AnnouncementList = {},
         m: ControllerOutput = {}) {
+
+        const params = this.evaluateParameterValuesAt(t)
+        this.profile = { ...this.profile, ...this.evaluateParameterValuesAt(t) }
 
         this.internals = {}
         this.output = {}
@@ -224,10 +227,10 @@ export default class Oref0
         this.treatmentHistory.push({
             _type: "Temp Basal",
             eventType: "Temp Basal",
-            rate: this.IIR - this.getParameterValues().current_basal,
+            rate: this.IIR - params.current_basal,
             date: t.valueOf() - 5 * 60 * 1000,
             timestamp: new Date(t.valueOf() - 5 * 60 * 1000),
-            insulin: 5 / 60 * (this.IIR - this.getParameterValues().current_basal), // TODO : add duration
+            insulin: 5 / 60 * (this.IIR - params.current_basal), // TODO : add duration
         })
 
         // compute glucose trends
@@ -271,7 +274,7 @@ export default class Oref0
         const meal_data = getMealData(opts, t)	// -> total.js
 
         // TODO: not sure why this is necessary; value seems to be overwritten??
-        this.profile.current_basal = this.getParameterValues().current_basal
+        this.profile.current_basal = params.current_basal
 
 
         // check if current temp is still active

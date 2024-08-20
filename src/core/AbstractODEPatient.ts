@@ -169,7 +169,10 @@ export class ODEPatientMixin
      * @returns {PatientProfile}
      */
     getPatientProfile(): PatientProfile {
-        const params = <any>this._odeModel.getParameterValues()
+        /** choose midnight as date of interest for time-varying parameters */
+        // TODO: compute an average insulin consumption instead??
+        const t = new Date(new Date().setHours(0,0,0,0))
+        const params = <any>this._odeModel.evaluateParameterValuesAt(t)
 
         let IIReq: number = NaN
 
@@ -181,13 +184,16 @@ export class ODEPatientMixin
         else if (typeof params?.Gpeq !== "undefined") {
             // try to compute it from given equilibrium glucose level
             try {
-                IIReq = this.computeIIR(params.Gpeq, {} as Date)
+                IIReq = this.computeIIR(params.Gpeq, t)
             }
             catch (e) {
                 console.warn("computation of equilibrium basal rate failed: " + e)
                 IIReq = NaN
             }
         }
+
+        // compute steady state for equilibrium basal rate
+        this.xeq = this._odeModel.computeSteadyState({ iir: IIReq }, t)
 
         this.profile = {
             name: params.name,
@@ -207,8 +213,6 @@ export class ODEPatientMixin
         this.solver = solver
         this._tLastUpdate = t
         const profile = this.getPatientProfile()
-        this.xeq = <State>this._odeModel.computeSteadyState(
-            { iir: profile.IIReq }, t)
         this.x = this.getInitialState()
     }
 

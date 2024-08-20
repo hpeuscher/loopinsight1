@@ -25,7 +25,7 @@ import AbstractSensor from '../AbstractSensor.js'
 export const profile: ModuleProfile = {
     type: "sensor",
     id: "Facchinetti2014",
-    version: "2.0.0",
+    version: "2.1.0",
     name: "Dexcom SEVEN Plus (Facchinetti 2014)",
 }
 
@@ -77,9 +77,9 @@ export default class Facchinetti2014
 
     update(t: Date, y: PatientOutput) {
         // update stochastic error (once a minute!)
-        const noise = this._getNextNoise()
+        const noise = this._getNextNoise(t)
         /** sensor parameters */
-        const params = this.getParameterValues()
+        const params = this.evaluateParameterValuesAt(t)
         
         if (isMultipleOfSamplingTime(t, params.samplingTime)) {
             /** glucose concentration in interstitium */
@@ -103,11 +103,11 @@ export default class Facchinetti2014
 
     /**
      * Returns next noise sample, must be called every minute.
-     * 
+     * @param {Date} t - Time of interest
      * @returns {number} noise sample
      */
-    protected _getNextNoise(): number {
-        const params = this.getParameterValues()
+    protected _getNextNoise(t: Date): number {
+        const params = this.evaluateParameterValuesAt(t)
         // update AR model of measurement noise (7), (14)
         const w_v = Math.sqrt(params.sigma_2_w) * this.rng.getNormal()
         const v = params.alpha_w1 * this.v[1] + params.alpha_w2 * this.v[0] + w_v

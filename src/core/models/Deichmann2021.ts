@@ -15,7 +15,7 @@ import AbstractODEPatient, { createPatientFromODE } from '../AbstractODEPatient.
 export const profile: ModuleProfile = {
     type: "patient",
     id: "Deichmann2021",
-    version: "2.0.0",
+    version: "2.1.0",
     name: "Deichmann 2021",
 }
 
@@ -53,14 +53,14 @@ export class Deichmann2021
         return parameterDescription
     }
 
-    computeIIR(targetBG: number, _t: Date): number {
-        const params = this.getParameterValues()
+    computeIIR(targetBG: number, t: Date): number {
+        const params = this.evaluateParameterValuesAt(t)
         return params.Ib * (params.kd + params.ka) / params.ka *
             (params.Vi * params.BW) * params.ke * 60e-6 // uU/min -> U/h
     }
 
-    computeSteadyState(u: PatientInput, _t: Date): State {
-        const params = this.getParameterValues()
+    computeSteadyState(u: PatientInput, t: Date): State {
+        const params = this.evaluateParameterValuesAt(t)
         const Xt = - params.p1 * (params.Gpeq - params.Gb) / params.Gpeq
         return {
             "x1": 0,
@@ -76,9 +76,9 @@ export class Deichmann2021
         }
     }
 
-    computeDerivatives(_t: Date, x: State, u: PatientInput): State {
+    computeDerivatives(t: Date, x: State, u: PatientInput): State {
 
-        const params = this.getParameterValues()
+        const params = this.evaluateParameterValuesAt(t)
 
         // inputs
         /** meal ingestion in mg/min */

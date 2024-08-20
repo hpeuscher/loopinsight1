@@ -71,7 +71,7 @@ export default abstract class AbstractActuator
      * @returns {Date | undefined}
      */
     getNextUpdateTime(t: Date): Date | undefined {
-        return nextUpdateTime(t, this.getParameterValues().samplingTime)
+        return nextUpdateTime(t, this.evaluateParameterValuesAt(t).samplingTime)
     }
 }
 

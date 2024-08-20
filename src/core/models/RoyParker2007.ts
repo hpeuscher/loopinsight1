@@ -15,7 +15,7 @@ import AbstractODEPatient, { createPatientFromODE } from '../AbstractODEPatient.
 export const profile: ModuleProfile = {
     type: "patient",
     id: "RoyParker2007",
-    version: "2.0.0",
+    version: "2.1.0",
     name: "Roy/Parker 2007",
 }
 
@@ -63,8 +63,8 @@ export class RoyParker2007
         return parameterDescription
     }
 
-    computeSteadyState(u: PatientInput, _t: Date): State {
-        const params = this.getParameterValues()
+    computeSteadyState(u: PatientInput, t: Date): State {
+        const params = this.evaluateParameterValuesAt(t)
 
         this.Ib = (params.u1b * 1e6 * params.p4) / (60 * params.n) // TODO U/h to µU/ml ***??
         return {
@@ -103,7 +103,7 @@ export class RoyParker2007
 
     computeDerivatives(t: Date, x: State, u: PatientInput): State {
 
-        const params = this.getParameterValues()
+        const params = this.evaluateParameterValuesAt(t)
 
         // inputs
         /** insulin infusion rate in µU/min */

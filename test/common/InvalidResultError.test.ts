@@ -14,7 +14,6 @@ describe('InvalidResultError', () => {
             const t = new Date()
             const error = new InvalidResultError(t, { y: {Gp: 100} })
             expect(error.name).to.equal('Error')
-            console.log(error.message)
             expect(error.message).to.contain.oneOf(['{"Gp":100}', "{'Gp':100}"])
             expect(error.message).to.contain("at time")
         })

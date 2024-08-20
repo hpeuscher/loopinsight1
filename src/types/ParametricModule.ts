@@ -5,6 +5,7 @@
  * See https://lt1.org for further information.
  */
 
+import DailyProfile from '../common/DailyProfile.js'
 import { ModuleTranslationList } from './ModuleProfile.js'
 
 /**
@@ -47,6 +48,13 @@ export default interface ParametricModule {
     getParameterValues(): ParameterValues
 
     /**
+     * Evaluates parameter values of this module for given date
+     * @param {Date} t - Date of interest.
+     * @returns {ParameterValues} Parameter values at time t.
+     */
+    evaluateParameterValuesAt(t: Date): ParameterValues
+
+    /**
      * Overwrites module parameters values with given values.
      * @param {ParameterValues} parameters - New parameter values.
      */
@@ -60,7 +68,7 @@ export default interface ParametricModule {
 
 
 /** supported types of a parameter value */
-export declare type ParameterValue = number | object | boolean | string
+export declare type ParameterValue = number | object | boolean | string | DailyProfile
 
 /** general module configuration (not specific to a certain module) */
 export declare type ParameterValues = {
@@ -88,21 +96,39 @@ export declare type ParameterDescriptions = {
  */
 export declare type TypedParameterValues<Parameters extends ParameterDescriptions,
     CommonParameters extends ParameterDescriptions> = {
-    [id in keyof Parameters]: 
+        [id in keyof Parameters]:
         // if instead of a default value we have another configuration...
         Parameters[id]["default"] extends ParameterDescriptions
-    ?
+        ?
+        {
+            // ... this parameter is an object -> find out types of its entries
+            [key in keyof Parameters[id]["default"]]:
+            Parameters[id]["default"][key]["default"]
+        }
+        :
+        // otherwise, this parameter is scalar -> use type of its default value
+        Parameters[id]["default"]
+    } &
     {
-        // ... this parameter is an object -> find out types of its entries
-        [key in keyof Parameters[id]["default"]]: 
-            Parameters[id]["default"][key]["default"] 
-    }
-    :
-    // otherwise, this parameter is scalar -> use type of its default value
-    Parameters[id]["default"]
-} & 
-{
-    [id in keyof CommonParameters]: 
+        [id in keyof CommonParameters]:
         // if instead of a default value we have another configuration...
         CommonParameters[id]["default"]
-}
+    }
+
+export declare type EvaluatedParameterValues<Parameters extends ParameterDescriptions,
+    CommonParameters extends ParameterDescriptions> = {
+        [id in keyof Parameters]:
+        // if instead of a default value we have another configuration...
+        Parameters[id]["default"] extends DailyProfile
+        ?
+        number
+        :
+        // otherwise, this parameter is scalar -> use type of its default value
+        Parameters[id]["default"]
+    } &
+    {
+        [id in keyof CommonParameters]:
+        // if instead of a default value we have another configuration...
+        CommonParameters[id]["default"]
+    }
+

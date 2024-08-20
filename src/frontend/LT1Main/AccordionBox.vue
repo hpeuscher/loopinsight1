@@ -66,6 +66,7 @@ h3 {
     margin: -.5rem;
     height: 1rem;
     border-bottom: 1px solid #aaaaaa;
+    box-sizing: content-box;
 }
 
 /* arrow to open or close box content */

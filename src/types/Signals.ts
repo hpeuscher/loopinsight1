@@ -130,6 +130,9 @@ export declare type PatientOutput = {
     Gp: number,
     /** tissue glucose in mg/dl */
     Gt?: number,
+} & {
+    /** additional physiological outputs */
+    [id in string]: number
 }
 
 /** 

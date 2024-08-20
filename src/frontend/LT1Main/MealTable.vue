@@ -42,15 +42,16 @@ export default defineComponent({
         },
         addRow() {
             const MS_PER_HOUR = 60 * 60e3
-            const mealStarts = this.meals.map((m: Meal) => { return m.start.getTime() })
-            const lastMeal = Math.max(...mealStarts, this.t0.getTime() - 3 * MS_PER_HOUR)
+            const nextMeal = this.meals.length > 0 ?
+                Math.max(...this.meals.map(m => m.start.getTime())) + 5 * MS_PER_HOUR :
+                new Date(this.t0).setHours(8,0,0,0)
             const carbs = 30 + ((1 + this.meals.length) % 3) * 10
             const newMeal: Meal = {
-                start: new Date(lastMeal + 5 * MS_PER_HOUR),
+                start: new Date(nextMeal),
                 duration: 15,
                 carbs,
                 announcement: {
-                    start: new Date(lastMeal + 5 * MS_PER_HOUR),
+                    start: new Date(nextMeal),
                     time: this.t0,
                     carbs,
                 }

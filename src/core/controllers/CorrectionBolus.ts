@@ -17,7 +17,7 @@ import AbstractController from '../AbstractController.js'
 export const profile: ModuleProfile = {
     type: "controller",
     id: "CorrectionBolus",
-    version: "2.0.0",
+    version: "2.1.0",
     name: "Meal bolus with correction",
 }
 
@@ -50,7 +50,7 @@ export default class CorrectionBolus
         return ["ibolus"]
     }
 
-    update(_t: Date,
+    update(t: Date,
         s: TracedMeasurement, 
         _a?: AnnouncementList, 
         m: ControllerOutput = {}): void {
@@ -61,11 +61,11 @@ export default class CorrectionBolus
 
         // check if bolus is demanded by another controller (e.g., meal bolus)
         if ((m.ibolus ?? 0) > 0) {
-            const params = this.getParameterValues()
+            const params = this.evaluateParameterValuesAt(t)
             // correct its value using current BG measurement
             /** actual blood glucose in mg/dl */
             const actualBG = Math.round(s.CGM?.() || s.SMBG?.() || NaN)
-            console.assert(!isNaN(actualBG), "BG = " + actualBG + " at " + _t.toLocaleTimeString())
+            console.assert(!isNaN(actualBG), "BG = " + actualBG + " at " + t.toLocaleTimeString())
             /** error between desired and actual BG in mg/dl */
             const BGerror = Math.round(actualBG - params.targetBG)
             /** correction bolus */

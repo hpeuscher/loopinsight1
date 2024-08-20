@@ -18,7 +18,7 @@ import AbstractODEPatient, {
 export const profile: ModuleProfile = {
     type: "patient",
     id: "Cambridge",
-    version: "2.0.0",
+    version: "2.1.0",
     name: "Cambridge",
 }
 
@@ -66,8 +66,8 @@ export class Cambridge
         return parameterDescription
     }
 
-    computeIIR(targetBG: number, _t?: Date): number {
-        const params = this.getParameterValues()
+    computeIIR(targetBG: number, t: Date): number {
+        const params = this.evaluateParameterValuesAt(t)
         /** equilibrium blood glucose levels in mmol/l */
         const Gpeq = targetBG / mmolG2mg * 10
         const Q1eq = Gpeq * params.VG * params.BW
@@ -86,8 +86,8 @@ export class Cambridge
         return Seq / params.tmaxI / 1000 * 60
     }
 
-    computeSteadyState(u: PatientInput, _t?: Date): State {
-        const params = this.getParameterValues()
+    computeSteadyState(u: PatientInput, t: Date): State {
+        const params = this.evaluateParameterValuesAt(t)
         /** equilibrium blood glucose levels in mmol/l */
         const Gpeq = params.Gpeq / mmolG2mg * 10
         const F01eq = params.F01 * params.BW * Math.min(Gpeq / 4.5, 1)
@@ -115,9 +115,9 @@ export class Cambridge
         }
     }
 
-    computeDerivatives(_t: Date, x: State, u: PatientInput): State {
+    computeDerivatives(t: Date, x: State, u: PatientInput): State {
         /** model parameters */
-        const params = this.getParameterValues()
+        const params =this.evaluateParameterValuesAt(t)
 
         // inputs
         /** meal ingestion in mmol/min */
@@ -164,8 +164,8 @@ export class Cambridge
 
     }
 
-    computeOutput(_t: Date, x: State): PatientOutput {
-        const params = this.getParameterValues()
+    computeOutput(t: Date, x: State): PatientOutput {
+        const params = this.evaluateParameterValuesAt(t)
         return {
             Gp: x.Q1 / (params.VG * params.BW) * mmolG2mg / 10,
         }
@@ -177,7 +177,7 @@ const mmolG2mg = 180.16
 
 
 /** Description of parameters. */
-const parameterDescription = {
+export const parameterDescription = {
     /** homeostatic glucose concentration in plasma */
     "Gpeq": { unit: "mg/dl", default: 100, step: 10 },
     /** body weight in kg */
@@ -215,7 +215,7 @@ const parameterDescription = {
 }
 
 /** Description of state variables. */
-const stateDescription = {
+export const stateDescription = {
     /** mass in accessible compartment (plasma) in mmol */
     Q1: { unit: "mmol" },
     /** mass in non-accessible compartment in mmol */

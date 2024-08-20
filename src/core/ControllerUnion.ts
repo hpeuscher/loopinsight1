@@ -200,6 +200,15 @@ export default class ControllerUnion implements Controller {
         return p
     }
 
+    evaluateParameterValuesAt(t: Date): ParameterValues {
+        let p: ParameterValues = {}
+        for (const controller of this._controllers) {
+            p = { ...p, ...controller.evaluateParameterValuesAt(t) }
+        }
+        // console.log("getting from " + this.constructor.name + " " + JSON.stringify(p))
+        return p
+    }
+
     setParameterValues(parameters: ParameterValues) {
         for (const controller of this._controllers) {
             // valid parameter ids of this controller

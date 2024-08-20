@@ -18,7 +18,7 @@ import EventManager from '../EventManager.js'
 export const profile: ModuleProfile = {
     type: "controller",
     id: "MealBolus",
-    version: "2.0.0",
+    version: "2.1.0",
     name: "Meal bolus",
 }
 
@@ -60,7 +60,7 @@ export default class MealBolus
 
     update(t: Date, _s: TracedMeasurement, announcements: AnnouncementList = {}) {
 
-        const parameters = this.getParameterValues()
+        const parameters = this.evaluateParameterValuesAt(t)
 
         // find announcements that are upcoming within premealTime and not yet handled
         const upcomingIDs = this.manager.update(announcements, (uid) => 

@@ -13,7 +13,7 @@ import AbstractSensor from '../AbstractSensor.js'
 export const profile: ModuleProfile = {
     type: "sensor",
     id: "IdealCGM",
-    version: "2.0.0",
+    version: "2.1.0",
     name: "Ideal CGM sensor",
 }
 
@@ -39,7 +39,7 @@ export default class CGMSensor
     }
 
     update(t: Date, y: PatientOutput) {
-        const params = this.getParameterValues()
+        const params = this.evaluateParameterValuesAt(t)
         // sampling
         if (isMultipleOfSamplingTime(t, params.samplingTime)) {
             this.output = { CGM: y.Gp }

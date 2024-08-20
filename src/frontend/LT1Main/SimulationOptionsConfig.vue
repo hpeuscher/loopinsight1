@@ -12,14 +12,6 @@ import AccordionBox from './AccordionBox.vue'
 import { ParameterDescriptions, ParameterValues } from '../../types/ParametricModule.js'
 import { ModuleTranslationList } from '../../types/ModuleProfile.js'
 
-const thisMorning6am = new Date(new Date(Date.now()).toISOString().substring(0, 11) + "06:00")
-
-const config: ParameterDescriptions = {
-    t0: { default: thisMorning6am },
-    tspan: { unit: "h", default: 12, increment: 4 },
-    seed: { unit: "", default: 1, increment: 1 },
-    dt: { unit: "min", default: 5, increment: 1 },
-}
 
 const i18n: ModuleTranslationList = {
     en: {
@@ -51,6 +43,12 @@ export default defineComponent({
 
     computed: {
         config() {
+            const config: ParameterDescriptions = {
+                t0: { default: new Date(new Date(Date.now()).setHours(0,0,0,0)) },
+                tspan: { unit: "h", default: 24, increment: 4 },
+                seed: { unit: "", default: 1, increment: 1 },
+                dt: { unit: "min", default: 5, increment: 1 },
+            }
             return config
         },
         description() {
