@@ -10,9 +10,8 @@ import { defineComponent, PropType, toRaw } from 'vue'
 import { defineAsyncComponent } from 'vue'
 import { ModuleContents, ModuleImportList, ModuleProfileList } from '../../types/ModuleProfile.js'
 import ControllerConfig from './ControllerConfig.vue'
-import Patient, { PatientProfile } from '../../types/Patient.js'
+import { PatientProfile } from '../../types/Patient.js'
 import AccordionBox from './AccordionBox.vue'
-import { VueI18n } from 'vue-i18n'
 
 /** 
  * type describing contents of <i18n> block.
@@ -28,6 +27,7 @@ declare type I18nLanguage = {
 /** list of controller components */
 const controllerList = [
     "Oref0",
+    "MPC_Hovorka2004",
     "BasalBolus",
     "CSII",
     "MealBolus",

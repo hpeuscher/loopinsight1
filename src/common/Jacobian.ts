@@ -6,6 +6,7 @@
  */
 
 import { Matrix, Vector } from '../types/CommonTypes.js'
+import { transpose } from './LinearAlgebra.js'
 
 /**
  * Class to compute a Jacobian matrix for a vector-valued differentiable
@@ -25,15 +26,12 @@ export default class Jacobian {
         const y0 = f(x0)
         x0.forEach(function (_v, i) {
             let x = x0.slice()  // copy
-            x[i] = x[i] + 1e-10
+            x[i] = x[i] + 1e-10 // TODO
             const y = f(x)
             A.push(y.map((_v, i) => (y[i] - y0[i]) * 1e10))
         })
         // transpose result
-        const A_T = A.map((c, i) => {
-            return c.map((_a, j) => A[j][i])
-        })
-        this.J = A_T
+        this.J = transpose(A)
     }
 
     public getMatrix(): Matrix {

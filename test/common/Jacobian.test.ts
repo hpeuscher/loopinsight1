@@ -32,4 +32,37 @@ describe("Jacobian", () => {
         })
     })
 
+    describe("example of function with N=3, m=1", () => {
+        const fTest: ((x: Vector) => Vector) = (x) => {
+            const eps: number = 1
+            const [x1, x2, x3] = x
+            const result: Vector = [x1 + x2*x2 + x3*x3*x3]
+            return result
+        }
+
+        it("should produce correct derivatives at [1,1,1]", () => {
+            const x0: Vector = [1, 1, 1]
+            const jac: Matrix = new Jacobian(fTest, x0).getMatrix()
+            assertTolerantMatrixEquality(jac, [[1, 2, 3]], 1e-6)
+        })
+
+    })
+
+    describe("example of function with N=1, m=3", () => {
+        const fTest: ((x: Vector) => Vector) = (x) => {
+            const eps: number = 1
+            const [x1] = x
+            const result: Vector = [x1, x1*x1, x1*x1*x1]
+            return result
+        }
+
+        it("should produce correct derivatives at [1]", () => {
+            const x0: Vector = [1]
+            const jac: Matrix = new Jacobian(fTest, x0).getMatrix()
+            assertTolerantMatrixEquality(jac, [[1], [2], [3]], 1e-6)
+        })
+
+    })
+
+
 })
