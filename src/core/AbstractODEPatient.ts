@@ -94,7 +94,7 @@ export function createPatientFromODE
             return this._patient.getOutput()
         }
 
-        getState(): PatientState {
+        getState(): TypedPatientState<S> {
             return this._patient.getState()
         }
 
