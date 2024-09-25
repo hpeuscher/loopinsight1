@@ -44,6 +44,7 @@ export default defineComponent({
                     return toRaw(mealBolus.getController())
                 }
                 else {
+                    // TODO: first check if ALL parts of ControllerUnion are valid            
                     const mealBolus = <InstanceType<typeof ControllerConfig>>
                         this.$refs.mealBolus
                     const correctionBolus = <InstanceType<typeof ControllerConfig>>

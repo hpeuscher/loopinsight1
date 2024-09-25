@@ -66,6 +66,9 @@ export default defineComponent({
     },
 
     mounted() {
+        // add three meals
+        this.addRow()
+        this.addRow()
         this.addRow()
     },
 

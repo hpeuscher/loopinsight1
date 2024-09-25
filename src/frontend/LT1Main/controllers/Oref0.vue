@@ -32,16 +32,19 @@ export default defineComponent({
 
 	methods: {
 
-        getController(): Controller {
-            const mealBolus = <InstanceType<typeof MealBolus>>
-                this.$refs.MealBolus
-            const oref0 = <InstanceType<typeof ControllerConfig>>
-                this.$refs.oref0
+        getController(): Controller | undefined {
+            // first check if ALL parts of ControllerUnion are valid
+            const mealBolus = toRaw((<InstanceType<typeof MealBolus>>
+                this.$refs.MealBolus).getController())
+            if (typeof mealBolus?.update === "undefined")
+                return undefined
+
+            const oref0 = toRaw((<InstanceType<typeof ControllerConfig>>
+                this.$refs.oref0).getController())
+            if (typeof oref0?.update === "undefined")
+                return undefined
             
-            return new ControllerUnion([
-                toRaw(mealBolus.getController()),
-                toRaw(oref0.getController()),
-            ])
+            return new ControllerUnion([mealBolus, oref0])
         },
 
         onControllerChanged() {

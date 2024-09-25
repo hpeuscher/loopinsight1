@@ -75,7 +75,7 @@ export default defineComponent({
             :type="'sensor'"
             :modelInfo="modelInfo"
             :modelImports="modelImports"
-            :defaultModel="'IdealCGM'"
+            :defaultModel="'Breton2008'"
             @valueChanged="(args) => $emit('valueChanged', args)"
         />
     </AccordionBox>

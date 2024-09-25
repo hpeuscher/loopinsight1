@@ -27,7 +27,7 @@ import Sensor from '../../types/Sensor.js'
 import Actuator from '../../types/Actuator.js'
 import Exercise from '../../types/Exercise.js'
 import Meal from '../../types/Meal.js'
-import Simulator, {SimulatorOptions} from '../../core/Simulator.js'
+import Simulator, { SimulatorOptions } from '../../core/Simulator.js'
 
 
 // prepare simulator
@@ -87,8 +87,18 @@ export default defineComponent({
             meals: [] as Meal[],
             exerciseUnits: [] as Exercise[],
             options: {} as SimulatorOptions,
-            myCharts: [],
         }
+    },
+
+    async mounted() {
+        // wait until all elements of simulation have been initialized
+        const isEmpty = (o: any) => (typeof o.update !== "function")
+        while (isEmpty(this.getPatient()) || isEmpty(this.getController()) ||
+            isEmpty(this.getSensor()) || isEmpty(this.getActuator())) {
+            await new Promise(r => setTimeout(r, 10))
+        }
+        // run simulation to populate graphs
+        this.run()
     },
 
     methods: {
@@ -203,7 +213,8 @@ export default defineComponent({
     <div class="lt1-container">
         <div class="box lt1-controls">
             <h2>{{ $t("settings") }}</h2>
-            <ControllerSelection @controllerChanged="controllerChanged" :patientProfile="patientProfile" ref="controller" />
+            <ControllerSelection @controllerChanged="controllerChanged" 
+                :patientProfile="patientProfile" ref="controller" />
             <SensorSelection @valueChanged="sensorChanged" />
             <ActuatorSelection @valueChanged="actuatorChanged" />
             <VirtualPatientSelection @patientChanged="patientChanged" />
@@ -219,7 +230,7 @@ export default defineComponent({
                         padding: '2rem'
                     },
                 }">
-                <br/>
+                <br />
                 <div style="font-size: 0.8em;">
                     {{ $t("shortcut") }}
                 </div>

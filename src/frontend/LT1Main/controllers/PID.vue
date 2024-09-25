@@ -35,6 +35,7 @@ export default defineComponent({
 
     methods: {
         getController(): Controller {
+            // TODO: first check if ALL parts of ControllerUnion are valid            
             const mealBolus = <InstanceType<typeof MealBolus>>this.$refs.MealBolus
             const PID = <InstanceType<typeof ControllerConfig>>this.$refs.PID
             return new ControllerUnion([
