@@ -4,8 +4,8 @@
   "description": "A modular framework for in-browser diabetes simulation",
   "type": "module",
   "scripts": {
-    "serve": "npx cross-env NODE_OPTIONS=--loader=ts-node/esm --moduleResolution=nodenext --target=es2017 webpack serve --config webpack.dev.js --stats-modules-space 999",
-    "build": "npx cross-env NODE_OPTIONS=--loader=ts-node/esm --moduleResolution=nodenext --target=es2017 webpack build --config webpack.prod.js --stats-modules-space 999",
+    "serve": "npx cross-env NODE_OPTIONS=--import=./register.js --moduleResolution=nodenext --target=es2017 webpack serve --config webpack.dev.js --stats-modules-space 999",
+    "build": "npx cross-env NODE_OPTIONS=--import=./register.js --moduleResolution=nodenext --target=es2017 webpack build --config webpack.prod.js --stats-modules-space 999",
     "postinstall": "patch-package",
     "test": "npx c8 mocha && npx c8 mocha --reporter mocha-badge-generator"
   },
