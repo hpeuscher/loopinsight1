@@ -82,6 +82,10 @@ export function createPatientFromODE
             return this._patient.reset(t, seed, solver)
         }
 
+        getInitialState(){
+            return this._patient.getInitialState()
+        }
+
         setInitialState(x0: TypedPatientState<S>) {
             return this._patient.setInitialState(x0)
         }

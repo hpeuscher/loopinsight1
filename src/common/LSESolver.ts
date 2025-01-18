@@ -6,6 +6,7 @@
  */
 
 import { Matrix, Vector } from '../types/CommonTypes.js'
+import { transpose } from '../common/LinearAlgebra.js'
 
 /**
  * solves a linear system A*x=b
@@ -35,6 +36,16 @@ export default class LSESolver {
         return this.solveWithLU(this.LU, this.P, b)
     }
 
+    /**
+     * solves a linear system A*X=B
+     * 
+     * @param {Matrix} B: right hand side matrix B
+     * @returns {Matrix} X: solution of A*X=B	
+     */
+    public solveMatrix(B: Matrix): Matrix {
+        return transpose(transpose(B).map(
+            (b: Vector)=>this.solveWithLU(this.LU, this.P, b)))
+    }
 
     /**
      * solves a linear system A*x=b using known LU decomposition of A

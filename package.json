@@ -4,8 +4,8 @@
   "description": "A modular framework for in-browser diabetes simulation",
   "type": "module",
   "scripts": {
-    "serve": "npx cross-env NODE_OPTIONS=--import=./register.js --moduleResolution=nodenext --target=es2017 webpack serve --config webpack.dev.js --stats-modules-space 999",
-    "build": "npx cross-env NODE_OPTIONS=--import=./register.js --moduleResolution=nodenext --target=es2017 webpack build --config webpack.prod.js --stats-modules-space 999",
+    "serve": "npx cross-env NODE_OPTIONS=--import=./register.js --moduleResolution=nodenext --target=es2017 webpack serve --config webpack.dev.ts --stats-modules-space 999",
+    "build": "npx cross-env NODE_OPTIONS=--import=./register.js --moduleResolution=nodenext --target=es2017 webpack build --config webpack.prod.ts --stats-modules-space 999",
     "postinstall": "patch-package",
     "test": "npx c8 mocha && npx c8 mocha --reporter mocha-badge-generator"
   },
@@ -13,7 +13,7 @@
   "license": "MIT",
   "dependencies": {
     "@svgdotjs/svg.js": "^3.2.0",
-    "chart.js": "^4.2.1",
+    "chart.js": "^4.4.7",
     "chartjs-adapter-luxon": "^1.3.1",
     "d3": "^7.8.5",
     "floating-vue": "^5.2.2",
@@ -22,33 +22,35 @@
   },
   "devDependencies": {
     "@intlify/vue-i18n-loader": "^4.2.0",
-    "@types/chai": "^4.3.10",
+    "@types/chai": "^5.0.1",
     "@types/d3": "^7.4.3",
-    "@types/mocha": "^10.0.3",
-    "@types/node": "^22.3.0",
+    "@types/mocha": "^10.0.10",
+    "@types/node": "^22.10.7",
+    "@types/webpack": "^5.28.5",
+    "@types/webpack-dev-server": "^4.7.1",
     "@types/webpack-env": "^1.18.3",
-    "chai": "^5.1.1",
+    "chai": "^5.1.2",
     "copy-webpack-plugin": "^12.0.2",
     "css-loader": "^7.1.2",
     "file-loader": "^6.2.0",
-    "html-webpack-plugin": "^5.5.0",
-    "mocha": "^10.2.0",
+    "html-webpack-plugin": "^5.6.3",
+    "mocha": "^11.0.1",
     "mocha-badge-generator": "^0.11.0",
     "patch-package": "^8.0.0",
     "process": "^0.11.10",
     "style-loader": "^4.0.0",
-    "ts-loader": "^9.5.1",
-    "ts-node": "^10.9.1",
-    "typescript": "^5.3.2",
-    "vue": "^3.4.38",
+    "ts-loader": "^9.5.2",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.7.3",
+    "vue": "^3.5.13",
     "vue-hot-reload-api": "^2.3.4",
     "vue-i18n": "^9.7.0",
     "vue-loader": "^17.3.0",
     "vue-shared": "^1.0.7",
     "vue-style-loader": "^4.1.3",
-    "webpack": "^5.89.0",
-    "webpack-cli": "^5.0.1",
-    "webpack-dev-server": "^5.0.4",
+    "webpack": "^5.97.1",
+    "webpack-cli": "^6.0.1",
+    "webpack-dev-server": "^5.2.0",
     "webpack-merge": "^6.0.1"
   },
   "exports": {
@@ -63,4 +65,3 @@
     }
   }
 }
-  

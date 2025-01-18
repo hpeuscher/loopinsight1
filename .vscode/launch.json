@@ -70,5 +70,12 @@
             "cwd": "${workspaceRoot}/examples/ExerciseModelsComparison/",
             "type": "node-terminal",
         },
+        {
+            "name": "MPC test",
+            "command": "node --loader ts-node/esm ./MPC.ts",
+            "request": "launch",
+            "cwd": "${workspaceRoot}/examples/MPC/",
+            "type": "node-terminal",
+        },
     ]
 }

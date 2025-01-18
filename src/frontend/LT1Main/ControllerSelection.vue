@@ -59,7 +59,7 @@ export default defineComponent({
     data() {
         return {
             controllerProfiles: {} as ModuleProfileList,
-            selectedID: "Oref0",
+            selectedID: "MPC_Hovorka2004",
         }
     },
 

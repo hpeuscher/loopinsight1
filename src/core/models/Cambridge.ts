@@ -146,15 +146,17 @@ export class Cambridge
 
         // compute and return vector of derivatives dx/dt
         return {
+            // glucose subsystem
+            Q1: - F01c - x.x1 * x.Q1 + params.k12 * x.Q2
+                - FR + UG + params.EGP0 * params.BW * (1 - x.x3),
+            Q2: x.x1 * x.Q1 - (params.k12 + x.x2) * x.Q2,
+
             // insulin subsystem
             S1: - x.S1 / params.tmaxI + IIR,
             S2: (x.S1 - x.S2) / params.tmaxI,
             I: x.S2 / params.tmaxI / (params.VI * params.BW) - params.ke * x.I,
 
-            // glucose subsystem
-            Q1: - F01c - x.x1 * x.Q1 + params.k12 * x.Q2
-                - FR + UG + params.EGP0 * params.BW * (1 - x.x3),
-            Q2: x.x1 * x.Q1 - (params.k12 + x.x2) * x.Q2,
+            // insulin action subsystem
             x1: -params.ka1 * x.x1 + kb1 * x.I,
             x2: -params.ka2 * x.x2 + kb2 * x.I,
             x3: -params.ka3 * x.x3 + kb3 * x.I,
@@ -241,7 +243,7 @@ export const stateDescription = {
 } satisfies StateDescription
 
 /** Type for patient state, i.e. numeric values of the state variables. */
-type State = TypedPatientState<typeof stateDescription>
+export type State = TypedPatientState<typeof stateDescription>
 
 /** Use mixin to create Patient from ODEPatientModel. */
 export default createPatientFromODE
