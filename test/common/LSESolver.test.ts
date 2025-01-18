@@ -40,5 +40,38 @@ describe("LSESolver", () => {
         expect(clone).to.deep.equal(input)
     })
 
+    /**
+     * Unit test for solveLSE which should solve a linear system of equations A*X=B
+     */
+    describe("solveMatrix", () => {
+
+        const B: Matrix = [
+            [1, 2],
+            [2, 4],
+            [3, 6]
+        ]
+        const expected: Matrix = [
+            [1, 2],
+            [0, 0],
+            [0, 0]
+        ]
+
+        it("should return correct solution for A * X = B", () => {
+            const result: Matrix = solver.solveMatrix(B)
+            
+            expect(result).to.be.an("array");
+            expect(result.length).to.equal(expected.length)
+            expect(result[0].length).to.equal(expected[0].length);
+
+            result.forEach((row, i) => {
+                expect(vectorDifferenceNorm(row, expected[i])).to.be.lessThan(1e-10);
+            })
+        })
+
+    })
+
 
 })
+
+    
+    

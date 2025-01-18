@@ -1,9 +1,9 @@
-/* This file is part of LoopInsighT1, an open source tool to
+/** 
+ * This file is part of LoopInsighT1, an open source tool to
  * simulate closed-loop glycemic control in type 1 diabetes.
  * Distributed under the MIT software license.
  * See https://lt1.org for further information.
  */
-
 
 import { Matrix, Vector } from '../types/CommonTypes.js'
 
@@ -15,8 +15,6 @@ import { Matrix, Vector } from '../types/CommonTypes.js'
 export function transpose(A: Matrix): Matrix {
     return A[0].map( (a_, i) => A.map((a) => a[i]))
 } 
-
-
 
 /**
  * Performs matrix multiplication.
@@ -48,7 +46,6 @@ export function addScalarToDiagonal(A: Matrix, lambda: number): Matrix {
     return A
 }
 
-
 /**
  * Returns diagonal entries of matrix.
  * @param {Matrix} A
@@ -71,7 +68,6 @@ export function addToDiagonal(A: Matrix, v: Vector): Matrix {
     return A.map((ai,i) => ai.map( (aij,j) => i==j ? aij + v[i] : aij ))
 }
 
-
 /**
  * Performs matrix-vector multiplication.
  * @param {Matrix} A
@@ -85,7 +81,6 @@ export function matrixTimesVector(A: Matrix, b: Vector): Vector {
                 (c, a_k, k) => c + a_k*b[k], 0) )
 }
 
-
 /**
  * Multiplies vector by scalar.
  * @param {Vector} v
@@ -95,7 +90,6 @@ export function matrixTimesVector(A: Matrix, b: Vector): Vector {
 export function vectorTimesScalar(v: Vector, a: number): Vector {
     return v.map( (e) => e * a )
 }
-
 
 /**
  * Calculates the sum of squares of a vector.
@@ -118,4 +112,91 @@ export function frobeniusNorm(A: Matrix): number {
         norm + ai.reduce((rowsum, aii) => rowsum + aii*aii, 0), 0)
 }
 
+/**
+ * Performs matrix addition.
+ * Adds two matrices of the same dimension.
+ * @param {Matrix} A
+ * @param {Matrix} B
+ * @returns {Matrix} A + B
+ */
+export function matrixAddition(A: Matrix, B: Matrix): Matrix {
+    console.assert(A.length === B.length && A[0].length === B[0].length, "Matrices must be of the same dimension.")
+    return A.map((row, i) => row.map((val, j) => val + B[i][j]))
+}
 
+/**
+ * Performs vector addition.
+ * Adds two vectors of the same dimension.
+ * @param {Vector} A 
+ * @param {Vector} B 
+ * @returns {Vector} A + B 
+ */
+export function vectorAddition(A: Vector, B: Vector): Vector {
+    console.assert(A.length === B.length, "Vectors must be of the same dimension.")
+    return A.map((val, i) => val + B[i])
+}
+
+/**
+ * Multiplies a scalar with a matrix.
+ * @param {number} a 
+ * @param {Matrix} B
+ * @returns {Matrix} a * B
+ */
+export function scalarMultiplyMatrix(a: number, B: Matrix): Matrix {
+    return B.map(row => row.map(element => a * element))
+}
+
+/**
+ * Generates a eye matrix of the given size.
+ * @param {number} size 
+ * @returns {Matrix} 
+ */
+export function eye(size: number): Matrix {
+    const I = [];
+    for (let i = 0; i < size; i++) {
+        const row = Array(size).fill(0)
+        row[i] = 1
+        I.push(row)
+    }
+    return I
+}
+
+/**
+ * Performs matrix subtraction.
+ * Subtracts matrix B from matrix A of the same dimension.
+ * @param {Matrix} A
+ * @param {Matrix} B
+ * @returns {Matrix} A - B
+ */
+export function matrixSubtraction(A: Matrix, B: Matrix): Matrix {
+    console.assert(A.length === B.length && A[0].length === B[0].length, "Matrices must be of the same dimension.");
+    return A.map((row, i) => row.map((val, j) => val - B[i][j]));
+}
+
+
+/**
+ * Multiplies the diagonal elements of a matrix by a scalar.
+ * @param {Matrix} A - The input matrix.
+ * @param {number} scalar - The scalar to multiply with the diagonal.
+ * @returns {Matrix} - The resulting matrix with scaled diagonal elements.
+ */
+export function scalarMultiplyDiagonal(A: Matrix, scalar: number): Matrix {
+    console.assert(A.length === A[0].length, "Matrix must be square.");
+    
+    return A.map((row, i) => 
+        row.map((val, j) => (i === j ? val * scalar : val))
+    );
+}
+
+/**
+ * Creates a diagonal matrix with elements from a vector.
+ * @param {Vector} v - The vector containing the diagonal elements.
+ * @returns {Matrix} - A square matrix with the vector elements as its diagonal.
+ */
+export function vectorToDiagonalMatrix(v: Vector): Matrix {
+    const size = v.length;
+    
+    return Array.from({ length: size }, (_, i) =>
+        Array.from({ length: size }, (_, j) => (i === j ? v[i] : 0))
+    );
+}

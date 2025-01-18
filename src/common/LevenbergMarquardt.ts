@@ -5,18 +5,15 @@
  * See https://lt1.org for further information.
  */
 
-import { Matrix, Vector } from '../types/CommonTypes.js'
+import { Vector } from '../types/CommonTypes.js'
 import Jacobian from './Jacobian.js'
 import {
     addScalarToDiagonal,
-    addToDiagonal,
     frobeniusNorm,
-    getDiagonal,
     matrixMultiplication,
     matrixTimesVector,
     sumOfSquares,
-    transpose,
-    vectorTimesScalar
+    transpose
 } from './LinearAlgebra.js'
 import LSESolver from './LSESolver.js'
 
@@ -44,7 +41,14 @@ export default class LevenbergMarquardt {
      * @param logcb - 
      * @returns 
      */
-    public findMinimum(u0: Vector, lambda: number, reltol: number = 1e-6, logcb: (msg: string) => void): Vector {
+    public findMinimum(
+        u0: Vector,
+        lambda: number,
+        reltol: number = 1e-3,
+        logcb: (msg: string) => void,
+        lowerBound?: number,
+        upperBound?: number
+    ): Vector {
         /** optimization variable */
         let u = u0
         /** 2-norm of  */
@@ -61,25 +65,35 @@ export default class LevenbergMarquardt {
             let M = addScalarToDiagonal(JTJ, lambda * frobeniusNorm(JT))
             const dz = new LSESolver(M).solve(JTb)
 
-            // update z
+            // update z and respect limits
             // TODO: this is no good spot to put constraints on u - where is?
-            const znew = u.map((v, i) => Math.max(0, v - dz[i]))
-
-            // log
-            logcb(`Step ${i}: J = ${b}`)
+            const znew = u.map((v, i) => {
+                let newVal = v - dz[i]
+                if (typeof lowerBound !== "undefined")
+                    newVal = Math.max(lowerBound, newVal)
+                if (typeof upperBound !== "undefined")
+                    newVal = Math.min(upperBound, newVal)
+                return newVal
+            });
 
             /** squared 2-norm */
             const norm2 = sumOfSquares(this.f(znew))
+
             if (norm2 > norm2_old) {
                 // cost funcational deteriorated 
                 // -> do not use new values, increase lambda instead
-                lambda = lambda * 5 // TODO: find good value
+                lambda = lambda * 2 // TODO: find good value
+                // log
+                logcb(`Step ${i}: J = ${norm2} -> refuse, lambda = ${lambda}`)
 
             } else {
+                // accept new optimized u
                 u = znew
                 // decrease lambda slightly
-                lambda = lambda / 1.25  // TODO: find good value
-                if (Math.sqrt(norm2_old / norm2) - 1 < reltol) {
+                lambda = lambda * 0.8  // TODO: find good value
+                // log
+                logcb(`Step ${i}: J = ${norm2} -> accept, lambda = ${lambda}`)
+                if (Math.abs(norm2_old - norm2) / norm2_old < reltol) {
                     // converged -> break
                     // TODO: improve this stopping criterion
                     return u
@@ -91,7 +105,3 @@ export default class LevenbergMarquardt {
     }
 
 }
-
-
-
-

@@ -5,9 +5,10 @@
  * See https://lt1.org for further information.
  */
 
+import { Vector } from '../../types/CommonTypes.js'
 import { isMultipleOfSamplingTime } from '../../common/DateUtility.js'
 import LevenbergMarquardt from '../../common/LevenbergMarquardt.js'
-import { sumOfSquares } from '../../common/LinearAlgebra.js'
+import EKF from '../../common/EKF.js'
 import Controller, {
     AnnouncementList,
     ControllerOutput,
@@ -16,10 +17,11 @@ import Controller, {
 } from '../../types/Controller.js'
 import { ModuleProfile } from '../../types/ModuleProfile.js'
 import { ParameterDescriptions } from '../../types/ParametricModule.js'
-import { PatientInputOverTime } from '../../types/Signals.js'
+import { PatientInput, PatientInputOverTime } from '../../types/Signals.js'
 import AbstractController from '../AbstractController.js'
-import Cambridge from '../models/Cambridge.js'
+import Cambridge, { stateDescription, State, i18n_tooltip as stateTranslation } from '../models/Cambridge.js'
 import SolverRK1 from '../solvers/SolverRK1.js'
+import { scalarMultiplyDiagonal, eye, vectorToDiagonalMatrix } from '../../common/LinearAlgebra.js'
 
 /**
  * Class that describes nonlinear model predictive controller.
@@ -52,7 +54,12 @@ export default class MPC_Hovorka2004
     protected patient = new Cambridge()
     /** forward Euler solver */
     protected solver = new SolverRK1()
-
+    /** Initialization of observer */
+    protected ekf!: EKF
+    /** Process noise for Observer */
+    protected Q!: number[][]
+    /** Measurement noise for Observer */
+    protected R!: number[][]
 
     getParameterDescription() {
         return MPCParameters
@@ -79,11 +86,13 @@ export default class MPC_Hovorka2004
         this.output = {}
         this._tLast = t
 
+        const iir = this.patient.computeIIR?.(120, t) ?? 0.4
+
         // reset previous optimal control curve to constant values
         const params = this.evaluateParameterValuesAt(t)
         const u0 = []
         for (let i = 0; i < params.predictionHorizon; i++) {
-            u0.push(1)
+            u0.push(iir)
         }
         this.u_opt_last = u0
 
@@ -92,6 +101,36 @@ export default class MPC_Hovorka2004
 
         // assume steady state in observer
         this.patient.setInitialState(undefined!)
+
+        // Initialization of Observer 
+        // Initial matrix of covariance
+        const P_ini = scalarMultiplyDiagonal(eye(10), 0.1)
+        // Inital start of observer in steady state
+        const x_ini = this.patient.computeSteadyState({
+            iir,
+            hir: 0,
+            carbs: 0,
+            exercise: 0,
+            meal: 0
+        }, t)
+
+        this.ekf = new EKF(
+            (t: Date, x: Vector, u: PatientInput) => {
+                const state = mapVectorToState(x)
+                const derivatives = this.patient.computeDerivatives(t, state, u)
+                return Object.values(derivatives)
+            },
+            (t: Date, x: Vector) => {
+                const state = mapVectorToState(x)
+                return [this.patient.computeOutput(t, state).Gp]
+            },
+            mapStateToVector(x_ini),
+            P_ini
+        )
+
+        // Initialization of process and measurement noise
+        this.Q = vectorToDiagonalMatrix(Object.keys(stateDescription).map((k)=><any>params.processNoise[k]))
+        this.R = vectorToDiagonalMatrix(params.measurementNoise)
     }
 
     update(t: Date, s: TracedMeasurement, a: AnnouncementList = {}) {
@@ -105,13 +144,17 @@ export default class MPC_Hovorka2004
             /** measured glucose concentration in mg/dl */
             const G = s.CGM?.() || NaN
 
-            const params = this.evaluateParameterValuesAt(t)
             /** prediction step size */
             const dt = params.predictionStep
+
+            //Innovation step of observer
+            let x_est = this.ekf.innovation(t, [G], this.R)
+            this.patient.setInitialState(mapVectorToState(x_est))
+
             /** relative step size stopping criterion */
-            const reltol = 1e-2
+            const reltol = 1e-3
             /** initial Levenberg-Marquardt dampening */
-            const lambda = 0.01
+            const lambda = 0.1
 
             // use previous optimal curve as initial values for optimization, 
             // but remove first element and copy last element instead
@@ -121,24 +164,31 @@ export default class MPC_Hovorka2004
             // prepare log
             let log: Array<string> = []
 
+            // compute target trajectory
+            const targetprojector = new TargetProjector(
+                G, params.predictionHorizon, params.predictionStep,
+                params.targetBG)
+            const G_target = targetprojector.getTargetTrajectory()
+
             // instanciate and call optimizer
             const u_opt = new LevenbergMarquardt((u) => {
 
-                // step 1: perform simulation for given input sequence u
+                // perform simulation for given input sequence u
                 const G_pred = this.predict(u, t, dt, a)
 
-                // step 2: compute desired BG values
-                let G_target = []
-                for (let i = 0; i < params.predictionHorizon; i++) {
-                    // TODO: replace by exponential / linear curve starting from current value
-                    G_target.push(params.targetBG)  
+                // compute cost functional
+                const RG = G_pred.map((G_, i) => G_ - G_target[i])
+                const RU = u.slice(1).map((value, index) => (value - u[index]) / Math.sqrt(params.kaggr))
+                const R = []
+                for (let i = 0; i < G_target.length - 1; i++) {
+                    R[2 * i] = RG[i]
+                    R[2 * i + 1] = RU[i]
                 }
+                R.push(RG[RG.length - 1])
 
-                // step 3: compute cost functional
-                // TODO: add second term from Hovorka's paper, including kaggr
-                const J = sumOfSquares(G_target.map((G_, i) => G_target[i] - G_pred[i]))
-                return [J]
-            }).findMinimum(u0, lambda, reltol, (msg: string) => log.push(msg))
+                return R
+            }).findMinimum(u0, lambda, reltol, (msg: string) =>
+                log.push(msg), params.lowerBound, params.upperBound)
 
             // store predicted BG levels for interactive visualization
             const G_pred = this.predict(u_opt!, t, dt, a)
@@ -152,8 +202,10 @@ export default class MPC_Hovorka2004
                 debug: log,
             }
             // debugging info
-            log.unshift("u_opt: " + u_opt?.map((u) => Math.round(u * 1000) / 1000).join(", "))
-            log.unshift("G_pred: " + G_pred?.map((G) => Math.round(G * 1000) / 1000).join(", "))
+            log.unshift("u_opt: " + u_opt?.map((u) =>
+                Math.round(u * 1000) / 1000).join(", "))
+            log.unshift("G_pred: " + G_pred?.map((G) =>
+                Math.round(G * 1000) / 1000).join(", "))
 
             // store solution for next iteration
             this.u_opt_last = u_opt!
@@ -162,13 +214,9 @@ export default class MPC_Hovorka2004
             const iir = u_opt![0]
             this.output = { iir }
 
-            // update observer based on computed control output
-            // At the moment this is purely feedforward!
-            // TODO: Use feedback G (sensor measurement)! 
-            this.predict([iir], t, params.samplingTime, a)
-            log.unshift("new observer state: " + JSON.stringify( this.patient.getState()))
-            this.patient.setInitialState(this.patient.getState()!)
-
+            // Update step of observer
+            const u = (t: Date) => { return { iir: iir, carbs: momentaryCarbIntake(a, t) } }
+            this.ekf.prediction(params.samplingTime, t, u, this.Q)
         }
 
         return {}
@@ -193,7 +241,7 @@ export default class MPC_Hovorka2004
             /** patient input during next time step */
             const u_t: PatientInputOverTime = (t) => {
                 // TODO: take announcements into account
-                return { iir: u[k], carbs: momentaryCarbIntake(a, t)  }
+                return { iir: u[k], carbs: momentaryCarbIntake(a, t) }
             }
             // simulate one time step ahead
             this.patient.update(t_pred, u_t)
@@ -204,6 +252,79 @@ export default class MPC_Hovorka2004
     }
 
 }
+
+
+/**
+ * Class to generate target blood glucose trajectory according to [Hovorka 2004]
+ */
+export class TargetProjector {
+    /* Target glucose trajectory array */
+    private G_target: number[]
+
+    /**
+     * Constructor to create the glucose target trajectory
+     * 
+     * @param {number} G - Measured glucose concentraiton (mg/dL).
+     * @param {number} predictionHorizon - Prediction horizon.
+     * @param {number} dt - Time step in minutes.
+     * @param {number} targetBG - Target glucose concentration (mg/dL).
+     */
+    constructor(G: number, predictionHorizon: number, dt: number, targetBG: number) {
+        this.G_target = this.computeTargetTrajectory(G, predictionHorizon, dt, targetBG)
+    }
+
+    /**
+     * Function to compute the reference glucose trajectory
+     * 
+     * @param {number} G - Measured glucose concentration (mg/dL).
+     * @param {number} predictionHorizon - Prediction horizon.
+     * @param {number} dt - Time step in minutes.
+     * @param {number} targetBG - Target glucose concentration (mg/dL).
+     * @returns {number[]} - Simulated reference glucose trajectory.
+     */
+    private computeTargetTrajectory(G: number, predictionHorizon: number,
+        dt: number, targetBG: number): number[] {
+        const G_target: number[] = new Array(predictionHorizon).fill(0)
+        G_target[0] = G
+
+        // Conversion factor from mmol/L in mg/dL
+        const mmolL2mgdL = 18.018
+
+        // Parameters and thresholds based on the Hovorka paper [2004]
+        // Threshold at 8 mmol/L
+        const threshold_exp = mmolL2mgdL * 8
+        // Fast decrease rate (mg/dL per minute)
+        const fast_change_rate = (2 * mmolL2mgdL) / 60
+        // Slow decrease rate (mg/dL per minute) 
+        const slow_change_rate = (1 * mmolL2mgdL) / 60
+
+        for (let i = 1; i <= predictionHorizon; i++) {
+            if (G_target[i - 1] > threshold_exp) {
+                G_target[i] = Math.max(G_target[i - 1] - fast_change_rate * dt, targetBG)
+            } else if (G_target[i - 1] > targetBG) {
+                G_target[i] = Math.max(G_target[i - 1] - slow_change_rate * dt, targetBG)
+            } else if (G_target[i - 1] < targetBG) {
+                const a = Math.pow(0.5, dt / 15)
+                const b = 1 - a
+                G_target[i] = a * G_target[i - 1] + b * targetBG
+            } else {
+                G_target[i] = targetBG
+            }
+        }
+
+        return G_target.slice(1)
+    }
+
+    /**
+     * Get the computed glucose reference trajectory.
+     * 
+     * @returns {number[]} - Reference glucose trajectory.
+     */
+    public getTargetTrajectory(): number[] {
+        return this.G_target
+    }
+}
+
 
 /** Conversion factor from milliseconds to minutes. */
 const MS_PER_MIN = 60e3
@@ -216,7 +337,7 @@ const MS_PER_MIN = 60e3
  * @returns {number} Carb intake in g/min
  */
 function momentaryCarbIntake(meals: AnnouncementList, t: Date): number {
-    return Object.values(meals).map( (meal) => {
+    return Object.values(meals).map((meal) => {
         // assume meal duration of 15min
         const duration = 15
         // see if given time is within meal duration 
@@ -224,8 +345,33 @@ function momentaryCarbIntake(meals: AnnouncementList, t: Date): number {
         const tend = new Date(start.valueOf() + duration * MS_PER_MIN)
         return ((t >= start!) && (t < tend)) ? carbs / duration : 0
     })
-    // sum up contributions of all meals
-    .reduce((acc, next) => acc + next, 0)
+        // sum up contributions of all meals
+        .reduce((acc, next) => acc + next, 0)
+}
+
+/**
+ * Converts a vector to a State.
+ * 
+ * @param {Vector} x - Input vector with 10 elements representing the state.
+ * @returns {State} Mapped patient state from the vector.
+ */
+function mapVectorToState(x: Vector): State {
+    const stateNames = <Array<keyof State>>Object.keys(stateDescription)
+    return stateNames.reduce((state, field, index) => {
+        state[field] = x[index]
+        return state
+    }, {} as State)
+}
+
+
+/**
+ * Converts a State to a vector.
+ *
+ * @param {State} state - Input State to be converted.
+ * @returns {Vector} The resulting vector representation of the state.
+ */
+function mapStateToVector(state: State): Vector {
+    return Object.values(state)
 }
 
 
@@ -233,13 +379,22 @@ export const MPCParameters = {
     /** target blood glucose in mg/dl */
     targetBG: { unit: 'mg/dl', default: 120 },
     /** aggressivity factor */
-    kaggr: { unit: "1", default: 1, step: 0.1 },
+    kaggr: { unit: "", default: 1, step: 0.1 },
     /** sampling time in minutes */
     samplingTime: { unit: "min", default: 15, min: 5, step: 5 },
     /** prediction horizon (number of steps) */
     predictionHorizon: { unit: "steps", default: 12, step: 1 },
     /** prediction horizon (number of steps) */
     predictionStep: { unit: "min", default: 15, step: 5 },
+    /**  lower constraint of control size */
+    lowerBound: { unit: "mg/dL", default: 0, step: 0.1 },
+    /**  upper constraint of control size */
+    upperBound: { unit: "mg/dL", default: 4, step: 0.1 },
+    /** Process noise */
+    processNoise: { unit: "1", default: Object.fromEntries(
+        Object.keys(stateDescription).map((e) => [e, {default: 1, step: 0.1 }])) },
+    /** Measurement noise */
+    measurementNoise: { unit: "1", default: new Array(1).fill(4), step: 0.1 },
 
 } satisfies ParameterDescriptions
 
@@ -252,6 +407,10 @@ export const i18n_label = {
         "predictionHorizon": "Prediction horizon",
         "predictionStep": "Prediction step size",
         "kaggr": "Aggressivity factor",
+        "lowerBound": "lower Bound u",
+        "upperBound": "upper Bound u",
+        "processNoise": {_: "Process noise"},
+        "measurementNoise": "Measurement noise",
     },
 
     de: {
@@ -261,6 +420,10 @@ export const i18n_label = {
         "predictionHorizon": "Prädiktions-Horizont",
         "predictionStep": "Prädiktions-Schrittweite",
         "kaggr": "Aggressivititäts-Faktor",
+        "lowerBound": "untere Grenze u",
+        "upperBound": "obere Grenze u",
+        "processNoise": {_: "Prozessrauschen"},
+        "measurementNoise": "Messrauschen",
     },
 }
 
@@ -271,6 +434,10 @@ export const i18n_tooltip = {
         "predictionHorizon": "This is the number of time steps the controller looks ahead. The total predicted time range is the product of prediction horizon and prediction timestep.",
         "predictionStep": "The duration of one prediction step. The total predicted time range is the product of prediction horizon and prediction timestep.",
         "kaggr": "The higher this value is chosen, the stronger the controller varies basal rate to achieve the desired glucose curve. Smaller values lead to softer course of action.",
+        "lowerBound": "This is the lower limit of the control variable..",
+        "upperBound": "This is the upper limit of the control variable.",
+        "processNoise": {_: "The larger these value is chosen, the more the measurement is trusted. Large values indicate high uncertainty in the respective state of the system.", ...stateTranslation.en},
+        "measurementNoise": "The larger this value is chosen, the more the process model is trusted. High values indicate high uncertainties in the measurement model.",
     },
 
     de: {
@@ -279,5 +446,9 @@ export const i18n_tooltip = {
         "predictionHorizon": "So viele Zeitschritte blickt der Regler in die Zukunft. Der gesamte prädizierte Zeitraum ist das Produkt von Prädiktions-Horizont und Prädiktions-Schrittweite.",
         "predictionStep": "Die Dauer eines Prädiktions-Zeitschritts. Der gesamte prädizierte Zeitraum ist das Produkt von Prädiktions-Horizont und Prädiktions-Schrittweite.",
         "kaggr": "Je größer dieser Wert gewählt wird, desto stärker variiert der Regler die Basalrate, um den gewünschten Glukoseverlauf möglichst genau zu erreichen. Für kleinere Werte ist sein Vorgehen behutsamer.",
+        "lowerBound": "Das ist die untere Beschränkung der Stellgröße.",
+        "upperBound": "Das ist die obere Beschränkung der Stellgröße.",
+        "processNoise": {_: "Je größer dieser Wert gewählt werden, desto mehr wird auf die Messung vertraut. Große Werte bedeuten hohe Unsicherheit im jeweiligen Zustand des Systems.", ...stateTranslation.de},
+        "measurementNoise": "Je größer dieser Wert gewählt wird, desto mehr wird auf die Prozessmodell vertraut. Hohe Werte bedeuten hohe Unsicherheiten im Messmodell.",
     }
 }
