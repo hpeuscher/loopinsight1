@@ -154,7 +154,7 @@ export default class MPC_Hovorka2004
             /** relative step size stopping criterion */
             const reltol = 1e-3
             /** initial Levenberg-Marquardt dampening */
-            const lambda = 0.1
+            const lambda = 0.001
 
             // use previous optimal curve as initial values for optimization, 
             // but remove first element and copy last element instead
