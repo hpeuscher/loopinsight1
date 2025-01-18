@@ -9,7 +9,7 @@ import {entryConfig, HtmlPlugins} from './util/createWebpackEntryPoints.js'
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
-export default {
+export default <webpack.Configuration>{
   entry: entryConfig,
   output: {
     filename: '[name].bundle.js',
@@ -23,7 +23,7 @@ export default {
     },
     alias: {
         'vue$': 'vue/dist/vue.esm-browser.js',
-        'vue-i18n': 'vue-i18n/dist/vue-i18n.runtime.esm-bundler.js',
+        // 'vue-i18n': 'vue-i18n/dist/vue-i18n.runtime.esm-bundler.js',
     },
   },
   module: {

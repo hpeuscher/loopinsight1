@@ -124,50 +124,52 @@ export default defineComponent({
                     <col />
                     <col style="width: 70px" />
                 </colgroup>
-                <tr>
-                    <td></td>
-                    <td>{{ $t("tir.veryhigh") }} (>250 mg/dl)</td>
-                    <td>{{ tir_veryhigh_percent }} %</td>
-                </tr>
-                <tr>
-                    <td style="vertical-align: bottom">
-                        <div class="barCell" id="tir_veryhigh"
-                            :style="'height: ' + tir_veryhigh_percent * tir_height + 'px'"></div>
-                        <div class="barCell" id="tir_high" :style="'height: ' + tir_high_percent * tir_height + 'px'"></div>
-                    </td>
-                    <td style="vertical-align: bottom">
-                        {{ $t("tir.high") }} (181-250 mg/dl)
-                    </td>
-                    <td style="vertical-align: bottom">{{ tir_high_percent }} %</td>
-                </tr>
-                <tr>
-                    <td>
-                        <div class="barCell" id="tir_target" :style="'height: ' + tir_target_percent * tir_height + 'px'">
-                        </div>
-                    </td>
-                    <td>{{ $t("tir.targetrange") }} (70-180 mg/dl)</td>
-                    <td>{{ tir_target_percent }} %</td>
-                </tr>
-                <tr>
-                    <td style="vertical-align: top">
-                        <div class="barCell" id="tir_low" :style="'height: ' + tir_low_percent * tir_height + 'px'"></div>
-                        <div class="barCell" id="tir_verylow" :style="'height: ' + tir_verylow_percent * tir_height + 'px'">
-                        </div>
-                    </td>
-                    <td style="vertical-align: top">
-                        <div style="vertical-align: top">
-                            {{ $t("tir.low") }} (54-69 mg/dl)
-                        </div>
-                    </td>
-                    <td style="vertical-align: top">
-                        <div style="vertical-align: top">{{ tir_low_percent }} %</div>
-                    </td>
-                </tr>
-                <tr>
-                    <td></td>
-                    <td>{{ $t("tir.verylow") }} (&lt;54 mg/dl)</td>
-                    <td>{{ tir_verylow_percent }} %</td>
-                </tr>
+                <tbody>
+                    <tr>
+                        <td></td>
+                        <td>{{ $t("tir.veryhigh") }} (>250 mg/dl)</td>
+                        <td>{{ tir_veryhigh_percent }} %</td>
+                    </tr>
+                    <tr>
+                        <td style="vertical-align: bottom">
+                            <div class="barCell" id="tir_veryhigh"
+                                :style="'height: ' + tir_veryhigh_percent * tir_height + 'px'"></div>
+                            <div class="barCell" id="tir_high" :style="'height: ' + tir_high_percent * tir_height + 'px'"></div>
+                        </td>
+                        <td style="vertical-align: bottom">
+                            {{ $t("tir.high") }} (181-250 mg/dl)
+                        </td>
+                        <td style="vertical-align: bottom">{{ tir_high_percent }} %</td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div class="barCell" id="tir_target" :style="'height: ' + tir_target_percent * tir_height + 'px'">
+                            </div>
+                        </td>
+                        <td>{{ $t("tir.targetrange") }} (70-180 mg/dl)</td>
+                        <td>{{ tir_target_percent }} %</td>
+                    </tr>
+                    <tr>
+                        <td style="vertical-align: top">
+                            <div class="barCell" id="tir_low" :style="'height: ' + tir_low_percent * tir_height + 'px'"></div>
+                            <div class="barCell" id="tir_verylow" :style="'height: ' + tir_verylow_percent * tir_height + 'px'">
+                            </div>
+                        </td>
+                        <td style="vertical-align: top">
+                            <div style="vertical-align: top">
+                                {{ $t("tir.low") }} (54-69 mg/dl)
+                            </div>
+                        </td>
+                        <td style="vertical-align: top">
+                            <div style="vertical-align: top">{{ tir_low_percent }} %</div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td>{{ $t("tir.verylow") }} (&lt;54 mg/dl)</td>
+                        <td>{{ tir_verylow_percent }} %</td>
+                    </tr>
+                </tbody>
             </table>
         </div>
     </AccordionBox>
